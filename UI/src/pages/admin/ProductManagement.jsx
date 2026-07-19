@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, Typography, Popconfirm, Tag, Row, Col, message } from 'antd';
+import { Table, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, Typography, Popconfirm, Tag, Row, Col, message, Upload } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
+import { resolveProductImageUrl } from '../../utils/imageHelper';
+import { URLS } from '../../config/urlConfig';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -13,6 +15,7 @@ const ProductManagement = () => {
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [fileList, setFileList] = useState([]);
   const [form] = Form.useForm();
 
   const fetchProducts = async () => {
@@ -47,19 +50,31 @@ const ProductManagement = () => {
 
   const handleOpenAdd = () => {
     setEditingProduct(null);
+    setFileList([]);
     form.resetFields();
     setModalOpen(true);
   };
 
   const handleOpenEdit = (product) => {
     setEditingProduct(product);
+    
+    // Map existing product images to Upload file structure
+    const existingFiles = (product.imageUrls || []).map((url, index) => ({
+      uid: `-${index}`,
+      name: url.substring(url.lastIndexOf('/') + 1),
+      status: 'done',
+      url: resolveProductImageUrl(url, 'thumb'),
+      thumbUrl: resolveProductImageUrl(url, 'thumb'),
+      response: { success: true, data: [url] } // Backend response mock to match mapping on save
+    }));
+    setFileList(existingFiles);
+
     form.setFieldsValue({
       name: product.name,
       categoryId: product.categoryId,
       price: product.price,
       stockQuantity: product.stockQuantity,
       description: product.description,
-      imageUrls: product.imageUrls?.join('\n') || '',
       isActive: product.isActive
     });
     setModalOpen(true);
@@ -70,9 +85,34 @@ const ProductManagement = () => {
       const values = await form.validateFields();
       setLoading(true);
 
+      // Extract only image paths from fileList
+      const imageUrls = fileList
+        .map(file => {
+          // If newly uploaded
+          if (file.response && file.response.success && file.response.data && file.response.data.length > 0) {
+            return file.response.data[0];
+          }
+          // If already existing, clean to get only relative path (exclude host/port origin)
+          if (file.url) {
+            const urlStr = file.url;
+            if (urlStr.includes('/uploads/products/')) {
+              let relativePath = urlStr.substring(urlStr.indexOf('/uploads/products/'));
+              // Remove the suffix _thumb, _medium, _large before saving to DB
+              relativePath = relativePath
+                .replace('_thumb.webp', '.webp')
+                .replace('_medium.webp', '.webp')
+                .replace('_large.webp', '.webp');
+              return relativePath;
+            }
+            return urlStr; // External seeded URL as-is
+          }
+          return null;
+        })
+        .filter(Boolean);
+
       const parsedPayload = {
         ...values,
-        imageUrls: values.imageUrls ? values.imageUrls.split('\n').map(u => u.trim()).filter(Boolean) : []
+        imageUrls: imageUrls
       };
 
       if (editingProduct) {
@@ -131,7 +171,7 @@ const ProductManagement = () => {
       width: '80px',
       render: (urls) => (
         <img
-          src={urls?.[0] || 'https://via.placeholder.com/50?text=Toy'}
+          src={resolveProductImageUrl(urls?.[0], 'thumb')}
           alt="product"
           style={{ width: '45px', height: '45px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #f0f0f0' }}
         />
@@ -168,7 +208,7 @@ const ProductManagement = () => {
           />
           <Popconfirm
             title="Are you sure you want to delete this toy?"
-            description="Toy will be archived and hidden from customer pages."
+            description="Toy will be archived and archived from customer pages."
             onConfirm={() => handleDelete(record.id)}
             okText="Yes"
             cancelText="No"
@@ -289,11 +329,54 @@ const ProductManagement = () => {
           </Form.Item>
 
           <Form.Item
-            name="imageUrls"
-            label="Image URLs (one URL per line)"
-            help="Provide direct internet URLs to images of the toy."
+            label="Product Images (Maximum 4 images)"
+            help="Allowed formats: JPG, JPEG, PNG, WEBP. Max size: 5 MB per image."
           >
-            <Input.TextArea placeholder="https://example.com/toy-img-1.jpg&#10;https://example.com/toy-img-2.jpg" rows={4} />
+            <Upload
+              action={`${URLS.BASE_URL}/upload/products`}
+              headers={{
+                Authorization: `Bearer ${(() => {
+                  const adminAuth = localStorage.getItem('admin_auth');
+                  return adminAuth ? JSON.parse(adminAuth).token : '';
+                })()}`
+              }}
+              name="files"
+              multiple={true}
+              listType="picture-card"
+              fileList={fileList}
+              onChange={({ fileList: newFileList }) => setFileList(newFileList.slice(0, 4))}
+              beforeUpload={(file) => {
+                const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp' || file.type === 'image/jpg';
+                const extension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
+                const isValidFormat = isJpgOrPng || ['.jpg', '.jpeg', '.png', '.webp'].includes(extension);
+
+                if (!isValidFormat) {
+                  message.error(`Format of '${file.name}' is not allowed. Only JPG, JPEG, PNG, WEBP are supported.`);
+                  return Upload.LIST_IGNORE;
+                }
+
+                const isLt5M = file.size / 1024 / 1024 < 5;
+                if (!isLt5M) {
+                  message.error(`Image '${file.name}' exceeds the 5 MB size limit.`);
+                  return Upload.LIST_IGNORE;
+                }
+
+                // Check limit client side
+                if (fileList.length >= 4) {
+                  message.error("Maximum 4 images can be uploaded per product.");
+                  return Upload.LIST_IGNORE;
+                }
+
+                return true;
+              }}
+            >
+              {fileList.length < 4 && (
+                <div>
+                  <PlusOutlined />
+                  <div style={{ marginTop: 8 }}>Upload</div>
+                </div>
+              )}
+            </Upload>
           </Form.Item>
         </Form>
       </Modal>

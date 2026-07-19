@@ -4,6 +4,7 @@ import { Row, Col, Button, InputNumber, Space, Typography, Spin, Card, Tag, mess
 import { ShoppingCartOutlined, ThunderboltOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { CartContext } from '../../context/CartContext';
+import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -83,8 +84,9 @@ const ProductDetails = () => {
               height: '400px'
             }}>
               <img 
-                src={selectedImage} 
+                src={resolveProductImageUrl(selectedImage, 'large')} 
                 alt={product.name}
+                loading="lazy"
                 style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
               />
             </div>
@@ -110,7 +112,12 @@ const ProductDetails = () => {
                       padding: '4px'
                     }}
                   >
-                    <img src={url} alt={`preview ${index}`} style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} />
+                    <img 
+                      src={resolveProductImageUrl(url, 'thumb')} 
+                      alt={`preview ${index}`} 
+                      loading="lazy"
+                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }} 
+                    />
                   </div>
                 ))}
               </div>

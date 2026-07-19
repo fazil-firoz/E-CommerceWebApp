@@ -28,6 +28,9 @@ namespace ToyShop.Infrastructure
             services.AddScoped<IEmailService, EmailService>();
             services.AddSingleton<OtpStore>(); // Singleton so OTPs persist across requests
 
+            // Image processing service
+            services.AddScoped<IImageProcessor, ImageProcessor>();
+
             return services;
         }
     }
