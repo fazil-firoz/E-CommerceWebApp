@@ -1,0 +1,293 @@
+/* ── Animated Order Success / Fail Page ──────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+.order-result-wrapper {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', sans-serif;
+}
+
+.order-success-bg {
+  background: linear-gradient(135deg, #e8f5e9 0%, #f0f9ff 50%, #e8f5e9 100%);
+}
+
+.order-fail-bg {
+  background: linear-gradient(135deg, #fff2f0 0%, #fff7e6 50%, #fff2f0 100%);
+}
+
+/* Card */
+.order-result-card {
+  background: white;
+  border-radius: 24px;
+  padding: 48px 40px;
+  max-width: 460px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+  opacity: 0;
+  transform: translateY(30px) scale(0.97);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  position: relative;
+  z-index: 10;
+}
+
+.order-card-visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* ── SVG Checkmark ──────────────────────────────────────────── */
+.order-icon-wrap {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  margin: 0 auto 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.order-success-icon {
+  background: linear-gradient(135deg, #52c41a, #73d13d);
+  box-shadow: 0 8px 24px rgba(82, 196, 26, 0.35);
+}
+
+.order-fail-icon {
+  background: linear-gradient(135deg, #ff4d4f, #ff7875);
+  box-shadow: 0 8px 24px rgba(255, 77, 79, 0.35);
+}
+
+.order-check-svg,
+.order-x-svg {
+  width: 52px;
+  height: 52px;
+}
+
+/* Circle draw animation */
+.order-check-circle {
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 2;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: stroke-draw 0.6s cubic-bezier(0.65, 0, 0.45, 1) 0.2s forwards;
+}
+
+/* Tick draw animation */
+.order-check-tick {
+  stroke: white;
+  stroke-width: 3.5;
+  stroke-dasharray: 48;
+  stroke-dashoffset: 48;
+  animation: stroke-draw 0.4s cubic-bezier(0.65, 0, 0.45, 1) 0.7s forwards;
+}
+
+/* X circle */
+.order-x-circle {
+  stroke: rgba(255, 255, 255, 0.6);
+  stroke-width: 2;
+  stroke-dasharray: 166;
+  stroke-dashoffset: 166;
+  animation: stroke-draw 0.6s cubic-bezier(0.65, 0, 0.45, 1) 0.2s forwards;
+}
+
+/* X lines */
+.order-x-line {
+  stroke: white;
+  stroke-width: 3.5;
+  stroke-dasharray: 30;
+  stroke-dashoffset: 30;
+  animation: stroke-draw 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.7s forwards;
+}
+
+@keyframes stroke-draw {
+  to { stroke-dashoffset: 0; }
+}
+
+/* Icon pulse after draw */
+.order-success-icon {
+  animation: icon-appear 0.5s ease 0.1s both, icon-pulse 2s ease-in-out 1.5s infinite;
+}
+
+.order-fail-icon {
+  animation: icon-appear 0.5s ease 0.1s both;
+}
+
+@keyframes icon-appear {
+  from { transform: scale(0); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes icon-pulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(82, 196, 26, 0.35); }
+  50% { box-shadow: 0 8px 32px rgba(82, 196, 26, 0.55); }
+}
+
+/* ── Text Content ──────────────────────────────────────────── */
+.order-success-badge {
+  display: inline-block;
+  background: linear-gradient(90deg, #52c41a, #73d13d);
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 14px;
+  border-radius: 20px;
+  margin-bottom: 16px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  animation: fade-up 0.4s ease 0.85s both;
+}
+
+.order-title {
+  font-size: 26px;
+  font-weight: 800;
+  margin: 0 0 8px;
+  animation: fade-up 0.4s ease 0.9s both;
+}
+
+.order-success-title { color: #1a1a1a; }
+.order-fail-title { color: #ff4d4f; }
+
+.order-subtitle {
+  color: #8c8c8c;
+  font-size: 15px;
+  margin: 0 0 24px;
+  animation: fade-up 0.4s ease 0.95s both;
+}
+
+/* Order number box */
+.order-detail-box {
+  background: #f9f9f9;
+  border: 1px solid #f0f0f0;
+  border-radius: 12px;
+  padding: 14px 20px;
+  margin-bottom: 16px;
+  text-align: left;
+  animation: fade-up 0.4s ease 1s both;
+}
+
+.order-number-text {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 800;
+  font-family: 'Courier New', monospace;
+  color: #1a1a1a;
+  letter-spacing: 1px;
+}
+
+.order-fail-box {
+  border-color: #ffccc7;
+  background: #fff2f0;
+}
+
+/* Status chips */
+.order-info-row {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  animation: fade-up 0.4s ease 1.05s both;
+}
+
+.order-info-chip {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 6px 14px;
+  border-radius: 20px;
+}
+
+.order-info-chip-green {
+  background: #f6ffed;
+  color: #52c41a;
+  border: 1px solid #b7eb8f;
+}
+
+.order-info-chip-blue {
+  background: #e6f4ff;
+  color: #1677ff;
+  border: 1px solid #91caff;
+}
+
+.order-track-note {
+  font-size: 13px;
+  color: #8c8c8c;
+  line-height: 1.6;
+  margin-bottom: 28px;
+  animation: fade-up 0.4s ease 1.1s both;
+}
+
+/* Action buttons */
+.order-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fade-up 0.4s ease 1.15s both;
+}
+
+.order-continue-btn {
+  background: linear-gradient(90deg, #0066cc, #0080ff) !important;
+  border: none !important;
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3) !important;
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Confetti ──────────────────────────────────────────────── */
+.confetti-container {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  top: -20px;
+  left: calc(var(--i) * 5.5%);
+  animation: confetti-fall calc(2s + var(--i) * 0.1s) ease-in calc(var(--i) * 0.08s) forwards;
+  border-radius: 2px;
+}
+
+.confetti-0 { background: #52c41a; width: 8px; height: 14px; }
+.confetti-1 { background: #1677ff; width: 12px; height: 8px; border-radius: 50%; }
+.confetti-2 { background: #faad14; width: 10px; height: 10px; }
+.confetti-3 { background: #eb2f96; width: 8px; height: 8px; border-radius: 50%; }
+.confetti-4 { background: #722ed1; width: 10px; height: 14px; }
+.confetti-5 { background: #13c2c2; width: 14px; height: 6px; }
+
+@keyframes confetti-fall {
+  0% {
+    top: -20px;
+    transform: rotate(0deg) translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: rotate(180deg) translateX(calc(var(--i) * 3px - 30px));
+  }
+  100% {
+    top: 110vh;
+    transform: rotate(360deg) translateX(calc(var(--i) * -3px + 30px));
+    opacity: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .order-result-card {
+    padding: 36px 24px;
+  }
+  .order-title {
+    font-size: 22px;
+  }
+}
