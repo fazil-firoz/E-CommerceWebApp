@@ -1,0 +1,28 @@
+# === .NET Core / Visual Studio ===
+.vs/
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# === Node / React ===
+node_modules/
+dist/
+dist-ssr/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# === IDEs / OS ===
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# === Application Uploads ===
+# We want to ignore actual upload files but keep the uploads directory
+wwwroot/uploads/products/*
+!wwwroot/uploads/products/.gitkeep
