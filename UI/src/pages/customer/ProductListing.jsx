@@ -5,6 +5,7 @@ import { SearchOutlined, AppstoreOutlined, ShoppingCartOutlined, ThunderboltOutl
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
 import { CartContext } from '../../context/CartContext';
+import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Text } = Typography;
 
@@ -189,13 +190,28 @@ const ProductListing = () => {
                     hoverable
                     cover={
                       <div
-                        style={{ position: 'relative', overflow: 'hidden', borderTopLeftRadius: '16px', borderTopRightRadius: '16px', cursor: 'pointer' }}
+                        style={{ 
+                          position: 'relative', 
+                          overflow: 'hidden', 
+                          borderTopLeftRadius: '16px', 
+                          borderTopRightRadius: '16px', 
+                          cursor: 'pointer',
+                          width: '100%',
+                          aspectRatio: '4/3' // Fixed aspect ratio container
+                        }}
                         onClick={() => navigate(`/products/${prod.id}`)}
                       >
                         <img
                           alt={prod.name}
-                          src={prod.imageUrls?.[0] || 'https://via.placeholder.com/200?text=Toy'}
-                          style={{ height: '200px', width: '100%', objectFit: 'cover', display: 'block', transition: 'transform 0.3s ease' }}
+                          src={resolveProductImageUrl(prod.imageUrls?.[0], 'thumb')}
+                          loading="lazy" // Lazy loading enabled
+                          style={{ 
+                            height: '100%', 
+                            width: '100%', 
+                            objectFit: 'cover', // object-fit: cover
+                            display: 'block', 
+                            transition: 'transform 0.3s ease' 
+                          }}
                           onMouseOver={e => e.currentTarget.style.transform = 'scale(1.04)'}
                           onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
                         />
