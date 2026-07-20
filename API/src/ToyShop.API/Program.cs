@@ -97,7 +97,7 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
-// Automatically run database migrations for ProductImage updates (IsMain, ZoomScale)
+// Automatically run database migrations and sync primary key sequences
 using (var scope = app.Services.CreateScope())
 {
     try
@@ -106,7 +106,17 @@ using (var scope = app.Services.CreateScope())
         Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(
             context.Database, 
             @"ALTER TABLE ""ProductImages"" ADD COLUMN IF NOT EXISTS ""IsMain"" BOOLEAN NOT NULL DEFAULT FALSE;
-              ALTER TABLE ""ProductImages"" ADD COLUMN IF NOT EXISTS ""ZoomScale"" DOUBLE PRECISION NOT NULL DEFAULT 1.0;"
+              ALTER TABLE ""ProductImages"" ADD COLUMN IF NOT EXISTS ""ZoomScale"" DOUBLE PRECISION NOT NULL DEFAULT 1.0;
+
+              SELECT setval('""Categories_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Categories""), 1));
+              SELECT setval('""Products_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Products""), 1));
+              SELECT setval('""ProductImages_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""ProductImages""), 1));
+              SELECT setval('""Customers_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Customers""), 1));
+              SELECT setval('""Addresses_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Addresses""), 1));
+              SELECT setval('""Orders_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Orders""), 1));
+              SELECT setval('""OrderItems_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""OrderItems""), 1));
+              SELECT setval('""Payments_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Payments""), 1));
+              SELECT setval('""Admins_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Admins""), 1));"
         );
     }
     catch (System.Exception ex)

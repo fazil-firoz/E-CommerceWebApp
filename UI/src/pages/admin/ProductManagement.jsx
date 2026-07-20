@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, Typography, Popconfirm, Tag, Row, Col, message, Upload, Slider, Card } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
@@ -16,12 +16,18 @@ const ProductManagement = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [fileList, setFileList] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [searchText, setSearchText] = useState('');
   const [form] = Form.useForm();
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (catId = selectedCategory, search = searchText) => {
     setLoading(true);
     try {
-      const response = await productApi.getAll({ adminMode: true });
+      const params = { adminMode: true };
+      if (catId) params.categoryId = catId;
+      if (search && search.trim()) params.search = search.trim();
+
+      const response = await productApi.getAll(params);
       if (response.success) {
         setProducts(response.data || []);
       }
@@ -309,6 +315,69 @@ const ProductManagement = () => {
           Add Toy
         </Button>
       </div>
+
+      {/* Search & Filter Bar */}
+      <Card size="small" style={{ borderRadius: '12px', background: '#fafafa', borderColor: '#f0f0f0' }}>
+        <Row gutter={[16, 16]} align="middle">
+          <Col xs={24} sm={10} md={9}>
+            <Input
+              placeholder="Search toy name..."
+              prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+              allowClear
+              value={searchText}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSearchText(val);
+                if (!val) {
+                  fetchProducts(selectedCategory, '');
+                }
+              }}
+              onPressEnter={() => fetchProducts(selectedCategory, searchText)}
+            />
+          </Col>
+          <Col xs={24} sm={10} md={9}>
+            <Select
+              placeholder="Filter by Category"
+              style={{ width: '100%' }}
+              allowClear
+              value={selectedCategory}
+              onChange={(val) => {
+                setSelectedCategory(val);
+                fetchProducts(val, searchText);
+              }}
+            >
+              {categories.map((cat) => (
+                <Option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </Option>
+              ))}
+            </Select>
+          </Col>
+          <Col xs={24} sm={4} md={6} style={{ display: 'flex', gap: '8px' }}>
+            <Button
+              type="primary"
+              icon={<SearchOutlined />}
+              onClick={() => fetchProducts(selectedCategory, searchText)}
+              style={{ borderRadius: '6px' }}
+            >
+              Search
+            </Button>
+            {(selectedCategory !== null || searchText) && (
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={() => {
+                  setSelectedCategory(null);
+                  setSearchText('');
+                  fetchProducts(null, '');
+                }}
+                style={{ borderRadius: '6px' }}
+              >
+                Reset
+              </Button>
+            )}
+          </Col>
+        </Row>
+      </Card>
 
       <Table
         dataSource={products}
