@@ -390,22 +390,19 @@ const ProductManagement = () => {
               listType="picture-card"
               fileList={fileList}
               onChange={({ fileList: newFileList }) => {
-                // Preserving custom values (isMain, zoomScale) when upload state changes
-                const updated = newFileList.map((newFile, idx) => {
+                // Mutate the original File/RcFile object reference directly to preserve prototypes and uploader methods
+                newFileList.forEach((newFile, idx) => {
                   const existing = fileList.find(f => f.uid === newFile.uid);
-                  return {
-                    ...newFile,
-                    isMain: existing ? existing.isMain : (fileList.length === 0 && idx === 0),
-                    zoomScale: existing ? existing.zoomScale : 1.0
-                  };
+                  newFile.isMain = existing ? existing.isMain : (fileList.length === 0 && idx === 0);
+                  newFile.zoomScale = existing ? existing.zoomScale : 1.0;
                 });
 
                 // Auto-flag first one if no main exists
-                if (updated.length > 0 && !updated.some(f => f.isMain)) {
-                  updated[0].isMain = true;
+                if (newFileList.length > 0 && !newFileList.some(f => f.isMain)) {
+                  newFileList[0].isMain = true;
                 }
 
-                setFileList(updated.slice(0, 4));
+                setFileList(newFileList.slice(0, 4));
               }}
               beforeUpload={(file) => {
                 const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp' || file.type === 'image/jpg';
@@ -524,11 +521,11 @@ const ProductManagement = () => {
                                   borderColor: isMain ? '#52c41a' : undefined
                                 }}
                                 onClick={() => {
-                                  const updated = fileList.map((f, fIdx) => ({
-                                    ...f,
-                                    isMain: fIdx === idx
-                                  }));
-                                  setFileList(updated);
+                                  const updated = fileList.map((f, fIdx) => {
+                                    f.isMain = fIdx === idx;
+                                    return f;
+                                  });
+                                  setFileList([...updated]);
                                 }}
                               >
                                 {isMain ? "✓ Card Main Image" : "Set as Main Card"}
