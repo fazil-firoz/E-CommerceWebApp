@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, Typography, Popconfirm, Tag, Row, Col, message, Upload } from 'antd';
+import { Table, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, Typography, Popconfirm, Tag, Row, Col, message, Upload, Slider } from 'antd';
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
@@ -59,13 +59,23 @@ const ProductManagement = () => {
     setEditingProduct(product);
     
     // Map existing product images to Upload file structure
-    const existingFiles = (product.imageUrls || []).map((url, index) => ({
+    const imagesSource = product.images && product.images.length > 0
+      ? product.images
+      : (product.imageUrls || []).map((url, idx) => ({
+          imageUrl: url,
+          isMain: idx === 0,
+          zoomScale: 1.0
+        }));
+
+    const existingFiles = imagesSource.map((img, index) => ({
       uid: `-${index}`,
-      name: url.substring(url.lastIndexOf('/') + 1),
+      name: img.imageUrl.substring(img.imageUrl.lastIndexOf('/') + 1),
       status: 'done',
-      url: resolveProductImageUrl(url, 'thumb'),
-      thumbUrl: resolveProductImageUrl(url, 'thumb'),
-      response: { success: true, data: [url] } // Backend response mock to match mapping on save
+      url: resolveProductImageUrl(img.imageUrl, 'thumb'),
+      thumbUrl: resolveProductImageUrl(img.imageUrl, 'thumb'),
+      isMain: img.isMain,
+      zoomScale: img.zoomScale,
+      response: { success: true, data: [img.imageUrl] } // Backend mock response
     }));
     setFileList(existingFiles);
 
@@ -86,14 +96,12 @@ const ProductManagement = () => {
       setLoading(true);
 
       // Extract only image paths from fileList
-      const imageUrls = fileList
-        .map(file => {
-          // If newly uploaded
+      const imagesPayload = fileList
+        .map((file, idx) => {
+          let url = '';
           if (file.response && file.response.success && file.response.data && file.response.data.length > 0) {
-            return file.response.data[0];
-          }
-          // If already existing, clean to get only relative path (exclude host/port origin)
-          if (file.url) {
+            url = file.response.data[0];
+          } else if (file.url) {
             const urlStr = file.url;
             if (urlStr.includes('/uploads/products/')) {
               let relativePath = urlStr.substring(urlStr.indexOf('/uploads/products/'));
@@ -102,17 +110,30 @@ const ProductManagement = () => {
                 .replace('_thumb.webp', '.webp')
                 .replace('_medium.webp', '.webp')
                 .replace('_large.webp', '.webp');
-              return relativePath;
+              url = relativePath;
+            } else {
+              url = urlStr; // External seeded URL as-is
             }
-            return urlStr; // External seeded URL as-is
           }
-          return null;
+
+          if (!url) return null;
+
+          return {
+            imageUrl: url,
+            isMain: file.isMain || false,
+            zoomScale: file.zoomScale || 1.0
+          };
         })
         .filter(Boolean);
 
+      // Enforce at least one main image
+      if (imagesPayload.length > 0 && !imagesPayload.some(img => img.isMain)) {
+        imagesPayload[0].isMain = true;
+      }
+
       const parsedPayload = {
         ...values,
-        imageUrls: imageUrls
+        images: imagesPayload
       };
 
       if (editingProduct) {
@@ -166,16 +187,40 @@ const ProductManagement = () => {
   const columns = [
     {
       title: 'Preview',
-      dataIndex: 'imageUrls',
-      key: 'imageUrls',
+      dataIndex: 'images',
+      key: 'images',
       width: '80px',
-      render: (urls) => (
-        <img
-          src={resolveProductImageUrl(urls?.[0], 'thumb')}
-          alt="product"
-          style={{ width: '45px', height: '45px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #f0f0f0' }}
-        />
-      )
+      render: (images, record) => {
+        // Find main image
+        const mainImage = (images && images.length > 0) 
+          ? images.find(img => img.isMain) 
+          : { imageUrl: record.imageUrls?.[0], zoomScale: 1.0 };
+        const previewUrl = mainImage?.imageUrl || record.imageUrls?.[0];
+        const zoom = mainImage?.zoomScale || 1.0;
+
+        return (
+          <div style={{
+            width: '45px',
+            height: '45px',
+            borderRadius: '8px',
+            overflow: 'hidden',
+            border: '1px solid #f0f0f0',
+            position: 'relative'
+          }}>
+            <img
+              src={resolveProductImageUrl(previewUrl, 'thumb')}
+              alt="product"
+              style={{ 
+                width: '100%', 
+                height: '100%', 
+                objectFit: 'cover', 
+                transform: `scale(${zoom})`,
+                display: 'block' 
+              }}
+            />
+          </div>
+        );
+      }
     },
     { title: 'Toy Name', dataIndex: 'name', key: 'name', fontWeight: 'bold', render: (text) => <strong>{text}</strong> },
     { title: 'Category', dataIndex: 'categoryName', key: 'categoryName' },
@@ -257,7 +302,7 @@ const ProductManagement = () => {
         onCancel={() => setModalOpen(false)}
         confirmLoading={loading}
         destroyOnClose
-        width={600}
+        width={650}
         style={{ borderRadius: '16px' }}
       >
         <Form
@@ -344,7 +389,24 @@ const ProductManagement = () => {
               multiple={true}
               listType="picture-card"
               fileList={fileList}
-              onChange={({ fileList: newFileList }) => setFileList(newFileList.slice(0, 4))}
+              onChange={({ fileList: newFileList }) => {
+                // Preserving custom values (isMain, zoomScale) when upload state changes
+                const updated = newFileList.map((newFile, idx) => {
+                  const existing = fileList.find(f => f.uid === newFile.uid);
+                  return {
+                    ...newFile,
+                    isMain: existing ? existing.isMain : (fileList.length === 0 && idx === 0),
+                    zoomScale: existing ? existing.zoomScale : 1.0
+                  };
+                });
+
+                // Auto-flag first one if no main exists
+                if (updated.length > 0 && !updated.some(f => f.isMain)) {
+                  updated[0].isMain = true;
+                }
+
+                setFileList(updated.slice(0, 4));
+              }}
               beforeUpload={(file) => {
                 const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png' || file.type === 'image/webp' || file.type === 'image/jpg';
                 const extension = file.name.substring(file.name.lastIndexOf('.')).toLowerCase();
@@ -378,6 +440,129 @@ const ProductManagement = () => {
               )}
             </Upload>
           </Form.Item>
+
+          {/* Interactive Card Presentation Tuning Section */}
+          <div style={{ marginTop: '20px', borderTop: '1px solid #f0f0f0', paddingTop: '16px' }}>
+            <Text strong style={{ display: 'block', marginBottom: '12px', fontSize: '14px', color: '#262626' }}>
+              🖼️ Customize Card Presentation Settings
+            </Text>
+            {fileList.length === 0 ? (
+              <Text type="secondary" style={{ fontStyle: 'italic', fontSize: '13px' }}>
+                Upload images above to adjust card display settings.
+              </Text>
+            ) : (
+              <Row gutter={[12, 12]}>
+                {fileList.map((file, idx) => {
+                  let previewUrl = '';
+                  if (file.url) {
+                    previewUrl = file.url;
+                  } else if (file.response && file.response.success && file.response.data && file.response.data.length > 0) {
+                    previewUrl = resolveProductImageUrl(file.response.data[0], 'thumb');
+                  } else if (file.thumbUrl) {
+                    previewUrl = file.thumbUrl;
+                  }
+
+                  const zoom = file.zoomScale || 1.0;
+                  const isMain = file.isMain || false;
+
+                  return (
+                    <Col span={24} key={file.uid || idx}>
+                      <Card 
+                        size="small" 
+                        style={{ 
+                          borderRadius: '12px', 
+                          background: isMain ? '#f6ffed' : '#ffffff', 
+                          border: isMain ? '1px solid #b7eb8f' : '1px solid #f0f0f0' 
+                        }}
+                      >
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap' }}>
+                          
+                          {/* Live Aspect-Ratio Card Preview Box */}
+                          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px' }}>
+                            <div style={{
+                              width: '100px',
+                              height: '75px', // Enforces aspect ratio (4:3)
+                              borderRadius: '8px',
+                              overflow: 'hidden',
+                              position: 'relative',
+                              border: '1px solid #d9d9d9',
+                              background: '#fafafa'
+                            }}>
+                              {previewUrl ? (
+                                <img
+                                  src={previewUrl}
+                                  alt="Card preview"
+                                  style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    objectFit: 'cover',
+                                    transform: `scale(${zoom})`,
+                                    transition: 'transform 0.1s ease',
+                                    display: 'block'
+                                  }}
+                                />
+                              ) : (
+                                <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#bfbfbf', fontSize: '11px' }}>
+                                  Uploading...
+                                </div>
+                              )}
+                            </div>
+                            <Text type="secondary" style={{ fontSize: '11px', fontWeight: 600 }}>Card Preview</Text>
+                          </div>
+
+                          {/* Control Controls */}
+                          <div style={{ flex: 1, minWidth: '220px' }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                              <Text strong style={{ fontSize: '13px' }}>Image #{idx + 1}</Text>
+                              <Button
+                                type={isMain ? "primary" : "default"}
+                                size="small"
+                                style={{ 
+                                  borderRadius: '6px', 
+                                  fontSize: '12px',
+                                  background: isMain ? '#52c41a' : undefined,
+                                  borderColor: isMain ? '#52c41a' : undefined
+                                }}
+                                onClick={() => {
+                                  const updated = fileList.map((f, fIdx) => ({
+                                    ...f,
+                                    isMain: fIdx === idx
+                                  }));
+                                  setFileList(updated);
+                                }}
+                              >
+                                {isMain ? "✓ Card Main Image" : "Set as Main Card"}
+                              </Button>
+                            </div>
+                            
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                              <span style={{ fontSize: '12px', color: '#595959', width: '70px' }}>Card Zoom:</span>
+                              <Slider
+                                min={1.0}
+                                max={2.5}
+                                step={0.1}
+                                value={zoom}
+                                onChange={(val) => {
+                                  const updated = [...fileList];
+                                  updated[idx].zoomScale = val;
+                                  setFileList(updated);
+                                }}
+                                style={{ flex: 1, margin: '0 8px' }}
+                              />
+                              <span style={{ fontSize: '12px', fontWeight: 600, color: '#1890ff', width: '35px', textAlign: 'right' }}>
+                                {zoom.toFixed(1)}x
+                              </span>
+                            </div>
+                          </div>
+
+                        </div>
+                      </Card>
+                    </Col>
+                  );
+                })}
+              </Row>
+            )}
+          </div>
         </Form>
       </Modal>
     </Space>

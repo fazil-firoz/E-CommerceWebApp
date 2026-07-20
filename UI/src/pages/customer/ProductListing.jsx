@@ -201,20 +201,27 @@ const ProductListing = () => {
                         }}
                         onClick={() => navigate(`/products/${prod.id}`)}
                       >
-                        <img
-                          alt={prod.name}
-                          src={resolveProductImageUrl(prod.imageUrls?.[0], 'thumb')}
-                          loading="lazy" // Lazy loading enabled
-                          style={{ 
-                            height: '100%', 
-                            width: '100%', 
-                            objectFit: 'cover', // object-fit: cover
-                            display: 'block', 
-                            transition: 'transform 0.3s ease' 
-                          }}
-                          onMouseOver={e => e.currentTarget.style.transform = 'scale(1.04)'}
-                          onMouseOut={e => e.currentTarget.style.transform = 'scale(1)'}
-                        />
+                        {(() => {
+                          const mainImage = prod.images?.find(img => img.isMain) || { imageUrl: prod.imageUrls?.[0], zoomScale: 1.0 };
+                          const zoom = mainImage?.zoomScale || 1.0;
+                          return (
+                            <img
+                              alt={prod.name}
+                              src={resolveProductImageUrl(mainImage?.imageUrl, 'thumb')}
+                              loading="lazy"
+                              style={{ 
+                                height: '100%', 
+                                width: '100%', 
+                                objectFit: 'cover', 
+                                display: 'block', 
+                                transform: `scale(${zoom})`,
+                                transition: 'transform 0.3s ease' 
+                              }}
+                              onMouseOver={e => e.currentTarget.style.transform = `scale(${zoom * 1.04})`}
+                              onMouseOut={e => e.currentTarget.style.transform = `scale(${zoom})`}
+                            />
+                          );
+                        })()}
                         {prod.stockQuantity === 0 && (
                           <div style={{
                             position: 'absolute', inset: 0,

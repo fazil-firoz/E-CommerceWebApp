@@ -97,6 +97,24 @@ builder.Services.AddAuthentication(options =>
 
 var app = builder.Build();
 
+// Automatically run database migrations for ProductImage updates (IsMain, ZoomScale)
+using (var scope = app.Services.CreateScope())
+{
+    try
+    {
+        var context = scope.ServiceProvider.GetRequiredService<ToyShop.Infrastructure.Persistence.ApplicationDbContext>();
+        Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(
+            context.Database, 
+            @"ALTER TABLE ""ProductImages"" ADD COLUMN IF NOT EXISTS ""IsMain"" BOOLEAN NOT NULL DEFAULT FALSE;
+              ALTER TABLE ""ProductImages"" ADD COLUMN IF NOT EXISTS ""ZoomScale"" DOUBLE PRECISION NOT NULL DEFAULT 1.0;"
+        );
+    }
+    catch (System.Exception ex)
+    {
+        System.Console.WriteLine($"Database migration error: {ex.Message}");
+    }
+}
+
 // Configure the HTTP request pipeline.
 // Always show Swagger for easy API testing
 app.UseSwagger();

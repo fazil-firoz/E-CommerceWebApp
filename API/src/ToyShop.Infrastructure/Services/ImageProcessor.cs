@@ -37,7 +37,8 @@ namespace ToyShop.Infrastructure.Services
             // Load original image using ImageSharp
             using var image = await Image.LoadAsync(imageStream, cancellationToken);
 
-            var webpEncoder = new WebpEncoder { Quality = 85 };
+            // Compress and convert to WebP with a balanced quality of 75 (optimal size/quality ratio)
+            var webpEncoder = new WebpEncoder { Quality = 75 };
 
             // 1. Generate Large Image (Max width/height 1200px)
             using (var largeImg = image.Clone(x => x.Resize(new ResizeOptions
