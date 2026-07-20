@@ -93,11 +93,27 @@ const ProductManagement = () => {
   const handleSave = async () => {
     try {
       const values = await form.validateFields();
+
+      // Check if any files are still uploading
+      const stillUploading = fileList.some(f => f.status === 'uploading');
+      if (stillUploading) {
+        message.warning('Please wait for all images to finish uploading before saving.');
+        return;
+      }
+
+      // Check for failed uploads
+      const failedFiles = fileList.filter(f => f.status === 'error');
+      if (failedFiles.length > 0) {
+        message.error('Some images failed to upload. Please remove them and try again.');
+        return;
+      }
+
       setLoading(true);
 
       // Extract only image paths from fileList
       const imagesPayload = fileList
-        .map((file, idx) => {
+        .filter(file => file.status === 'done') // Only include successfully uploaded files
+        .map((file) => {
           let url = '';
           if (file.response && file.response.success && file.response.data && file.response.data.length > 0) {
             url = file.response.data[0];
@@ -136,6 +152,8 @@ const ProductManagement = () => {
         images: imagesPayload
       };
 
+      console.log('Saving product with payload:', JSON.stringify(parsedPayload, null, 2));
+
       if (editingProduct) {
         // Edit product
         const response = await productApi.update(editingProduct.id, {
@@ -161,7 +179,12 @@ const ProductManagement = () => {
         }
       }
     } catch (err) {
-      // Form validation failed
+      console.error('Save product error:', err);
+      if (err?.message) {
+        message.error(err.message);
+      } else if (err?.errors) {
+        message.error(err.errors.join(', '));
+      }
     } finally {
       setLoading(false);
     }
