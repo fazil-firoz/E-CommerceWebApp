@@ -27,7 +27,12 @@ namespace ToyShop.Application.Features.Orders
     }
 
     // Queries
-    public record GetOrdersQuery : IRequest<BaseResponse<List<OrderDto>>>;
+    public record GetOrdersQuery(
+        int? OrderStatus = null,
+        DateTimeOffset? StartDate = null,
+        DateTimeOffset? EndDate = null,
+        string? Search = null
+    ) : IRequest<BaseResponse<List<OrderDto>>>;
 
     public record GetOrderByIdQuery(int Id) : IRequest<BaseResponse<OrderDto>>;
 
@@ -70,11 +75,38 @@ namespace ToyShop.Application.Features.Orders
 
         public async Task<BaseResponse<List<OrderDto>>> Handle(GetOrdersQuery request, CancellationToken cancellationToken)
         {
-            var orders = await _orderRepository.Query()
+            var query = _orderRepository.Query()
                 .Include(o => o.Customer)
                 .Include(o => o.Address)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
+                .AsQueryable();
+
+            if (request.OrderStatus.HasValue)
+            {
+                query = query.Where(o => (int)o.OrderStatus == request.OrderStatus.Value);
+            }
+
+            if (request.StartDate.HasValue)
+            {
+                query = query.Where(o => o.OrderDate >= request.StartDate.Value);
+            }
+
+            if (request.EndDate.HasValue)
+            {
+                query = query.Where(o => o.OrderDate <= request.EndDate.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.Search))
+            {
+                var s = request.Search.ToLower();
+                query = query.Where(o => o.OrderNumber.ToLower().Contains(s) ||
+                                         (o.CustomerEmail != null && o.CustomerEmail.ToLower().Contains(s)) ||
+                                         (o.CustomerPhone != null && o.CustomerPhone.Contains(s)) ||
+                                         (o.Customer != null && o.Customer.Name.ToLower().Contains(s)));
+            }
+
+            var orders = await query
                 .OrderByDescending(o => o.OrderDate)
                 .Select(o => MapToDto(o))
                 .ToListAsync(cancellationToken);

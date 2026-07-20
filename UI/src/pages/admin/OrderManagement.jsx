@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Select, Tag, Space, Typography, Card, Row, Col, Divider, message } from 'antd';
-import { EyeOutlined, SendOutlined, TruckOutlined } from '@ant-design/icons';
+import { Table, Button, Modal, Form, Input, Select, Tag, Space, Typography, Card, Row, Col, Divider, message, DatePicker } from 'antd';
+import { EyeOutlined, SendOutlined, TruckOutlined, SearchOutlined, ReloadOutlined, FilterOutlined } from '@ant-design/icons';
 import { orderApi } from '../../api/orderApi';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
+const { RangePicker } = DatePicker;
 
 const STATUS_MAP = {
   'Pending': 0, 'Paid': 1, 'Packed': 2, 'Shipped': 3, 'Delivered': 4, 'Cancelled': 5
@@ -21,16 +22,29 @@ const OrderManagement = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
 
+  // Filters state
+  const [statusFilter, setStatusFilter] = useState(null);
+  const [dateRange, setDateRange] = useState(null);
+  const [searchText, setSearchText] = useState('');
+
   // Shipping modal state
   const [shippingModalOpen, setShippingModalOpen] = useState(false);
   const [pendingStatusChange, setPendingStatusChange] = useState(null); // { orderId, newStatus }
   const [shippingForm] = Form.useForm();
   const [shippingLoading, setShippingLoading] = useState(false);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (status = statusFilter, dates = dateRange, search = searchText) => {
     setLoading(true);
     try {
-      const response = await orderApi.getAll();
+      const params = {};
+      if (status !== null && status !== undefined) params.orderStatus = status;
+      if (dates && dates[0] && dates[1]) {
+        params.startDate = dates[0].startOf('day').toISOString();
+        params.endDate = dates[1].endOf('day').toISOString();
+      }
+      if (search && search.trim()) params.search = search.trim();
+
+      const response = await orderApi.getAll(params);
       if (response.success) setOrders(response.data || []);
     } catch (err) {
       message.error('Failed to fetch orders');
@@ -160,6 +174,82 @@ const OrderManagement = () => {
       <div>
         <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Order Management</Title>
       </div>
+
+      {/* Search & Filter Bar */}
+      <Card size="small" style={{ borderRadius: '12px', background: '#fafafa', borderColor: '#f0f0f0' }}>
+        <Row gutter={[16, 16]} align="middle">
+          <Col xs={24} sm={12} md={7}>
+            <Input
+              placeholder="Search Order #, Customer, Phone..."
+              prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
+              allowClear
+              value={searchText}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSearchText(val);
+                if (!val) {
+                  fetchOrders(statusFilter, dateRange, '');
+                }
+              }}
+              onPressEnter={() => fetchOrders(statusFilter, dateRange, searchText)}
+            />
+          </Col>
+          <Col xs={24} sm={12} md={5}>
+            <Select
+              placeholder="Filter by Status"
+              style={{ width: '100%' }}
+              allowClear
+              value={statusFilter}
+              onChange={(val) => {
+                setStatusFilter(val);
+                fetchOrders(val, dateRange, searchText);
+              }}
+            >
+              <Option value={0}>Pending</Option>
+              <Option value={1}>Paid</Option>
+              <Option value={2}>Packed</Option>
+              <Option value={3}>Shipped</Option>
+              <Option value={4}>Delivered</Option>
+              <Option value={5}>Cancelled</Option>
+            </Select>
+          </Col>
+          <Col xs={24} sm={16} md={8}>
+            <RangePicker
+              style={{ width: '100%' }}
+              value={dateRange}
+              onChange={(dates) => {
+                setDateRange(dates);
+                fetchOrders(statusFilter, dates, searchText);
+              }}
+              format="DD/MM/YYYY"
+            />
+          </Col>
+          <Col xs={24} sm={8} md={4} style={{ display: 'flex', gap: '8px' }}>
+            <Button
+              type="primary"
+              icon={<SearchOutlined />}
+              onClick={() => fetchOrders(statusFilter, dateRange, searchText)}
+              style={{ borderRadius: '6px' }}
+            >
+              Search
+            </Button>
+            {(statusFilter !== null || dateRange !== null || searchText) && (
+              <Button
+                icon={<ReloadOutlined />}
+                onClick={() => {
+                  setStatusFilter(null);
+                  setDateRange(null);
+                  setSearchText('');
+                  fetchOrders(null, null, '');
+                }}
+                style={{ borderRadius: '6px' }}
+              >
+                Reset
+              </Button>
+            )}
+          </Col>
+        </Row>
+      </Card>
 
       <Table dataSource={orders} columns={columns} rowKey="id" loading={loading} pagination={{ pageSize: 10 }} />
 
