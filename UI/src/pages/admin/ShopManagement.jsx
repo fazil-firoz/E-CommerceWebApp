@@ -42,13 +42,13 @@ const ShopManagement = () => {
       const values = await authForm.validateFields();
       setVerifying(true);
 
-      // Verify credentials against admin authentication API
-      const response = await adminApi.login({
+      // Verify credentials against Super Admin endpoint
+      const response = await shopApi.verifySuperAdmin({
         username: values.username,
         password: values.password
       });
 
-      if (response.success && response.data) {
+      if (response.success) {
         sessionStorage.setItem('super_admin_unlocked', 'true');
         setIsUnlocked(true);
         setAuthModalOpen(false);

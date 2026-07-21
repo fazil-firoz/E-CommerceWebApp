@@ -7,4 +7,5 @@ export const shopApi = {
   uploadLogo: (formData) => apiClient.post(`${URLS.BASE_URL}/shop/upload-logo`, formData, {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
+  verifySuperAdmin: (data) => apiClient.post(`${URLS.BASE_URL}/shop/verify-super-admin`, data),
 };

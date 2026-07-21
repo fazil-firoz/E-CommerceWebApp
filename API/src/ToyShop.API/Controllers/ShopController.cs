@@ -14,10 +14,12 @@ namespace ToyShop.API.Controllers
     public class ShopController : BaseApiController
     {
         private readonly IWebHostEnvironment _environment;
+        private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
 
-        public ShopController(IWebHostEnvironment environment)
+        public ShopController(IWebHostEnvironment environment, Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
             _environment = environment;
+            _configuration = configuration;
         }
 
         /// <summary>
@@ -40,6 +42,29 @@ namespace ToyShop.API.Controllers
             var result = await Mediator.Send(new UpdateShopCommand(request));
             if (!result.Success) return BadRequest(result);
             return Ok(result);
+        }
+
+        /// <summary>
+        /// Verify Super Admin credentials from appsettings.json
+        /// </summary>
+        [HttpPost("verify-super-admin")]
+        [Authorize(Roles = "Admin")]
+        public ActionResult<BaseResponse<bool>> VerifySuperAdmin([FromBody] SuperAdminVerifyRequest request)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Username) || string.IsNullOrWhiteSpace(request.Password))
+            {
+                return BadRequest(BaseResponse<bool>.Fail("Username and Password are required"));
+            }
+
+            var configuredUsername = _configuration["SuperAdminSettings:Username"] ?? "superadmin";
+            var configuredPassword = _configuration["SuperAdminSettings:Password"] ?? "superadmin@firoz";
+
+            if (request.Username.Trim() == configuredUsername && request.Password == configuredPassword)
+            {
+                return Ok(BaseResponse<bool>.Ok(true, "Super Admin access granted"));
+            }
+
+            return BadRequest(BaseResponse<bool>.Fail("Invalid Super Admin credentials"));
         }
 
         /// <summary>
@@ -87,5 +112,14 @@ namespace ToyShop.API.Controllers
     public class ShopLogoUploadRequest
     {
         public IFormFile File { get; set; } = null!;
+    }
+
+    /// <summary>
+    /// Request model for Super Admin verification
+    /// </summary>
+    public class SuperAdminVerifyRequest
+    {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 }
