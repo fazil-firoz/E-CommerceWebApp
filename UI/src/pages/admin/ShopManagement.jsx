@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Card, Tabs, Row, Col, Typography, Upload, message, Space, Divider, Spin } from 'antd';
-import { ShopOutlined, PhoneOutlined, EnvironmentOutlined, FileTextOutlined, ShareAltOutlined, UploadOutlined, SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Card, Tabs, Row, Col, Typography, Upload, message, Space, Divider, Spin, Modal } from 'antd';
+import { ShopOutlined, PhoneOutlined, EnvironmentOutlined, FileTextOutlined, ShareAltOutlined, UploadOutlined, SaveOutlined, ArrowLeftOutlined, LockOutlined, UnlockOutlined, KeyOutlined, UserOutlined } from '@ant-design/icons';
 import { shopApi } from '../../api/shopApi';
+import { adminApi } from '../../api/adminApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 import { useNavigate } from 'react-router-dom';
 
@@ -9,34 +10,66 @@ const { Title, Text } = Typography;
 
 const ShopManagement = () => {
   const [form] = Form.useForm();
+  const [authForm] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [logoUrl, setLogoUrl] = useState('');
   const [faviconUrl, setFaviconUrl] = useState('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFavicon, setUploadingFavicon] = useState(false);
+
+  // Security Lock State
+  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [verifying, setVerifying] = useState(false);
+
   const navigate = useNavigate();
 
-  const fetchShopDetails = async () => {
-    setLoading(true);
+  useEffect(() => {
+    // Check if session is already unlocked
+    const unlocked = sessionStorage.getItem('super_admin_unlocked');
+    if (unlocked === 'true') {
+      setIsUnlocked(true);
+      fetchShopDetails();
+    } else {
+      setIsUnlocked(false);
+      setAuthModalOpen(true);
+    }
+  }, []);
+
+  const handleSuperAdminAuth = async () => {
     try {
-      const response = await shopApi.getSettings();
+      const values = await authForm.validateFields();
+      setVerifying(true);
+
+      // Verify credentials against admin authentication API
+      const response = await adminApi.login({
+        username: values.username,
+        password: values.password
+      });
+
       if (response.success && response.data) {
-        const data = response.data;
-        form.setFieldsValue(data);
-        setLogoUrl(data.logoUrl || '');
-        setFaviconUrl(data.faviconUrl || '');
+        sessionStorage.setItem('super_admin_unlocked', 'true');
+        setIsUnlocked(true);
+        setAuthModalOpen(false);
+        message.success('Super Admin access granted!');
+        fetchShopDetails();
+      } else {
+        message.error(response.message || 'Invalid Super Admin credentials');
       }
     } catch (err) {
-      message.error('Failed to load shop settings');
+      if (err?.message) message.error(err.message);
     } finally {
-      setLoading(false);
+      setVerifying(false);
     }
   };
 
-  useEffect(() => {
-    fetchShopDetails();
-  }, []);
+  const handleLock = () => {
+    sessionStorage.removeItem('super_admin_unlocked');
+    setIsUnlocked(false);
+    authForm.resetFields();
+    setAuthModalOpen(true);
+  };
 
   const handleLogoUpload = async (file, isFavicon = false) => {
     const formData = new FormData();
@@ -303,6 +336,66 @@ const ShopManagement = () => {
 
   return (
     <Space direction="vertical" size={20} style={{ width: '100%' }}>
+      {/* Super Admin Security Authentication Modal */}
+      <Modal
+        title={
+          <Space>
+            <LockOutlined style={{ color: '#ff4d4f', fontSize: '20px' }} />
+            <span>Super Admin Security Verification</span>
+          </Space>
+        }
+        open={authModalOpen}
+        onCancel={() => {
+          setAuthModalOpen(false);
+          navigate('/admin/orders');
+        }}
+        footer={[
+          <Button key="cancel" onClick={() => {
+            setAuthModalOpen(false);
+            navigate('/admin/orders');
+          }}>
+            Cancel
+          </Button>,
+          <Button
+            key="unlock"
+            type="primary"
+            icon={<UnlockOutlined />}
+            loading={verifying}
+            onClick={handleSuperAdminAuth}
+            style={{ background: '#001529', borderColor: '#001529' }}
+          >
+            Authenticate & Unlock
+          </Button>
+        ]}
+        maskClosable={false}
+        centered
+        width={420}
+      >
+        <div style={{ padding: '12px 0 20px' }}>
+          <Text type="secondary">
+            Entering the <strong>Shop Master Settings</strong> screen requires Super Admin authentication.
+            Please enter your administrator username & password to proceed.
+          </Text>
+        </div>
+        <Form form={authForm} layout="vertical" onFinish={handleSuperAdminAuth}>
+          <Form.Item
+            name="username"
+            label="Super Admin Username"
+            rules={[{ required: true, message: 'Please enter username' }]}
+          >
+            <Input prefix={<UserOutlined style={{ color: '#bfbfbf' }} />} placeholder="Username" size="large" />
+          </Form.Item>
+          <Form.Item
+            name="password"
+            label="Super Admin Password"
+            rules={[{ required: true, message: 'Please enter password' }]}
+          >
+            <Input.Password prefix={<KeyOutlined style={{ color: '#bfbfbf' }} />} placeholder="Password" size="large" />
+          </Form.Item>
+        </Form>
+      </Modal>
+
+      {/* Main Master Screen Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <Space align="center" size={12}>
           <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/admin/orders')} style={{ borderRadius: '6px' }} />
@@ -311,22 +404,46 @@ const ShopManagement = () => {
             <Text type="secondary" style={{ fontSize: '13px' }}>Configure store branding, contact info, tax registration, and expanded address settings.</Text>
           </div>
         </Space>
-        <Button 
-          type="primary" 
-          icon={<SaveOutlined />} 
-          loading={saving}
-          onClick={handleSave}
-          style={{ borderRadius: '8px', background: '#001529', borderColor: '#001529', height: '40px', padding: '0 24px' }}
-        >
-          Save All Changes
-        </Button>
+        <Space size={12}>
+          <Button 
+            icon={<LockOutlined />} 
+            onClick={handleLock}
+            danger
+            style={{ borderRadius: '8px' }}
+          >
+            Lock Screen
+          </Button>
+          <Button 
+            type="primary" 
+            icon={<SaveOutlined />} 
+            loading={saving}
+            disabled={!isUnlocked}
+            onClick={handleSave}
+            style={{ borderRadius: '8px', background: '#001529', borderColor: '#001529', height: '40px', padding: '0 24px' }}
+          >
+            Save All Changes
+          </Button>
+        </Space>
       </div>
 
-      <Card style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
-        <Form form={form} layout="vertical">
-          <Tabs defaultActiveKey="identity" items={items} />
-        </Form>
-      </Card>
+      {isUnlocked ? (
+        <Card style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+          <Form form={form} layout="vertical">
+            <Tabs defaultActiveKey="identity" items={items} />
+          </Form>
+        </Card>
+      ) : (
+        <Card style={{ borderRadius: '12px', textAlign: 'center', padding: '60px 0' }}>
+          <Space direction="vertical" size={16}>
+            <LockOutlined style={{ fontSize: '48px', color: '#ff4d4f' }} />
+            <Title level={4} style={{ margin: 0 }}>Super Admin Security Lock Active</Title>
+            <Text type="secondary">This screen is locked for security. Click Unlock to authenticate.</Text>
+            <Button type="primary" icon={<UnlockOutlined />} onClick={() => setAuthModalOpen(true)} style={{ background: '#001529' }}>
+              Unlock Master Settings
+            </Button>
+          </Space>
+        </Card>
+      )}
     </Space>
   );
 };
