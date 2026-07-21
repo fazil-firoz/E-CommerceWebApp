@@ -25,6 +25,23 @@ const ShopManagement = () => {
 
   const navigate = useNavigate();
 
+  const fetchShopDetails = async () => {
+    setLoading(true);
+    try {
+      const response = await shopApi.getSettings();
+      if (response.success && response.data) {
+        const data = response.data;
+        form.setFieldsValue(data);
+        setLogoUrl(data.logoUrl || '');
+        setFaviconUrl(data.faviconUrl || '');
+      }
+    } catch (err) {
+      message.error('Failed to load shop settings');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
     // Check if session is already unlocked
     const unlocked = sessionStorage.getItem('super_admin_unlocked');
