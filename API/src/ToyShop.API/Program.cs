@@ -108,6 +108,45 @@ using (var scope = app.Services.CreateScope())
             @"ALTER TABLE ""ProductImages"" ADD COLUMN IF NOT EXISTS ""IsMain"" BOOLEAN NOT NULL DEFAULT FALSE;
               ALTER TABLE ""ProductImages"" ADD COLUMN IF NOT EXISTS ""ZoomScale"" DOUBLE PRECISION NOT NULL DEFAULT 1.0;
 
+              CREATE TABLE IF NOT EXISTS ""Shops"" (
+                  ""Id"" SERIAL PRIMARY KEY,
+                  ""ShopName"" VARCHAR(255) NOT NULL DEFAULT '',
+                  ""Motto"" VARCHAR(500) DEFAULT '',
+                  ""LogoUrl"" VARCHAR(500) DEFAULT '',
+                  ""FaviconUrl"" VARCHAR(500) DEFAULT '',
+                  ""Email1"" VARCHAR(255) DEFAULT '',
+                  ""Email2"" VARCHAR(255) DEFAULT '',
+                  ""Phone1"" VARCHAR(50) DEFAULT '',
+                  ""Phone2"" VARCHAR(50) DEFAULT '',
+                  ""Phone3"" VARCHAR(50) DEFAULT '',
+                  ""WhatsAppNumber"" VARCHAR(50) DEFAULT '',
+                  ""AddressLine1"" VARCHAR(500) DEFAULT '',
+                  ""AddressLine2"" VARCHAR(500) DEFAULT '',
+                  ""City"" VARCHAR(100) DEFAULT '',
+                  ""State"" VARCHAR(100) DEFAULT '',
+                  ""Pincode"" VARCHAR(20) DEFAULT '',
+                  ""Country"" VARCHAR(100) DEFAULT 'India',
+                  ""GstNo"" VARCHAR(100) DEFAULT '',
+                  ""RegNo"" VARCHAR(100) DEFAULT '',
+                  ""PanNo"" VARCHAR(100) DEFAULT '',
+                  ""FacebookUrl"" VARCHAR(500) DEFAULT '',
+                  ""InstagramUrl"" VARCHAR(500) DEFAULT '',
+                  ""TwitterUrl"" VARCHAR(500) DEFAULT '',
+                  ""YouTubeUrl"" VARCHAR(500) DEFAULT '',
+                  ""OpeningHours"" VARCHAR(255) DEFAULT '',
+                  ""CreatedDate"" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  ""CreatedBy"" VARCHAR(255) DEFAULT 'System',
+                  ""UpdatedDate"" TIMESTAMPTZ NULL,
+                  ""UpdatedBy"" VARCHAR(255) NULL,
+                  ""DeletedDate"" TIMESTAMPTZ NULL,
+                  ""DeletedBy"" VARCHAR(255) NULL,
+                  ""IsDeleted"" BOOLEAN NOT NULL DEFAULT FALSE
+              );
+
+              INSERT INTO ""Shops"" (""Id"", ""ShopName"", ""Motto"", ""LogoUrl"", ""FaviconUrl"", ""Email1"", ""Email2"", ""Phone1"", ""Phone2"", ""Phone3"", ""WhatsAppNumber"", ""AddressLine1"", ""AddressLine2"", ""City"", ""State"", ""Pincode"", ""Country"", ""GstNo"", ""RegNo"", ""PanNo"", ""FacebookUrl"", ""InstagramUrl"", ""TwitterUrl"", ""YouTubeUrl"", ""OpeningHours"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
+              SELECT 1, 'ToyShop Wonderland', 'Bringing Smiles & Pure Joy to Every Kid!', '/logo.png', '/favicon.ico', 'contact@toyshop.com', 'support@toyshop.com', '+91 98765 43210', '+91 98765 43211', '+91 80000 11223', '+91 98765 43210', '123 Fun & Games Street', 'Near Central Toy Park, MG Road', 'Kochi', 'Kerala', '682001', 'India', '32ABCDE1234F1Z5', 'REG-TOY-2026-99', 'ABCDE1234F', 'https://facebook.com', 'https://instagram.com', 'https://twitter.com', 'https://youtube.com', 'Mon - Sat: 9:00 AM - 9:00 PM', NOW(), 'System', FALSE
+              WHERE NOT EXISTS (SELECT 1 FROM ""Shops"" WHERE ""Id"" = 1);
+
               SELECT setval('""Categories_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Categories""), 1));
               SELECT setval('""Products_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Products""), 1));
               SELECT setval('""ProductImages_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""ProductImages""), 1));
@@ -116,7 +155,8 @@ using (var scope = app.Services.CreateScope())
               SELECT setval('""Orders_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Orders""), 1));
               SELECT setval('""OrderItems_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""OrderItems""), 1));
               SELECT setval('""Payments_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Payments""), 1));
-              SELECT setval('""Admins_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Admins""), 1));"
+              SELECT setval('""Admins_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Admins""), 1));
+              SELECT setval('""Shops_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Shops""), 1));"
         );
     }
     catch (System.Exception ex)

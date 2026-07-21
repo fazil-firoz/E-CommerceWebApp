@@ -28,6 +28,7 @@ namespace ToyShop.Infrastructure.Persistence
         public DbSet<OrderItem> OrderItems => Set<OrderItem>();
         public DbSet<Payment> Payments => Set<Payment>();
         public DbSet<Admin> Admins => Set<Admin>();
+        public DbSet<Shop> Shops => Set<Shop>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -43,6 +44,7 @@ namespace ToyShop.Infrastructure.Persistence
             modelBuilder.Entity<OrderItem>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<Payment>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<Admin>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<Shop>().HasQueryFilter(e => !e.IsDeleted);
 
             // Configure entity relationships
             modelBuilder.Entity<Product>()
