@@ -35,13 +35,17 @@ export const CartProvider = ({ children }) => {
       }
 
       message.success(`${product.name} added to cart.`);
+      const mainImageObj = product.images?.find(i => i.isMain) || product.images?.[0];
+      const mainImageUrl = mainImageObj?.imageUrl || product.imageUrl || product.imageUrls?.[0] || 'https://via.placeholder.com/200?text=Toy';
+
       return [
         ...prevItems,
         {
           id: product.id,
           name: product.name,
           price: product.price,
-          imageUrl: product.imageUrls?.[0] || 'https://via.placeholder.com/200?text=Toy',
+          imageUrl: mainImageUrl,
+          imageUrls: product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls : [mainImageUrl],
           quantity,
           stockQuantity: product.stockQuantity,
         },

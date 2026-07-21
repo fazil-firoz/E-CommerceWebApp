@@ -391,7 +391,7 @@ const ShopManagement = () => {
         <div style={{ padding: '12px 0 20px' }}>
           <Text type="secondary">
             Entering the <strong>Shop Master Settings</strong> screen requires Super Admin authentication.
-            Please enter your administrator username & password to proceed.
+            please connect the super administrator if you do not have the credentials.
           </Text>
         </div>
         <Form form={authForm} layout="vertical" onFinish={handleSuperAdminAuth}>

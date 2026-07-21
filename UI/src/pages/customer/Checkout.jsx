@@ -9,6 +9,7 @@ import {
 import { CartContext } from '../../context/CartContext';
 import { orderApi } from '../../api/orderApi';
 import { paymentApi } from '../../api/paymentApi';
+import { resolveProductImageUrl } from '../../utils/imageHelper';
 import './Checkout.css';
 
 const { Title, Text } = Typography;
@@ -188,7 +189,7 @@ const Checkout = () => {
             {cartItems.map(item => (
               <div key={item.id} className="checkout-item-row">
                 <div className="checkout-item-img-wrap">
-                  <img src={item.imageUrls?.[0] || 'https://via.placeholder.com/64?text=Toy'} alt={item.name} />
+                  <img src={resolveProductImageUrl(item.imageUrl || item.imageUrls?.[0], 'thumb')} alt={item.name} />
                   <span className="checkout-item-qty">{item.quantity}</span>
                 </div>
                 <Text style={{ flex: 1, fontSize: '14px' }}>{item.name}</Text>
@@ -343,7 +344,7 @@ const Checkout = () => {
           {cartItems.map(item => (
             <div key={item.id} className="checkout-item-row">
               <div className="checkout-item-img-wrap">
-                <img src={item.imageUrls?.[0] || 'https://via.placeholder.com/64?text=Toy'} alt={item.name} />
+                <img src={resolveProductImageUrl(item.imageUrl || item.imageUrls?.[0], 'thumb')} alt={item.name} />
                 <span className="checkout-item-qty">{item.quantity}</span>
               </div>
               <div style={{ flex: 1 }}>
