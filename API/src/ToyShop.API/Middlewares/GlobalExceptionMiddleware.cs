@@ -36,7 +36,16 @@ namespace ToyShop.API.Middlewares
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = StatusCodes.Status500InternalServerError;
 
-            var response = BaseResponse<object>.Fail("An unexpected error occurred on the server.", exception.Message);
+            // Collect the full exception chain for debugging
+            var errors = new System.Collections.Generic.List<string>();
+            var ex = exception;
+            while (ex != null)
+            {
+                errors.Add(ex.Message);
+                ex = ex.InnerException;
+            }
+
+            var response = BaseResponse<object>.Fail("An unexpected error occurred on the server.", errors);
 
             var options = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
             var json = JsonSerializer.Serialize(response, options);

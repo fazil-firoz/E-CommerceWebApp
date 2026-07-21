@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { Row, Col, Button, InputNumber, Space, Typography, Spin, Card, Tag, message } from 'antd';
+import { Row, Col, Button, InputNumber, Space, Typography, Spin, Card, Tag, message, Carousel } from 'antd';
 import { ShoppingCartOutlined, ThunderboltOutlined, SafetyCertificateOutlined } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { CartContext } from '../../context/CartContext';
@@ -17,6 +17,8 @@ const ProductDetails = () => {
   const [loading, setLoading] = useState(true);
   const [selectedImage, setSelectedImage] = useState('');
   const [quantity, setQuantity] = useState(1);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const carouselRef = useRef(null);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -25,6 +27,7 @@ const ProductDetails = () => {
         if (response.success && response.data) {
           setProduct(response.data);
           setSelectedImage(response.data.imageUrls?.[0] || 'https://via.placeholder.com/400?text=Toy');
+          setCurrentSlide(0);
         } else {
           message.error('Toy not found');
           navigate('/products');
@@ -78,17 +81,46 @@ const ProductDetails = () => {
               overflow: 'hidden',
               border: '1px solid #f0f0f0',
               background: '#fff',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              height: '400px'
+              position: 'relative'
             }}>
-              <img 
-                src={resolveProductImageUrl(selectedImage, 'large')} 
-                alt={product.name}
-                loading="lazy"
-                style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-              />
+              <Carousel
+                ref={carouselRef}
+                dots={true}
+                afterChange={(current) => {
+                  setCurrentSlide(current);
+                  if (product.imageUrls?.[current]) {
+                    setSelectedImage(product.imageUrls[current]);
+                  }
+                }}
+                style={{ height: '400px' }}
+              >
+                {(product.imageUrls && product.imageUrls.length > 0) ? (
+                  product.imageUrls.map((url, index) => (
+                    <div key={index} style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
+                      <img 
+                        src={resolveProductImageUrl(url, 'large')} 
+                        alt={`${product.name} - slide ${index}`}
+                        loading="lazy"
+                        style={{ 
+                          maxWidth: '100%', 
+                          maxHeight: '400px', 
+                          objectFit: 'contain',
+                          margin: '0 auto',
+                          display: 'block'
+                        }}
+                      />
+                    </div>
+                  ))
+                ) : (
+                  <div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
+                    <img 
+                      src="https://via.placeholder.com/400?text=No+Image" 
+                      alt="placeholder" 
+                      style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', margin: '0 auto' }} 
+                    />
+                  </div>
+                )}
+              </Carousel>
             </div>
             
             {/* Thumbnails Row */}
@@ -97,19 +129,24 @@ const ProductDetails = () => {
                 {product.imageUrls.map((url, index) => (
                   <div
                     key={index}
-                    onClick={() => setSelectedImage(url)}
+                    onClick={() => {
+                      setSelectedImage(url);
+                      setCurrentSlide(index);
+                      carouselRef.current?.goTo(index);
+                    }}
                     style={{
                       width: '70px',
                       height: '70px',
                       borderRadius: '10px',
                       overflow: 'hidden',
-                      border: selectedImage === url ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                      border: currentSlide === index ? '2px solid #1890ff' : '1px solid #d9d9d9',
                       cursor: 'pointer',
                       background: '#fff',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      padding: '4px'
+                      padding: '4px',
+                      transition: 'border-color 0.2s'
                     }}
                   >
                     <img 

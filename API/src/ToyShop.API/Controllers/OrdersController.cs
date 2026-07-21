@@ -12,9 +12,13 @@ namespace ToyShop.API.Controllers
     {
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<BaseResponse<List<OrderDto>>>> GetAll()
+        public async Task<ActionResult<BaseResponse<List<OrderDto>>>> GetAll(
+            [FromQuery] int? orderStatus,
+            [FromQuery] DateTimeOffset? startDate,
+            [FromQuery] DateTimeOffset? endDate,
+            [FromQuery] string? search)
         {
-            return Ok(await Mediator.Send(new GetOrdersQuery()));
+            return Ok(await Mediator.Send(new GetOrdersQuery(orderStatus, startDate, endDate, search)));
         }
 
         [HttpGet("{id}")]

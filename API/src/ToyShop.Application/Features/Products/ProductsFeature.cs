@@ -12,6 +12,8 @@ using System;
 
 namespace ToyShop.Application.Features.Products
 {
+    public record ProductImageInput(string ImageUrl, bool IsMain, double ZoomScale = 1.0);
+
     // Queries
     public record GetProductsQuery(int? CategoryId, string? Search, bool AdminMode = false) : IRequest<BaseResponse<List<ProductDto>>>;
     
@@ -24,7 +26,7 @@ namespace ToyShop.Application.Features.Products
         decimal Price, 
         int StockQuantity, 
         int CategoryId, 
-        List<string> ImageUrls
+        List<ProductImageInput> Images
     ) : IRequest<BaseResponse<int>>;
 
     public record UpdateProductCommand(
@@ -34,7 +36,7 @@ namespace ToyShop.Application.Features.Products
         decimal Price,
         int StockQuantity,
         int CategoryId,
-        List<string> ImageUrls,
+        List<ProductImageInput> Images,
         bool IsActive
     ) : IRequest<BaseResponse<bool>>;
 
@@ -88,7 +90,21 @@ namespace ToyShop.Application.Features.Products
                     CategoryId = p.CategoryId,
                     CategoryName = p.Category != null ? p.Category.Name : string.Empty,
                     IsActive = p.IsActive,
-                    ImageUrls = p.Images.Where(i => !i.IsDeleted).Select(i => i.ImageUrl).ToList()
+                    ImageUrls = p.Images.Where(i => !i.IsDeleted)
+                                         .OrderByDescending(i => i.IsMain)
+                                         .ThenBy(i => i.Id)
+                                         .Select(i => i.ImageUrl)
+                                         .ToList(),
+                    Images = p.Images.Where(i => !i.IsDeleted)
+                                     .OrderByDescending(i => i.IsMain)
+                                     .ThenBy(i => i.Id)
+                                     .Select(i => new ProductImageDto
+                                     {
+                                         ImageUrl = i.ImageUrl,
+                                         IsMain = i.IsMain,
+                                         ZoomScale = i.ZoomScale
+                                     })
+                                     .ToList()
                 })
                 .ToListAsync(cancellationToken);
 
@@ -115,7 +131,21 @@ namespace ToyShop.Application.Features.Products
                 CategoryId = product.CategoryId,
                 CategoryName = product.Category != null ? product.Category.Name : string.Empty,
                 IsActive = product.IsActive,
-                ImageUrls = product.Images.Where(i => !i.IsDeleted).Select(i => i.ImageUrl).ToList()
+                ImageUrls = product.Images.Where(i => !i.IsDeleted)
+                                           .OrderByDescending(i => i.IsMain)
+                                           .ThenBy(i => i.Id)
+                                           .Select(i => i.ImageUrl)
+                                           .ToList(),
+                Images = product.Images.Where(i => !i.IsDeleted)
+                                       .OrderByDescending(i => i.IsMain)
+                                       .ThenBy(i => i.Id)
+                                       .Select(i => new ProductImageDto
+                                       {
+                                           ImageUrl = i.ImageUrl,
+                                           IsMain = i.IsMain,
+                                           ZoomScale = i.ZoomScale
+                                       })
+                                       .ToList()
             };
 
             return BaseResponse<ProductDto>.Ok(dto, "Product retrieved successfully");
@@ -158,11 +188,18 @@ namespace ToyShop.Application.Features.Products
                 IsActive = true
             };
 
-            if (request.ImageUrls != null && request.ImageUrls.Count > 0)
+            if (request.Images != null && request.Images.Count > 0)
             {
-                foreach (var url in request.ImageUrls)
+                var hasMain = request.Images.Any(img => img.IsMain);
+                for (int i = 0; i < request.Images.Count; i++)
                 {
-                    product.Images.Add(new ProductImage { ImageUrl = url });
+                    var img = request.Images[i];
+                    product.Images.Add(new ProductImage 
+                    { 
+                        ImageUrl = img.ImageUrl,
+                        IsMain = hasMain ? img.IsMain : (i == 0),
+                        ZoomScale = img.ZoomScale
+                    });
                 }
             }
 
@@ -200,11 +237,18 @@ namespace ToyShop.Application.Features.Products
                 _imageRepository.Delete(img);
             }
 
-            if (request.ImageUrls != null)
+            if (request.Images != null)
             {
-                foreach (var url in request.ImageUrls)
+                var hasMain = request.Images.Any(img => img.IsMain);
+                for (int i = 0; i < request.Images.Count; i++)
                 {
-                    product.Images.Add(new ProductImage { ImageUrl = url });
+                    var img = request.Images[i];
+                    product.Images.Add(new ProductImage 
+                    { 
+                        ImageUrl = img.ImageUrl,
+                        IsMain = hasMain ? img.IsMain : (i == 0),
+                        ZoomScale = img.ZoomScale
+                    });
                 }
             }
 
