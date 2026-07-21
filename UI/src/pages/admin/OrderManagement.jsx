@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Table, Button, Modal, Form, Input, Select, Tag, Space, Typography, Card, Row, Col, Divider, message, DatePicker } from 'antd';
-import { EyeOutlined, SendOutlined, TruckOutlined, SearchOutlined, ReloadOutlined, FilterOutlined } from '@ant-design/icons';
+import { EyeOutlined, SendOutlined, TruckOutlined, SearchOutlined, ReloadOutlined, FilterOutlined, ShopOutlined } from '@ant-design/icons';
 import { orderApi } from '../../api/orderApi';
+import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -17,6 +18,7 @@ const STATUS_COLORS = {
 };
 
 const OrderManagement = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -252,6 +254,19 @@ const OrderManagement = () => {
       </Card>
 
       <Table dataSource={orders} columns={columns} rowKey="id" loading={loading} pagination={{ pageSize: 10 }} />
+
+      {/* Discrete Super Admin Master Settings Button */}
+      <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '4px' }}>
+        <Button 
+          type="text" 
+          size="small" 
+          icon={<ShopOutlined />} 
+          onClick={() => navigate('/admin/shop-settings')}
+          style={{ color: '#8c8c8c', fontSize: '12px' }}
+        >
+          ⚙️ Shop Master Settings (Super Admin)
+        </Button>
+      </div>
 
       {/* Order Detail Modal */}
       <Modal
