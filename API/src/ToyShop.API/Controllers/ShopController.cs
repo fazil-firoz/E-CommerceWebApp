@@ -47,10 +47,14 @@ namespace ToyShop.API.Controllers
         /// </summary>
         [HttpPost("upload-logo")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<BaseResponse<string>>> UploadLogo([FromForm] IFormFile file)
+        [Consumes("multipart/form-data")]
+        public async Task<ActionResult<BaseResponse<string>>> UploadLogo([FromForm] ShopLogoUploadRequest request)
         {
+            var file = request?.File;
             if (file == null || file.Length == 0)
+            {
                 return BadRequest(BaseResponse<string>.Fail("No image file uploaded"));
+            }
 
             var allowedExtensions = new[] { ".jpg", ".jpeg", ".png", ".webp", ".ico", ".svg" };
             var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
@@ -75,5 +79,13 @@ namespace ToyShop.API.Controllers
             var relativePath = $"/uploads/shopdata/{uniqueFileName}";
             return Ok(BaseResponse<string>.Ok(relativePath, "Logo uploaded successfully"));
         }
+    }
+
+    /// <summary>
+    /// Request model for shop logo / favicon upload endpoint
+    /// </summary>
+    public class ShopLogoUploadRequest
+    {
+        public IFormFile File { get; set; } = null!;
     }
 }
