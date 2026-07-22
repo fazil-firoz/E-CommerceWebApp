@@ -9,6 +9,7 @@ import {
 import { CartContext } from '../../context/CartContext';
 import { orderApi } from '../../api/orderApi';
 import { paymentApi } from '../../api/paymentApi';
+import { shipmentApi } from '../../api/shipmentApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 import './Checkout.css';
 
@@ -23,6 +24,22 @@ const Checkout = () => {
   const [orderResponse, setOrderResponse] = useState(null);
   const [showMockModal, setShowMockModal] = useState(false);
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
+  const [shippingMethod, setShippingMethod] = useState(null);
+
+  useEffect(() => {
+    const fetchShipping = async () => {
+      try {
+        const res = await shipmentApi.getAll();
+        if (res.success && res.data && res.data.length > 0) {
+          const defaultMethod = res.data.find(m => m.isDefault && m.isActive) || res.data.find(m => m.isActive) || res.data[0];
+          setShippingMethod(defaultMethod);
+        }
+      } catch (err) {
+        console.error('Failed to load shipping method', err);
+      }
+    };
+    fetchShipping();
+  }, []);
 
   if (cartItems.length === 0) {
     return (
@@ -152,7 +169,15 @@ const Checkout = () => {
     }
   };
 
-  const shippingCharge = 0; // free shipping
+  const calculateShippingFee = () => {
+    if (!shippingMethod) return 0;
+    if (shippingMethod.freeShippingThreshold > 0 && cartTotal >= shippingMethod.freeShippingThreshold) {
+      return 0;
+    }
+    return shippingMethod.fee;
+  };
+
+  const shippingCharge = calculateShippingFee();
   const grandTotal = cartTotal + shippingCharge;
 
   return (
@@ -362,8 +387,12 @@ const Checkout = () => {
             <Text>₹{cartTotal.toLocaleString('en-IN')}</Text>
           </div>
           <div className="checkout-summary-row">
-            <Text type="secondary">Shipping</Text>
-            <Text style={{ color: '#52c41a' }}>Free</Text>
+            <Text type="secondary">Shipping ({shippingMethod?.name || 'Standard'})</Text>
+            {shippingCharge === 0 ? (
+              <Text style={{ color: '#52c41a', fontWeight: 600 }}>FREE</Text>
+            ) : (
+              <Text strong>₹{shippingCharge.toLocaleString('en-IN')}</Text>
+            )}
           </div>
 
           <Divider style={{ margin: '12px 0' }} />

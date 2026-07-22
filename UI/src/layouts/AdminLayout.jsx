@@ -8,7 +8,8 @@ import {
   SolutionOutlined, 
   LogoutOutlined,
   HomeOutlined,
-  ShopOutlined
+  ShopOutlined,
+  ControlOutlined
 } from '@ant-design/icons';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 
@@ -49,6 +50,11 @@ const AdminLayout = () => {
       key: '/admin/orders',
       icon: <SolutionOutlined />,
       label: <Link to="/admin/orders">Orders</Link>,
+    },
+    {
+      key: '/admin/app-control',
+      icon: <ControlOutlined />,
+      label: <Link to="/admin/app-control">App Control</Link>,
     },
     {
       key: '/admin/shop-settings',

@@ -450,9 +450,9 @@ const ProductManagement = () => {
                 name="mrp"
                 label="MRP (₹)"
                 rules={[{ required: true, message: 'Input MRP!' }]}
-                help="Original Price"
+                
               >
-                <InputNumber min={1} style={{ width: '100%' }} placeholder="e.g. 500" />
+                <InputNumber min={1} style={{ width: '100%' }} placeholder="500" />
               </Form.Item>
             </Col>
             <Col span={6}>
@@ -460,9 +460,9 @@ const ProductManagement = () => {
                 name="price"
                 label="Real Price (₹)"
                 rules={[{ required: true, message: 'Input selling price!' }]}
-                help="Selling Price"
+                
               >
-                <InputNumber min={1} style={{ width: '100%' }} placeholder="e.g. 299" />
+                <InputNumber min={1} style={{ width: '100%' }} placeholder="299" />
               </Form.Item>
             </Col>
             <Col span={6}>
