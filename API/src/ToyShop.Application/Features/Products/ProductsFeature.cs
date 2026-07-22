@@ -24,6 +24,7 @@ namespace ToyShop.Application.Features.Products
         string Name, 
         string? Description, 
         decimal Price, 
+        decimal Mrp,
         int StockQuantity, 
         int CategoryId, 
         List<ProductImageInput> Images
@@ -34,6 +35,7 @@ namespace ToyShop.Application.Features.Products
         string Name,
         string? Description,
         decimal Price,
+        decimal Mrp,
         int StockQuantity,
         int CategoryId,
         List<ProductImageInput> Images,
@@ -86,6 +88,7 @@ namespace ToyShop.Application.Features.Products
                     Name = p.Name,
                     Description = p.Description,
                     Price = p.Price,
+                    Mrp = p.Mrp > 0 ? p.Mrp : p.Price,
                     StockQuantity = p.StockQuantity,
                     CategoryId = p.CategoryId,
                     CategoryName = p.Category != null ? p.Category.Name : string.Empty,
@@ -127,6 +130,7 @@ namespace ToyShop.Application.Features.Products
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,
+                Mrp = product.Mrp > 0 ? product.Mrp : product.Price,
                 StockQuantity = product.StockQuantity,
                 CategoryId = product.CategoryId,
                 CategoryName = product.Category != null ? product.Category.Name : string.Empty,
@@ -183,6 +187,7 @@ namespace ToyShop.Application.Features.Products
                 Name = request.Name,
                 Description = request.Description,
                 Price = request.Price,
+                Mrp = request.Mrp > 0 ? request.Mrp : request.Price,
                 StockQuantity = request.StockQuantity,
                 CategoryId = request.CategoryId,
                 IsActive = true
@@ -226,6 +231,7 @@ namespace ToyShop.Application.Features.Products
             product.Name = request.Name;
             product.Description = request.Description;
             product.Price = request.Price;
+            product.Mrp = request.Mrp > 0 ? request.Mrp : request.Price;
             product.StockQuantity = request.StockQuantity;
             product.CategoryId = request.CategoryId;
             product.IsActive = request.IsActive;

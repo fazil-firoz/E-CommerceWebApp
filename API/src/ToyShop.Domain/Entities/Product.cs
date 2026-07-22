@@ -8,6 +8,7 @@ namespace ToyShop.Domain.Entities
         public string Name { get; set; } = string.Empty;
         public string? Description { get; set; }
         public decimal Price { get; set; }
+        public decimal Mrp { get; set; }
         public int StockQuantity { get; set; }
         public int CategoryId { get; set; }
         public bool IsActive { get; set; } = true;

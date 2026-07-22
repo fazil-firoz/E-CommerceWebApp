@@ -247,9 +247,16 @@ const ProductListing = () => {
                         {prod.name}
                       </Text>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Text strong style={{ fontSize: '18px', color: '#ff4d4f' }}>
-                          ₹{prod.price.toLocaleString('en-IN')}
-                        </Text>
+                        <div>
+                          <Text strong style={{ fontSize: '18px', color: '#ff4d4f' }}>
+                            ₹{prod.price.toLocaleString('en-IN')}
+                          </Text>
+                          {prod.mrp > prod.price && (
+                            <Text delete style={{ fontSize: '12px', color: '#8c8c8c', marginLeft: '6px' }}>
+                              ₹{prod.mrp.toLocaleString('en-IN')}
+                            </Text>
+                          )}
+                        </div>
                         <Text
                           style={{
                             fontSize: '11px',

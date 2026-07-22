@@ -88,6 +88,7 @@ const ProductManagement = () => {
     form.setFieldsValue({
       name: product.name,
       categoryId: product.categoryId,
+      mrp: product.mrp || product.price,
       price: product.price,
       stockQuantity: product.stockQuantity,
       description: product.description,
@@ -253,7 +254,22 @@ const ProductManagement = () => {
     },
     { title: 'Toy Name', dataIndex: 'name', key: 'name', fontWeight: 'bold', render: (text) => <strong>{text}</strong> },
     { title: 'Category', dataIndex: 'categoryName', key: 'categoryName' },
-    { title: 'Price', dataIndex: 'price', key: 'price', align: 'right', render: (val) => `₹${val.toLocaleString('en-IN')}` },
+    { 
+      title: 'Price (₹)', 
+      dataIndex: 'price', 
+      key: 'price', 
+      align: 'right', 
+      render: (val, record) => (
+        <div>
+          <Text strong style={{ color: '#52c41a' }}>₹{val.toLocaleString('en-IN')}</Text>
+          {record.mrp > record.price && (
+            <div style={{ fontSize: '11px', color: '#8c8c8c', textDecoration: 'line-through' }}>
+              MRP: ₹{record.mrp.toLocaleString('en-IN')}
+            </div>
+          )}
+        </div>
+      ) 
+    },
     { title: 'Stock', dataIndex: 'stockQuantity', key: 'stockQuantity', align: 'center', render: (val) => <Text strong>{val}</Text> },
     {
       title: 'Status',
@@ -429,16 +445,27 @@ const ProductManagement = () => {
           </Row>
 
           <Row gutter={16}>
-            <Col span={8}>
+            <Col span={6}>
               <Form.Item
-                name="price"
-                label="Price (₹)"
-                rules={[{ required: true, message: 'Input price!' }]}
+                name="mrp"
+                label="MRP (₹)"
+                rules={[{ required: true, message: 'Input MRP!' }]}
+                help="Original Price"
               >
-                <InputNumber min={1} style={{ width: '100%' }} />
+                <InputNumber min={1} style={{ width: '100%' }} placeholder="e.g. 500" />
               </Form.Item>
             </Col>
-            <Col span={8}>
+            <Col span={6}>
+              <Form.Item
+                name="price"
+                label="Real Price (₹)"
+                rules={[{ required: true, message: 'Input selling price!' }]}
+                help="Selling Price"
+              >
+                <InputNumber min={1} style={{ width: '100%' }} placeholder="e.g. 299" />
+              </Form.Item>
+            </Col>
+            <Col span={6}>
               <Form.Item
                 name="stockQuantity"
                 label="Stock Quantity"
@@ -447,7 +474,7 @@ const ProductManagement = () => {
                 <InputNumber min={0} style={{ width: '100%' }} />
               </Form.Item>
             </Col>
-            <Col span={8} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <Col span={6} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Form.Item
                 name="isActive"
                 label="Active Status"
@@ -457,6 +484,12 @@ const ProductManagement = () => {
               </Form.Item>
             </Col>
           </Row>
+
+          <div style={{ marginTop: '-4px', marginBottom: '16px' }}>
+            <Text type="secondary" style={{ fontSize: '12px', color: '#8c8c8c' }}>
+              ℹ️ Note: Prices include all applicable taxes (Price Include tax).
+            </Text>
+          </div>
 
           <Form.Item
             name="description"

@@ -173,17 +173,24 @@ const ProductDetails = () => {
                 {product.name}
               </Title>
               
-              <Space align="baseline">
+              <Space align="baseline" style={{ display: 'flex', flexWrap: 'wrap' }}>
                 <Text strong style={{ fontSize: '32px', color: '#ff4d4f' }}>
                   ₹{product.price.toLocaleString('en-IN')}
                 </Text>
-                <Text delete style={{ color: '#bfbfbf', fontSize: '16px', marginLeft: '8px' }}>
-                  ₹{(product.price * 1.2).toLocaleString('en-IN')}
-                </Text>
-                <Text style={{ color: '#52c41a', fontWeight: 600, marginLeft: '8px' }}>
-                  (20% OFF)
-                </Text>
+                {product.mrp > product.price && (
+                  <>
+                    <Text delete style={{ color: '#bfbfbf', fontSize: '18px', marginLeft: '8px' }}>
+                      ₹{product.mrp.toLocaleString('en-IN')}
+                    </Text>
+                    <Text style={{ color: '#52c41a', fontWeight: 600, marginLeft: '8px', fontSize: '15px' }}>
+                      ({Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF)
+                    </Text>
+                  </>
+                )}
               </Space>
+              <Text type="secondary" style={{ fontSize: '12px', display: 'block', color: '#8c8c8c', marginTop: '2px' }}>
+                Inclusive of all taxes
+              </Text>
             </div>
 
             <Card style={{ background: '#fcfcfc', borderRadius: '12px', border: '1px dashed #d9d9d9' }} bodyStyle={{ padding: '16px' }}>
