@@ -24,6 +24,8 @@ namespace ToyShop.Application.Features.Reports
         DateTimeOffset? StartDate = null,
         DateTimeOffset? EndDate = null,
         string? OrderStatus = null,
+        string? CustomerName = null,
+        string? CustomerPhone = null,
         string? Search = null
     ) : IRequest<BaseResponse<SalesReportSummaryDto>>;
 
@@ -170,6 +172,24 @@ namespace ToyShop.Application.Features.Reports
             {
                 var statusStr = request.OrderStatus.ToLower();
                 query = query.Where(o => o.OrderStatus.ToString().ToLower() == statusStr);
+            }
+
+            // Customer Name filter
+            if (!string.IsNullOrWhiteSpace(request.CustomerName))
+            {
+                var name = request.CustomerName.Trim().ToLower();
+                query = query.Where(o =>
+                    (o.Customer != null && o.Customer.Name.ToLower().Contains(name)) ||
+                    (o.CustomerEmail != null && o.CustomerEmail.ToLower().Contains(name)));
+            }
+
+            // Customer Phone filter
+            if (!string.IsNullOrWhiteSpace(request.CustomerPhone))
+            {
+                var phone = request.CustomerPhone.Trim().ToLower();
+                query = query.Where(o =>
+                    (o.CustomerPhone != null && o.CustomerPhone.ToLower().Contains(phone)) ||
+                    (o.Customer != null && o.Customer.PhoneNumber != null && o.Customer.PhoneNumber.ToLower().Contains(phone)));
             }
 
             // Search filter

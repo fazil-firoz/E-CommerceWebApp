@@ -32,9 +32,11 @@ namespace ToyShop.API.Controllers
             [FromQuery] DateTimeOffset? startDate,
             [FromQuery] DateTimeOffset? endDate,
             [FromQuery] string? orderStatus,
+            [FromQuery] string? customerName,
+            [FromQuery] string? customerPhone,
             [FromQuery] string? search)
         {
-            return Ok(await Mediator.Send(new GetSalesReportQuery(periodPreset, startDate, endDate, orderStatus, search)));
+            return Ok(await Mediator.Send(new GetSalesReportQuery(periodPreset, startDate, endDate, orderStatus, customerName, customerPhone, search)));
         }
     }
 }
