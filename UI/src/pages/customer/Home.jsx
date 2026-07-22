@@ -4,6 +4,7 @@ import { Card, Col, Row, Button, Typography, Space, Spin, message } from 'antd';
 import { RightOutlined, FireOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
+import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Paragraph, Text } = Typography;
 
@@ -149,24 +150,50 @@ const Home = () => {
         </div>
         
         <Row gutter={[24, 24]}>
-          {latestProducts.map((prod) => (
-            <Col xs={24} sm={12} md={8} lg={6} key={prod.id}>
-              <Card
-                hoverable
-                cover={
-                  <img
-                    alt={prod.name}
-                    src={prod.imageUrls?.[0] || 'https://via.placeholder.com/200?text=Toy'}
-                    style={{ height: '220px', objectFit: 'cover', borderTopLeftRadius: '16px', borderTopRightRadius: '16px' }}
-                  />
-                }
-                onClick={() => navigate(`/products/${prod.id}`)}
-                style={{
-                  borderRadius: '16px',
-                  boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-                  border: '1px solid #f0f0f0'
-                }}
-              >
+          {latestProducts.map((prod) => {
+            const mainImage = prod.images?.find(img => img.isMain) || { imageUrl: prod.imageUrls?.[0], zoomScale: 1.0 };
+            const mainImageUrl = mainImage?.imageUrl || prod.imageUrls?.[0];
+            const zoom = mainImage?.zoomScale || 1.0;
+
+            return (
+              <Col xs={24} sm={12} md={8} lg={6} key={prod.id}>
+                <Card
+                  hoverable
+                  cover={
+                    <div
+                      style={{ 
+                        position: 'relative', 
+                        overflow: 'hidden', 
+                        borderTopLeftRadius: '16px', 
+                        borderTopRightRadius: '16px', 
+                        cursor: 'pointer',
+                        width: '100%',
+                        aspectRatio: '4/3'
+                      }}
+                      onClick={() => navigate(`/products/${prod.id}`)}
+                    >
+                      <img
+                        alt={prod.name}
+                        src={resolveProductImageUrl(mainImageUrl, 'thumb')}
+                        loading="lazy"
+                        style={{ 
+                          height: '100%', 
+                          width: '100%', 
+                          objectFit: 'cover', 
+                          display: 'block',
+                          transform: `scale(${zoom})`,
+                          transition: 'transform 0.3s ease'
+                        }}
+                      />
+                    </div>
+                  }
+                  onClick={() => navigate(`/products/${prod.id}`)}
+                  style={{
+                    borderRadius: '16px',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
+                    border: '1px solid #f0f0f0'
+                  }}
+                >
                 <Card.Meta
                   title={
                     <span style={{ fontSize: '16px', fontWeight: 700, color: '#262626' }}>
@@ -207,7 +234,8 @@ const Home = () => {
                 />
               </Card>
             </Col>
-          ))}
+          );
+        })}
         </Row>
       </div>
     </Space>
