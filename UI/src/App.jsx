@@ -24,6 +24,7 @@ import ProductManagement from './pages/admin/ProductManagement';
 import OrderManagement from './pages/admin/OrderManagement';
 import ShopManagement from './pages/admin/ShopManagement';
 import AppControl from './pages/admin/AppControl';
+import ReportManagement from './pages/admin/ReportManagement';
 
 function App() {
   return (
@@ -51,6 +52,7 @@ function App() {
               <Route path="categories" element={<CategoryManagement />} />
               <Route path="products" element={<ProductManagement />} />
               <Route path="orders" element={<OrderManagement />} />
+              <Route path="reports" element={<ReportManagement />} />
               <Route path="app-control" element={<AppControl />} />
               <Route path="shop-settings" element={<ShopManagement />} />
             </Route>
