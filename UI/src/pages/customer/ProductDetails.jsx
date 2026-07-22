@@ -50,11 +50,10 @@ const ProductDetails = () => {
 
   const handleBuyNow = () => {
     if (product) {
-      addToCart(product, quantity);
-      // Brief timeout to let the state sync up before navigating
+      addToCart(product, quantity, false);
       setTimeout(() => {
-        navigate('/cart');
-      }, 100);
+        navigate('/checkout');
+      }, 50);
     }
   };
 

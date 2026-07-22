@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Form, Input, Button, Typography, Divider, Modal, message, Spin } from 'antd';
 import {
@@ -222,6 +222,19 @@ const Checkout = () => {
               </div>
             ))}
             <Divider style={{ margin: '12px 0' }} />
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <Text type="secondary">Subtotal</Text>
+              <Text>₹{cartTotal.toLocaleString('en-IN')}</Text>
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <Text type="secondary">Shipping ({shippingMethod?.name || 'Standard'})</Text>
+              {shippingCharge === 0 ? (
+                <Text style={{ color: '#52c41a', fontWeight: 700 }}>₹0 (FREE)</Text>
+              ) : (
+                <Text strong>₹{shippingCharge.toLocaleString('en-IN')}</Text>
+              )}
+            </div>
+            <Divider style={{ margin: '8px 0' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Text strong style={{ fontSize: '16px' }}>Total</Text>
               <Text strong style={{ fontSize: '16px' }}>₹{grandTotal.toLocaleString('en-IN')}</Text>
@@ -386,10 +399,16 @@ const Checkout = () => {
             <Text type="secondary">Subtotal</Text>
             <Text>₹{cartTotal.toLocaleString('en-IN')}</Text>
           </div>
-          <div className="checkout-summary-row">
-            <Text type="secondary">Shipping ({shippingMethod?.name || 'Standard'})</Text>
+          <div className="checkout-summary-row" style={{ alignItems: 'flex-start' }}>
+            <div>
+              <Text type="secondary" style={{ display: 'block' }}>Shipping ({shippingMethod?.name || 'Standard Delivery'})</Text>
+              <Text type="secondary" style={{ fontSize: '11px', color: '#8c8c8c' }}>
+                Standard Rate: ₹{shippingMethod?.fee ?? 50}
+                {shippingMethod?.freeShippingThreshold > 0 && ` (Free on orders > ₹${shippingMethod.freeShippingThreshold})`}
+              </Text>
+            </div>
             {shippingCharge === 0 ? (
-              <Text style={{ color: '#52c41a', fontWeight: 600 }}>FREE</Text>
+              <Text style={{ color: '#52c41a', fontWeight: 700 }}>₹0 (FREE)</Text>
             ) : (
               <Text strong>₹{shippingCharge.toLocaleString('en-IN')}</Text>
             )}

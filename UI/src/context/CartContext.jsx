@@ -13,28 +13,35 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('toy_shop_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product, quantity = 1) => {
+  const addToCart = (product, quantity = 1, showToast = true) => {
+    let messageType = null;
+    let messageText = '';
+
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id);
       
       if (existingItem) {
         const newQty = existingItem.quantity + quantity;
         if (newQty > product.stockQuantity) {
-          message.warning(`Cannot add more. Only ${product.stockQuantity} items available in stock.`);
+          messageType = 'warning';
+          messageText = `Cannot add more. Only ${product.stockQuantity} items available in stock.`;
           return prevItems;
         }
-        message.success(`Updated ${product.name} quantity in cart.`);
+        messageType = 'success';
+        messageText = `Updated ${product.name} quantity in cart.`;
         return prevItems.map((item) =>
           item.id === product.id ? { ...item, quantity: newQty } : item
         );
       }
 
       if (quantity > product.stockQuantity) {
-        message.warning(`Only ${product.stockQuantity} items available in stock.`);
+        messageType = 'warning';
+        messageText = `Only ${product.stockQuantity} items available in stock.`;
         return prevItems;
       }
 
-      message.success(`${product.name} added to cart.`);
+      messageType = 'success';
+      messageText = `${product.name} added to cart.`;
       const mainImageObj = product.images?.find(i => i.isMain) || product.images?.[0];
       const mainImageUrl = mainImageObj?.imageUrl || product.imageUrl || product.imageUrls?.[0] || 'https://via.placeholder.com/200?text=Toy';
 
@@ -51,6 +58,11 @@ export const CartProvider = ({ children }) => {
         },
       ];
     });
+
+    if (showToast && messageText) {
+      if (messageType === 'warning') message.warning(messageText);
+      else if (messageType === 'success') message.success(messageText);
+    }
   };
 
   const updateQuantity = (productId, quantity) => {

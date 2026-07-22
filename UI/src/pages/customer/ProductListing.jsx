@@ -81,14 +81,13 @@ const ProductListing = () => {
     if (prod.stockQuantity === 0) return;
     setAddingId(prod.id);
     addToCart({ ...prod, imageUrls: prod.imageUrls });
-    message.success({ content: `${prod.name} added to cart!`, duration: 2, icon: '🛒' });
     setTimeout(() => setAddingId(null), 500);
   };
 
   const handleBuyNow = (e, prod) => {
     e.stopPropagation();
     if (prod.stockQuantity === 0) return;
-    addToCart({ ...prod, imageUrls: prod.imageUrls });
+    addToCart({ ...prod, imageUrls: prod.imageUrls }, 1, false);
     navigate('/checkout');
   };
 
