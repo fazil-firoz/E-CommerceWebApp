@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Table, Button, InputNumber, Space, Typography, Card, Row, Col, Empty, Popconfirm } from 'antd';
 import { DeleteOutlined, ShoppingCartOutlined, ArrowLeftOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { CartContext } from '../../context/CartContext';
+import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Text } = Typography;
 
@@ -18,7 +19,7 @@ const Cart = () => {
       render: (text, record) => (
         <Space size="middle">
           <img
-            src={record.imageUrl}
+            src={resolveProductImageUrl(record.imageUrl || record.imageUrls?.[0], 'thumb')}
             alt={text}
             style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #f0f0f0' }}
           />
