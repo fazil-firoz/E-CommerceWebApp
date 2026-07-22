@@ -26,6 +26,16 @@ namespace ToyShop.Application.DTOs
         public List<StockReportItemDto> Items { get; set; } = new List<StockReportItemDto>();
     }
 
+    public class SalesReportOrderItemDto
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public decimal UnitPrice { get; set; }
+        public int Quantity { get; set; }
+        public decimal Subtotal { get; set; }
+        public string PrimaryImageUrl { get; set; } = string.Empty;
+    }
+
     public class SalesReportItemDto
     {
         public int OrderId { get; set; }
@@ -37,6 +47,7 @@ namespace ToyShop.Application.DTOs
         public decimal TotalAmount { get; set; }
         public string OrderStatus { get; set; } = string.Empty;
         public string PaymentStatus { get; set; } = string.Empty;
+        public List<SalesReportOrderItemDto> OrderItems { get; set; } = new List<SalesReportOrderItemDto>();
     }
 
     public class SalesReportSummaryDto

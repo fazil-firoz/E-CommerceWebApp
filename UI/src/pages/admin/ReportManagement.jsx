@@ -1,17 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Card, Row, Col, Typography, Table, Select, Input, Button, DatePicker, 
-  Tag, Space, Statistic, Divider, Alert, Spin, message, Tooltip 
+  Tag, Space, Statistic, Divider, Alert, Spin, message, Tabs, Tooltip 
 } from 'antd';
 import { 
   BarChartOutlined, BoxPlotOutlined, DollarOutlined, ShoppingCartOutlined, 
-  SearchOutlined, DownloadOutlined, PrinterOutlined, ReloadOutlined, 
+  SearchOutlined, DownloadOutlined, FilePdfOutlined, ReloadOutlined, 
   CalendarOutlined, WarningOutlined, CheckCircleOutlined, InfoCircleOutlined,
-  FilterOutlined, ArrowUpOutlined, TagOutlined
+  FilterOutlined, TagOutlined, DownOutlined, ShopOutlined
 } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { reportApi } from '../../api/reportApi';
 import { categoryApi } from '../../api/categoryApi';
+import { shopApi } from '../../api/shopApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Text, Paragraph } = Typography;
@@ -19,8 +20,9 @@ const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const ReportManagement = () => {
-  const [selectedReport, setSelectedReport] = useState('stock'); // 'stock' | 'sales'
+  const [activeTab, setActiveTab] = useState('stock');
   const [categories, setCategories] = useState([]);
+  const [shopSettings, setShopSettings] = useState(null);
   
   // Stock Report State
   const [stockLoading, setStockLoading] = useState(false);
@@ -37,19 +39,20 @@ const ReportManagement = () => {
   const [salesOrderStatus, setSalesOrderStatus] = useState('all');
   const [salesSearch, setSalesSearch] = useState('');
 
-  // Load Categories
+  // Fetch Categories & Shop Info
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchInitial = async () => {
       try {
-        const res = await categoryApi.getAll();
-        if (res.success) {
-          setCategories(res.data || []);
-        }
+        const catRes = await categoryApi.getAll();
+        if (catRes.success) setCategories(catRes.data || []);
+
+        const shopRes = await shopApi.getSettings();
+        if (shopRes.success) setShopSettings(shopRes.data);
       } catch (err) {
-        console.error('Failed to load categories', err);
+        console.error('Failed to load initial report settings', err);
       }
     };
-    fetchCategories();
+    fetchInitial();
   }, []);
 
   // Fetch Stock Report
@@ -108,14 +111,14 @@ const ReportManagement = () => {
   };
 
   useEffect(() => {
-    if (selectedReport === 'stock') {
+    if (activeTab === 'stock') {
       fetchStockReport();
     } else {
       fetchSalesReport();
     }
-  }, [selectedReport]);
+  }, [activeTab]);
 
-  // Export Stock CSV
+  // Export CSV
   const exportStockCSV = () => {
     if (!stockData.items.length) {
       message.warning('No stock data to export');
@@ -133,10 +136,9 @@ const ReportManagement = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    message.success('Stock report downloaded as CSV');
+    message.success('Stock report exported as Excel CSV');
   };
 
-  // Export Sales CSV
   const exportSalesCSV = () => {
     if (!salesData.items.length) {
       message.warning('No sales data to export');
@@ -155,12 +157,198 @@ const ReportManagement = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-    message.success('Sales report downloaded as CSV');
+    message.success('Sales report exported as Excel CSV');
   };
 
-  // Print Report
-  const handlePrint = () => {
-    window.print();
+  // PDF Export Function with Header, Logo, and Footer
+  const exportPDF = (type) => {
+    const isStock = type === 'stock';
+    const reportTitle = isStock ? 'Stock & Inventory Valuation Report' : 'Sales & Financial Analytics Report';
+    const items = isStock ? stockData.items : salesData.items;
+
+    if (!items.length) {
+      message.warning('No report data available to export to PDF');
+      return;
+    }
+
+    const shopName = shopSettings?.shopName || 'ToyVerse Shop';
+    const shopLogo = shopSettings?.logoUrl 
+      ? resolveProductImageUrl(shopSettings.logoUrl) 
+      : 'https://via.placeholder.com/150?text=ToyVerse';
+    const shopAddress = shopSettings?.address || 'ToyVerse Main Branch, City Center';
+    const shopPhone = shopSettings?.phone || '+91 9876543210';
+    const shopEmail = shopSettings?.email || 'admin@toyverse.com';
+    const generatedDate = dayjs().format('DD MMMM YYYY, hh:mm A');
+
+    let summaryHtml = '';
+    if (isStock) {
+      const s = stockData.summary || {};
+      summaryHtml = `
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-title">Total Products</span>
+            <span class="kpi-value">${s.totalProducts || 0}</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Total Stock Units</span>
+            <span class="kpi-value">${s.totalStockQuantity || 0}</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Total Inventory Valuation</span>
+            <span class="kpi-value">₹${(s.totalInventoryValue || 0).toLocaleString('en-IN')}</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Low / Out of Stock</span>
+            <span class="kpi-value" style="color: #ff4d4f;">${(s.lowStockCount || 0) + (s.outOfStockCount || 0)}</span>
+          </div>
+        </div>
+      `;
+    } else {
+      const s = salesData.summary || {};
+      summaryHtml = `
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-title">Total Revenue</span>
+            <span class="kpi-value" style="color: #52c41a;">₹${(s.totalRevenue || 0).toLocaleString('en-IN')}</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Total Orders</span>
+            <span class="kpi-value">${s.totalOrders || 0}</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Average Order Value</span>
+            <span class="kpi-value">₹${(s.averageOrderValue || 0).toLocaleString('en-IN')}</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-title">Total Items Sold</span>
+            <span class="kpi-value">${s.totalItemsSold || 0}</span>
+          </div>
+        </div>
+      `;
+    }
+
+    let tableHeaders = isStock
+      ? '<th>ID</th><th>Toy Name</th><th>Category</th><th>MRP</th><th>Price</th><th>Stock</th><th>Valuation</th><th>Status</th>'
+      : '<th>Order #</th><th>Date</th><th>Customer</th><th>Phone</th><th>Items</th><th>Payment</th><th>Status</th><th>Total Revenue</th>';
+
+    let tableRows = '';
+    items.forEach((item, idx) => {
+      if (isStock) {
+        tableRows += `
+          <tr>
+            <td>#${item.id}</td>
+            <td><strong>${item.name}</strong></td>
+            <td>${item.categoryName}</td>
+            <td>₹${item.mrp.toLocaleString('en-IN')}</td>
+            <td style="color: #2e7d32; font-weight: 600;">₹${item.price.toLocaleString('en-IN')}</td>
+            <td><strong>${item.stockQuantity}</strong></td>
+            <td>₹${item.totalStockValue.toLocaleString('en-IN')}</td>
+            <td><span class="badge ${item.stockStatus}">${item.stockStatus}</span></td>
+          </tr>
+        `;
+      } else {
+        const dateStr = dayjs(item.orderDate).format('DD MMM YYYY, hh:mm A');
+        tableRows += `
+          <tr>
+            <td style="color: #0288d1; font-weight: 700;">${item.orderNumber}</td>
+            <td>${dateStr}</td>
+            <td><strong>${item.customerName}</strong></td>
+            <td>${item.customerPhone}</td>
+            <td style="text-align: center;">${item.totalItems}</td>
+            <td>${item.paymentStatus}</td>
+            <td><span class="badge ${item.orderStatus}">${item.orderStatus}</span></td>
+            <td style="color: #d32f2f; font-weight: 700;">₹${item.totalAmount.toLocaleString('en-IN')}</td>
+          </tr>
+        `;
+      }
+    });
+
+    const printHtml = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>${reportTitle} - ${shopName}</title>
+        <style>
+          body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 24px; color: #262626; background: #fff; }
+          .header { display: flex; justify: space-between; align-items: center; border-bottom: 2px solid #1890ff; padding-bottom: 16px; margin-bottom: 20px; }
+          .shop-info { display: flex; align-items: center; gap: 16px; }
+          .shop-logo { width: 64px; height: 64px; object-fit: contain; border-radius: 8px; border: 1px solid #e8e8e8; }
+          .shop-details h1 { margin: 0; font-size: 24px; color: #001529; font-weight: 800; }
+          .shop-details p { margin: 2px 0; font-size: 12px; color: #595959; }
+          .report-meta { text-align: right; }
+          .report-meta h2 { margin: 0; font-size: 18px; color: #1890ff; }
+          .report-meta p { margin: 4px 0 0 0; font-size: 11px; color: #8c8c8c; }
+          
+          .kpi-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+          .kpi-card { background: #fafafa; border: 1px solid #f0f0f0; border-radius: 8px; padding: 12px; text-align: center; }
+          .kpi-title { font-size: 11px; color: #8c8c8c; display: block; text-transform: uppercase; }
+          .kpi-value { font-size: 18px; font-weight: 800; color: #262626; margin-top: 4px; display: block; }
+          
+          table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
+          th { background: #fafafa; border-bottom: 2px solid #e8e8e8; padding: 10px; text-align: left; font-weight: 700; color: #595959; }
+          td { border-bottom: 1px solid #f0f0f0; padding: 10px; }
+          tr:nth-child(even) { background: #fcfcfc; }
+          
+          .badge { padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+          .InStock { background: #e6f7ff; color: #1890ff; }
+          .LowStock { background: #fff7e6; color: #fa8c16; }
+          .OutOfStock { background: #fff1f0; color: #f5222d; }
+          .Delivered { background: #f6ffed; color: #52c41a; }
+          .Cancelled { background: #fff1f0; color: #f5222d; }
+          
+          .footer { margin-top: 30px; border-top: 1px solid #e8e8e8; padding-top: 12px; text-align: center; font-size: 11px; color: #8c8c8c; }
+          @media print {
+            body { padding: 0; }
+            .kpi-grid { page-break-inside: avoid; }
+            table { page-break-inside: auto; }
+            tr { page-break-inside: avoid; page-break-after: auto; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="header">
+          <div class="shop-info">
+            <img src="${shopLogo}" alt="Logo" class="shop-logo" />
+            <div class="shop-details">
+              <h1>${shopName}</h1>
+              <p>${shopAddress}</p>
+              <p>Phone: ${shopPhone} | Email: ${shopEmail}</p>
+            </div>
+          </div>
+          <div class="report-meta">
+            <h2>${reportTitle}</h2>
+            <p>Generated: ${generatedDate}</p>
+            <p>Status: Confidential Official Document</p>
+          </div>
+        </div>
+
+        ${summaryHtml}
+
+        <table>
+          <thead>
+            <tr>${tableHeaders}</tr>
+          </thead>
+          <tbody>
+            ${tableRows}
+          </tbody>
+        </table>
+
+        <div class="footer">
+          <p>${shopName} E-Commerce Management System &bull; Confidential Report &bull; Page 1 of 1</p>
+        </div>
+
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    const printWin = window.open('', '_blank');
+    printWin.document.write(printHtml);
+    printWin.document.close();
   };
 
   // Stock Columns
@@ -173,7 +361,7 @@ const ReportManagement = () => {
       render: (id) => <Text type="secondary">#{id}</Text>
     },
     {
-      title: 'Product',
+      title: 'Product Name',
       dataIndex: 'name',
       key: 'name',
       render: (name, record) => (
@@ -184,7 +372,7 @@ const ReportManagement = () => {
             style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: '8px', border: '1px solid #f0f0f0' }}
           />
           <div>
-            <Text strong style={{ display: 'block' }}>{name}</Text>
+            <Text strong style={{ display: 'block', fontSize: '14px' }}>{name}</Text>
             <Tag color="blue" style={{ fontSize: '11px', marginTop: '2px' }}>{record.categoryName}</Tag>
           </div>
         </Space>
@@ -202,7 +390,7 @@ const ReportManagement = () => {
       dataIndex: 'price',
       key: 'price',
       align: 'right',
-      render: (val) => <Text strong style={{ color: '#52c41a' }}>₹{val.toLocaleString('en-IN')}</Text>
+      render: (val) => <Text strong style={{ color: '#52c41a', fontSize: '14px' }}>₹{val.toLocaleString('en-IN')}</Text>
     },
     {
       title: 'Stock Qty',
@@ -210,7 +398,7 @@ const ReportManagement = () => {
       key: 'stockQuantity',
       align: 'center',
       render: (qty) => (
-        <Text strong style={{ fontSize: '15px', color: qty === 0 ? '#ff4d4f' : qty <= 5 ? '#faad14' : '#1890ff' }}>
+        <Text strong style={{ fontSize: '16px', color: qty === 0 ? '#ff4d4f' : qty <= 5 ? '#faad14' : '#1890ff' }}>
           {qty}
         </Text>
       )
@@ -220,7 +408,7 @@ const ReportManagement = () => {
       dataIndex: 'totalStockValue',
       key: 'totalStockValue',
       align: 'right',
-      render: (val) => <Text strong style={{ fontSize: '14px' }}>₹{val.toLocaleString('en-IN')}</Text>
+      render: (val) => <Text strong style={{ fontSize: '15px' }}>₹{val.toLocaleString('en-IN')}</Text>
     },
     {
       title: 'Stock Status',
@@ -241,7 +429,7 @@ const ReportManagement = () => {
       title: 'Order #',
       dataIndex: 'orderNumber',
       key: 'orderNumber',
-      render: (num) => <Text strong style={{ color: '#0066cc' }}>{num}</Text>
+      render: (num) => <Text strong style={{ color: '#0066cc', fontSize: '14px' }}>{num}</Text>
     },
     {
       title: 'Date & Time',
@@ -261,14 +449,14 @@ const ReportManagement = () => {
       )
     },
     {
-      title: 'Items',
+      title: 'Items Sold',
       dataIndex: 'totalItems',
       key: 'totalItems',
       align: 'center',
-      render: (qty) => <Tag color="blue">{qty} Items</Tag>
+      render: (qty) => <Tag color="blue" style={{ fontWeight: 600 }}>{qty} Items</Tag>
     },
     {
-      title: 'Payment',
+      title: 'Payment Status',
       dataIndex: 'paymentStatus',
       key: 'paymentStatus',
       align: 'center',
@@ -293,356 +481,385 @@ const ReportManagement = () => {
       }
     },
     {
-      title: 'Revenue (₹)',
+      title: 'Total Revenue (₹)',
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right',
-      render: (val) => <Text strong style={{ fontSize: '15px', color: '#ff4d4f' }}>₹{val.toLocaleString('en-IN')}</Text>
+      render: (val) => <Text strong style={{ fontSize: '16px', color: '#ff4d4f' }}>₹{val.toLocaleString('en-IN')}</Text>
+    }
+  ];
+
+  // Expanded Order Items Table
+  const expandedOrderItemsRender = (record) => {
+    const itemColumns = [
+      {
+        title: 'Item Thumbnail',
+        dataIndex: 'primaryImageUrl',
+        key: 'primaryImageUrl',
+        width: '100px',
+        render: (url, item) => (
+          <img
+            src={resolveProductImageUrl(url, 'thumb')}
+            alt={item.productName}
+            style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: '6px', border: '1px solid #f0f0f0' }}
+          />
+        )
+      },
+      {
+        title: 'Toy Name',
+        dataIndex: 'productName',
+        key: 'productName',
+        render: (name) => <Text strong>{name}</Text>
+      },
+      {
+        title: 'Unit Price (₹)',
+        dataIndex: 'unitPrice',
+        key: 'unitPrice',
+        align: 'right',
+        render: (val) => `₹${val.toLocaleString('en-IN')}`
+      },
+      {
+        title: 'Quantity',
+        dataIndex: 'quantity',
+        key: 'quantity',
+        align: 'center',
+        render: (qty) => <Tag color="cyan">x {qty}</Tag>
+      },
+      {
+        title: 'Subtotal (₹)',
+        dataIndex: 'subtotal',
+        key: 'subtotal',
+        align: 'right',
+        render: (val) => <Text strong style={{ color: '#52c41a' }}>₹{val.toLocaleString('en-IN')}</Text>
+      }
+    ];
+
+    return (
+      <Card
+        size="small"
+        title={<Text strong style={{ fontSize: '13px', color: '#0066cc' }}>📦 Order Items Breakdown ({record.orderNumber})</Text>}
+        style={{ borderRadius: '12px', background: '#fafafa', margin: '8px 0' }}
+      >
+        <Table
+          dataSource={record.orderItems || []}
+          columns={itemColumns}
+          rowKey="productId"
+          pagination={false}
+          size="small"
+        />
+      </Card>
+    );
+  };
+
+  const tabItems = [
+    {
+      key: 'stock',
+      label: <span><BoxPlotOutlined /> Stock / Inventory Report</span>,
+      children: (
+        <Space direction="vertical" size={16} style={{ width: '100%' }}>
+          {/* Stock KPI Summary Cards */}
+          <Row gutter={[16, 16]}>
+            <Col xs={12} sm={6}>
+              <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
+                <Statistic
+                  title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Products</Text>}
+                  value={stockData.summary?.totalProducts || 0}
+                  prefix={<BoxPlotOutlined style={{ color: '#1890ff' }} />}
+                />
+              </Card>
+            </Col>
+            <Col xs={12} sm={6}>
+              <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
+                <Statistic
+                  title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Stock Units</Text>}
+                  value={stockData.summary?.totalStockQuantity || 0}
+                  prefix={<ShoppingCartOutlined style={{ color: '#52c41a' }} />}
+                />
+              </Card>
+            </Col>
+            <Col xs={12} sm={6}>
+              <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
+                <Statistic
+                  title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Inventory Valuation</Text>}
+                  value={stockData.summary?.totalInventoryValue || 0}
+                  precision={2}
+                  prefix="₹"
+                  valueStyle={{ fontWeight: 800 }}
+                />
+              </Card>
+            </Col>
+            <Col xs={12} sm={6}>
+              <Card style={{ borderRadius: '14px', background: '#fff2f0' }}>
+                <Statistic
+                  title={<Text type="secondary" style={{ fontSize: '12px' }}>Low / Out of Stock Alert</Text>}
+                  value={(stockData.summary?.lowStockCount || 0) + (stockData.summary?.outOfStockCount || 0)}
+                  valueStyle={{ color: '#ff4d4f', fontWeight: 800 }}
+                  prefix={<WarningOutlined style={{ color: '#ff4d4f' }} />}
+                />
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Stock Filters Bar */}
+          <Card style={{ borderRadius: '14px' }}>
+            <Row gutter={[12, 12]} align="middle">
+              <Col xs={24} sm={8}>
+                <Input
+                  placeholder="Search toy name or category..."
+                  prefix={<SearchOutlined />}
+                  value={stockSearch}
+                  onChange={(e) => setStockSearch(e.target.value)}
+                  onPressEnter={fetchStockReport}
+                  allowClear
+                  style={{ borderRadius: '8px' }}
+                />
+              </Col>
+              <Col xs={12} sm={6}>
+                <Select
+                  value={stockFilterCategory}
+                  onChange={(val) => setStockFilterCategory(val)}
+                  style={{ width: '100%', borderRadius: '8px' }}
+                >
+                  <Option value={0}>All Categories (Default)</Option>
+                  {categories.map((c) => (
+                    <Option key={c.id} value={c.id}>{c.name}</Option>
+                  ))}
+                </Select>
+              </Col>
+              <Col xs={12} sm={6}>
+                <Select
+                  value={stockFilterStatus}
+                  onChange={(val) => setStockFilterStatus(val)}
+                  style={{ width: '100%', borderRadius: '8px' }}
+                >
+                  <Option value="all">All Stock Statuses</Option>
+                  <Option value="InStock">In Stock</Option>
+                  <Option value="LowStock">Low Stock (&le; 5)</Option>
+                  <Option value="OutOfStock">Out of Stock</Option>
+                </Select>
+              </Col>
+              <Col xs={24} sm={4}>
+                <Button type="primary" icon={<FilterOutlined />} onClick={fetchStockReport} block style={{ borderRadius: '8px' }}>
+                  Apply Filter
+                </Button>
+              </Col>
+            </Row>
+          </Card>
+
+          {/* Stock Table */}
+          <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <Table
+              dataSource={stockData.items}
+              columns={stockColumns}
+              rowKey="id"
+              loading={stockLoading}
+              pagination={{ pageSize: 10 }}
+            />
+          </Card>
+        </Space>
+      )
+    },
+    {
+      key: 'sales',
+      label: <span><BarChartOutlined /> Sales & Revenue Report</span>,
+      children: (
+        <Space direction="vertical" size={16} style={{ width: '100%' }}>
+          {/* Sales KPI Summary Cards */}
+          <Row gutter={[16, 16]}>
+            <Col xs={12} sm={6}>
+              <Card style={{ borderRadius: '14px', background: '#f6ffed' }}>
+                <Statistic
+                  title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Revenue</Text>}
+                  value={salesData.summary?.totalRevenue || 0}
+                  precision={2}
+                  prefix="₹"
+                  valueStyle={{ color: '#52c41a', fontWeight: 800 }}
+                />
+              </Card>
+            </Col>
+            <Col xs={12} sm={6}>
+              <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
+                <Statistic
+                  title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Orders Placed</Text>}
+                  value={salesData.summary?.totalOrders || 0}
+                  prefix={<ShoppingCartOutlined style={{ color: '#1890ff' }} />}
+                />
+              </Card>
+            </Col>
+            <Col xs={12} sm={6}>
+              <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
+                <Statistic
+                  title={<Text type="secondary" style={{ fontSize: '12px' }}>Avg Order Value (AOV)</Text>}
+                  value={salesData.summary?.averageOrderValue || 0}
+                  precision={2}
+                  prefix="₹"
+                />
+              </Card>
+            </Col>
+            <Col xs={12} sm={6}>
+              <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
+                <Statistic
+                  title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Items Sold</Text>}
+                  value={salesData.summary?.totalItemsSold || 0}
+                  prefix={<TagOutlined style={{ color: '#722ed1' }} />}
+                />
+              </Card>
+            </Col>
+          </Row>
+
+          {/* Sales Filters Bar */}
+          <Card style={{ borderRadius: '14px' }}>
+            <Space direction="vertical" style={{ width: '100%' }} size={12}>
+              {/* Time Presets Row */}
+              <Row gutter={[8, 8]} align="middle">
+                <Col>
+                  <Text strong style={{ fontSize: '13px', marginRight: '8px' }}>Period Preset:</Text>
+                </Col>
+                <Col>
+                  <Space wrap>
+                    <Button
+                      type={salesPeriod === 'all' ? 'primary' : 'default'}
+                      size="small"
+                      onClick={() => { setSalesPeriod('all'); setSalesDateRange(null); }}
+                      style={{ borderRadius: '6px' }}
+                    >
+                      All Time
+                    </Button>
+                    <Button
+                      type={salesPeriod === 'daily' ? 'primary' : 'default'}
+                      size="small"
+                      onClick={() => { setSalesPeriod('daily'); setSalesDateRange(null); }}
+                      style={{ borderRadius: '6px' }}
+                    >
+                      Daily (Today)
+                    </Button>
+                    <Button
+                      type={salesPeriod === 'monthly' ? 'primary' : 'default'}
+                      size="small"
+                      onClick={() => { setSalesPeriod('monthly'); setSalesDateRange(null); }}
+                      style={{ borderRadius: '6px' }}
+                    >
+                      Monthly (This Month)
+                    </Button>
+                    <Button
+                      type={salesPeriod === 'yearly' ? 'primary' : 'default'}
+                      size="small"
+                      onClick={() => { setSalesPeriod('yearly'); setSalesDateRange(null); }}
+                      style={{ borderRadius: '6px' }}
+                    >
+                      Yearly (This Year)
+                    </Button>
+                    <Button
+                      type={salesPeriod === 'custom' ? 'primary' : 'default'}
+                      size="small"
+                      onClick={() => setSalesPeriod('custom')}
+                      style={{ borderRadius: '6px' }}
+                    >
+                      Custom Range
+                    </Button>
+                  </Space>
+                </Col>
+              </Row>
+
+              {/* Range Picker & Filters Row */}
+              <Row gutter={[12, 12]} align="middle">
+                {salesPeriod === 'custom' && (
+                  <Col xs={24} sm={10}>
+                    <RangePicker
+                      value={salesDateRange}
+                      onChange={(dates) => setSalesDateRange(dates)}
+                      style={{ width: '100%', borderRadius: '8px' }}
+                    />
+                  </Col>
+                )}
+                <Col xs={24} sm={salesPeriod === 'custom' ? 7 : 10}>
+                  <Input
+                    placeholder="Search Order # or Customer..."
+                    prefix={<SearchOutlined />}
+                    value={salesSearch}
+                    onChange={(e) => setSalesSearch(e.target.value)}
+                    onPressEnter={fetchSalesReport}
+                    allowClear
+                    style={{ borderRadius: '8px' }}
+                  />
+                </Col>
+                <Col xs={12} sm={salesPeriod === 'custom' ? 4 : 8}>
+                  <Select
+                    value={salesOrderStatus}
+                    onChange={(val) => setSalesOrderStatus(val)}
+                    style={{ width: '100%', borderRadius: '8px' }}
+                  >
+                    <Option value="all">All Order Statuses</Option>
+                    <Option value="Pending">Pending</Option>
+                    <Option value="Processing">Processing</Option>
+                    <Option value="Shipped">Shipped</Option>
+                    <Option value="Delivered">Delivered</Option>
+                    <Option value="Cancelled">Cancelled</Option>
+                  </Select>
+                </Col>
+                <Col xs={12} sm={3}>
+                  <Button type="primary" icon={<FilterOutlined />} onClick={fetchSalesReport} block style={{ borderRadius: '8px' }}>
+                    Apply Filter
+                  </Button>
+                </Col>
+              </Row>
+            </Space>
+          </Card>
+
+          {/* Sales Table with Expandable Order Items Breakdown */}
+          <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+            <Table
+              dataSource={salesData.items}
+              columns={salesColumns}
+              rowKey="orderId"
+              loading={salesLoading}
+              pagination={{ pageSize: 10 }}
+              expandable={{
+                expandedRowRender: expandedOrderItemsRender,
+                expandRowByClick: false
+              }}
+            />
+          </Card>
+        </Space>
+      )
     }
   ];
 
   return (
     <Space direction="vertical" size={20} style={{ width: '100%' }}>
-      {/* Top Title Bar */}
+      {/* Top Header Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
           <Title level={3} style={{ margin: 0, fontWeight: 800 }}>ToyVerse Reports & Analytics</Title>
-          <Text type="secondary" style={{ fontSize: '13px' }}>Generate and analyze inventory valuation, low stock alerts, and financial sales performance.</Text>
+          <Text type="secondary" style={{ fontSize: '13px' }}>Monitor inventory counts, low stock alerts, order items, and revenue performance.</Text>
         </div>
         <Space>
-          <Button icon={<PrinterOutlined />} onClick={handlePrint} style={{ borderRadius: '8px' }}>
-            Print
+          <Button
+            icon={<DownloadOutlined />}
+            onClick={activeTab === 'stock' ? exportStockCSV : exportSalesCSV}
+            style={{ borderRadius: '8px' }}
+          >
+            Export Excel (CSV)
           </Button>
           <Button
             type="primary"
-            icon={<DownloadOutlined />}
-            onClick={selectedReport === 'stock' ? exportStockCSV : exportSalesCSV}
+            icon={<FilePdfOutlined />}
+            onClick={() => exportPDF(activeTab)}
             style={{ borderRadius: '8px', background: '#001529', borderColor: '#001529' }}
           >
-            Export CSV
+            Export PDF
           </Button>
         </Space>
       </div>
 
-      <Row gutter={[20, 20]}>
-        {/* Left Side Reports Menu Selector */}
-        <Col xs={24} md={6}>
-          <Card
-            title={<Text strong style={{ fontSize: '15px' }}>📋 Available Reports</Text>}
-            style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
-            bodyStyle={{ padding: '12px' }}
-          >
-            <Space direction="vertical" style={{ width: '100%' }} size={8}>
-              <div
-                onClick={() => setSelectedReport('stock')}
-                style={{
-                  padding: '14px 16px',
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  background: selectedReport === 'stock' ? '#e6f7ff' : '#ffffff',
-                  border: selectedReport === 'stock' ? '1px solid #1890ff' : '1px solid #f0f0f0',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <Space align="center" size={12}>
-                  <BoxPlotOutlined style={{ fontSize: '22px', color: selectedReport === 'stock' ? '#1890ff' : '#8c8c8c' }} />
-                  <div>
-                    <Text strong style={{ display: 'block', color: selectedReport === 'stock' ? '#1890ff' : '#262626' }}>
-                      Stock / Inventory Report
-                    </Text>
-                    <Text type="secondary" style={{ fontSize: '12px' }}>Inventory count & valuation</Text>
-                  </div>
-                </Space>
-              </div>
-
-              <div
-                onClick={() => setSelectedReport('sales')}
-                style={{
-                  padding: '14px 16px',
-                  borderRadius: '12px',
-                  cursor: 'pointer',
-                  background: selectedReport === 'sales' ? '#e6f7ff' : '#ffffff',
-                  border: selectedReport === 'sales' ? '1px solid #1890ff' : '1px solid #f0f0f0',
-                  transition: 'all 0.2s'
-                }}
-              >
-                <Space align="center" size={12}>
-                  <BarChartOutlined style={{ fontSize: '22px', color: selectedReport === 'sales' ? '#1890ff' : '#8c8c8c' }} />
-                  <div>
-                    <Text strong style={{ display: 'block', color: selectedReport === 'sales' ? '#1890ff' : '#262626' }}>
-                      Sales & Revenue Report
-                    </Text>
-                    <Text type="secondary" style={{ fontSize: '12px' }}>Financial sales & order metrics</Text>
-                  </div>
-                </Space>
-              </div>
-            </Space>
-          </Card>
-        </Col>
-
-        {/* Right Side Main Report View */}
-        <Col xs={24} md={18}>
-          {selectedReport === 'stock' ? (
-            /* 📦 STOCK REPORT */
-            <Space direction="vertical" size={16} style={{ width: '100%' }}>
-              {/* Stock KPI Summary Cards */}
-              <Row gutter={[16, 16]}>
-                <Col xs={12} sm={6}>
-                  <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
-                    <Statistic
-                      title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Products</Text>}
-                      value={stockData.summary?.totalProducts || 0}
-                      prefix={<BoxPlotOutlined style={{ color: '#1890ff' }} />}
-                    />
-                  </Card>
-                </Col>
-                <Col xs={12} sm={6}>
-                  <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
-                    <Statistic
-                      title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Stock Units</Text>}
-                      value={stockData.summary?.totalStockQuantity || 0}
-                      prefix={<ShoppingCartOutlined style={{ color: '#52c41a' }} />}
-                    />
-                  </Card>
-                </Col>
-                <Col xs={12} sm={6}>
-                  <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
-                    <Statistic
-                      title={<Text type="secondary" style={{ fontSize: '12px' }}>Inventory Value</Text>}
-                      value={stockData.summary?.totalInventoryValue || 0}
-                      precision={2}
-                      prefix="₹"
-                    />
-                  </Card>
-                </Col>
-                <Col xs={12} sm={6}>
-                  <Card style={{ borderRadius: '14px', background: '#fff2f0' }}>
-                    <Statistic
-                      title={<Text type="secondary" style={{ fontSize: '12px' }}>Low / Out of Stock</Text>}
-                      value={(stockData.summary?.lowStockCount || 0) + (stockData.summary?.outOfStockCount || 0)}
-                      valueStyle={{ color: '#ff4d4f' }}
-                      prefix={<WarningOutlined style={{ color: '#ff4d4f' }} />}
-                    />
-                  </Card>
-                </Col>
-              </Row>
-
-              {/* Stock Filters Card */}
-              <Card style={{ borderRadius: '14px' }}>
-                <Row gutter={[12, 12]} align="middle">
-                  <Col xs={24} sm={8}>
-                    <Input
-                      placeholder="Search toy or category..."
-                      prefix={<SearchOutlined />}
-                      value={stockSearch}
-                      onChange={(e) => setStockSearch(e.target.value)}
-                      onPressEnter={fetchStockReport}
-                      allowClear
-                      style={{ borderRadius: '8px' }}
-                    />
-                  </Col>
-                  <Col xs={12} sm={6}>
-                    <Select
-                      value={stockFilterCategory}
-                      onChange={(val) => setStockFilterCategory(val)}
-                      style={{ width: '100%', borderRadius: '8px' }}
-                    >
-                      <Option value={0}>All Categories</Option>
-                      {categories.map((c) => (
-                        <Option key={c.id} value={c.id}>{c.name}</Option>
-                      ))}
-                    </Select>
-                  </Col>
-                  <Col xs={12} sm={6}>
-                    <Select
-                      value={stockFilterStatus}
-                      onChange={(val) => setStockFilterStatus(val)}
-                      style={{ width: '100%', borderRadius: '8px' }}
-                    >
-                      <Option value="all">All Stock Statuses</Option>
-                      <Option value="InStock">In Stock</Option>
-                      <Option value="LowStock">Low Stock (&le; 5)</Option>
-                      <Option value="OutOfStock">Out of Stock</Option>
-                    </Select>
-                  </Col>
-                  <Col xs={24} sm={4}>
-                    <Button type="primary" icon={<FilterOutlined />} onClick={fetchStockReport} block style={{ borderRadius: '8px' }}>
-                      Apply Filter
-                    </Button>
-                  </Col>
-                </Row>
-              </Card>
-
-              {/* Stock Table */}
-              <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                <Table
-                  dataSource={stockData.items}
-                  columns={stockColumns}
-                  rowKey="id"
-                  loading={stockLoading}
-                  pagination={{ pageSize: 8 }}
-                />
-              </Card>
-            </Space>
-          ) : (
-            /* 📊 SALES REPORT */
-            <Space direction="vertical" size={16} style={{ width: '100%' }}>
-              {/* Sales KPI Summary Cards */}
-              <Row gutter={[16, 16]}>
-                <Col xs={12} sm={6}>
-                  <Card style={{ borderRadius: '14px', background: '#f6ffed' }}>
-                    <Statistic
-                      title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Revenue</Text>}
-                      value={salesData.summary?.totalRevenue || 0}
-                      precision={2}
-                      prefix="₹"
-                      valueStyle={{ color: '#52c41a', fontWeight: 800 }}
-                    />
-                  </Card>
-                </Col>
-                <Col xs={12} sm={6}>
-                  <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
-                    <Statistic
-                      title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Orders</Text>}
-                      value={salesData.summary?.totalOrders || 0}
-                      prefix={<ShoppingCartOutlined style={{ color: '#1890ff' }} />}
-                    />
-                  </Card>
-                </Col>
-                <Col xs={12} sm={6}>
-                  <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
-                    <Statistic
-                      title={<Text type="secondary" style={{ fontSize: '12px' }}>Avg Order Value (AOV)</Text>}
-                      value={salesData.summary?.averageOrderValue || 0}
-                      precision={2}
-                      prefix="₹"
-                    />
-                  </Card>
-                </Col>
-                <Col xs={12} sm={6}>
-                  <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
-                    <Statistic
-                      title={<Text type="secondary" style={{ fontSize: '12px' }}>Items Sold</Text>}
-                      value={salesData.summary?.totalItemsSold || 0}
-                      prefix={<TagOutlined style={{ color: '#722ed1' }} />}
-                    />
-                  </Card>
-                </Col>
-              </Row>
-
-              {/* Sales Filters Card */}
-              <Card style={{ borderRadius: '14px' }}>
-                <Space direction="vertical" style={{ width: '100%' }} size={12}>
-                  {/* Time Presets Row */}
-                  <Row gutter={[8, 8]} align="middle">
-                    <Col>
-                      <Text strong style={{ fontSize: '13px', marginRight: '8px' }}>Period:</Text>
-                    </Col>
-                    <Col>
-                      <Space wrap>
-                        <Button
-                          type={salesPeriod === 'all' ? 'primary' : 'default'}
-                          size="small"
-                          onClick={() => { setSalesPeriod('all'); setSalesDateRange(null); }}
-                          style={{ borderRadius: '6px' }}
-                        >
-                          All Time
-                        </Button>
-                        <Button
-                          type={salesPeriod === 'daily' ? 'primary' : 'default'}
-                          size="small"
-                          onClick={() => { setSalesPeriod('daily'); setSalesDateRange(null); }}
-                          style={{ borderRadius: '6px' }}
-                        >
-                          Daily (Today)
-                        </Button>
-                        <Button
-                          type={salesPeriod === 'monthly' ? 'primary' : 'default'}
-                          size="small"
-                          onClick={() => { setSalesPeriod('monthly'); setSalesDateRange(null); }}
-                          style={{ borderRadius: '6px' }}
-                        >
-                          Monthly (This Month)
-                        </Button>
-                        <Button
-                          type={salesPeriod === 'yearly' ? 'primary' : 'default'}
-                          size="small"
-                          onClick={() => { setSalesPeriod('yearly'); setSalesDateRange(null); }}
-                          style={{ borderRadius: '6px' }}
-                        >
-                          Yearly (This Year)
-                        </Button>
-                        <Button
-                          type={salesPeriod === 'custom' ? 'primary' : 'default'}
-                          size="small"
-                          onClick={() => setSalesPeriod('custom')}
-                          style={{ borderRadius: '6px' }}
-                        >
-                          Custom Range
-                        </Button>
-                      </Space>
-                    </Col>
-                  </Row>
-
-                  {/* Range Picker & Filters Row */}
-                  <Row gutter={[12, 12]} align="middle">
-                    {salesPeriod === 'custom' && (
-                      <Col xs={24} sm={10}>
-                        <RangePicker
-                          value={salesDateRange}
-                          onChange={(dates) => setSalesDateRange(dates)}
-                          style={{ width: '100%', borderRadius: '8px' }}
-                        />
-                      </Col>
-                    )}
-                    <Col xs={24} sm={salesPeriod === 'custom' ? 7 : 10}>
-                      <Input
-                        placeholder="Search Order # or Customer..."
-                        prefix={<SearchOutlined />}
-                        value={salesSearch}
-                        onChange={(e) => setSalesSearch(e.target.value)}
-                        onPressEnter={fetchSalesReport}
-                        allowClear
-                        style={{ borderRadius: '8px' }}
-                      />
-                    </Col>
-                    <Col xs={12} sm={salesPeriod === 'custom' ? 4 : 8}>
-                      <Select
-                        value={salesOrderStatus}
-                        onChange={(val) => setSalesOrderStatus(val)}
-                        style={{ width: '100%', borderRadius: '8px' }}
-                      >
-                        <Option value="all">All Order Statuses</Option>
-                        <Option value="Pending">Pending</Option>
-                        <Option value="Processing">Processing</Option>
-                        <Option value="Shipped">Shipped</Option>
-                        <Option value="Delivered">Delivered</Option>
-                        <Option value="Cancelled">Cancelled</Option>
-                      </Select>
-                    </Col>
-                    <Col xs={12} sm={3}>
-                      <Button type="primary" icon={<FilterOutlined />} onClick={fetchSalesReport} block style={{ borderRadius: '8px' }}>
-                        Apply
-                      </Button>
-                    </Col>
-                  </Row>
-                </Space>
-              </Card>
-
-              {/* Sales Table */}
-              <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-                <Table
-                  dataSource={salesData.items}
-                  columns={salesColumns}
-                  rowKey="orderId"
-                  loading={salesLoading}
-                  pagination={{ pageSize: 8 }}
-                />
-              </Card>
-            </Space>
-          )}
-        </Col>
-      </Row>
+      {/* Main Full-Width Tabs Container */}
+      <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+        <Tabs
+          activeKey={activeTab}
+          onChange={(key) => setActiveTab(key)}
+          items={tabItems}
+        />
+      </Card>
     </Space>
   );
 };

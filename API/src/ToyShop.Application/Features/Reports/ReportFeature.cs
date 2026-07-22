@@ -127,6 +127,8 @@ namespace ToyShop.Application.Features.Reports
         {
             var query = _orderRepo.Query()
                 .Include(o => o.OrderItems)
+                    .ThenInclude(i => i.Product)
+                        .ThenInclude(p => p.Images)
                 .Include(o => o.Customer)
                 .AsQueryable();
 
@@ -214,6 +216,16 @@ namespace ToyShop.Application.Features.Reports
                     totalRevenue += o.TotalAmount;
                 }
 
+                var orderItemDtos = o.OrderItems.Select(i => new SalesReportOrderItemDto
+                {
+                    ProductId = i.ProductId,
+                    ProductName = i.Product != null ? i.Product.Name : "Product #" + i.ProductId,
+                    UnitPrice = i.UnitPrice,
+                    Quantity = i.Quantity,
+                    Subtotal = i.TotalPrice > 0 ? i.TotalPrice : i.UnitPrice * i.Quantity,
+                    PrimaryImageUrl = i.Product?.Images?.FirstOrDefault(img => img.IsMain)?.ImageUrl ?? i.Product?.Images?.FirstOrDefault()?.ImageUrl ?? string.Empty
+                }).ToList();
+
                 items.Add(new SalesReportItemDto
                 {
                     OrderId = o.Id,
@@ -224,7 +236,8 @@ namespace ToyShop.Application.Features.Reports
                     TotalItems = itemsCount,
                     TotalAmount = o.TotalAmount,
                     OrderStatus = oStatus,
-                    PaymentStatus = pStatus
+                    PaymentStatus = pStatus,
+                    OrderItems = orderItemDtos
                 });
             }
 
