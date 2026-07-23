@@ -263,7 +263,8 @@ const CustomerLayout = () => {
                 <Link to="/privacy-policy" style={{ color: '#ffffffa6' }}>Privacy Policy</Link>
                 <Link to="/refund-policy" style={{ color: '#ffffffa6' }}>Refund & Return Policy</Link>
                 <Link to="/terms-conditions" style={{ color: '#ffffffa6' }}>Terms & Conditions</Link>
-                <Link to="/contact" style={{ color: '#ffffffa6' }}>Store Location & Map</Link>
+                <Link to="/shipping-policy" style={{ color: '#ffffffa6' }}>Shipping & Delivery Policy</Link>
+                <Link to="/faqs" style={{ color: '#ffffffa6' }}>Help & FAQs</Link>
               </Space>
             </Col>
 

@@ -20,6 +20,8 @@ import PrivacyPolicy from './pages/customer/PrivacyPolicy';
 import RefundPolicy from './pages/customer/RefundPolicy';
 import TermsConditions from './pages/customer/TermsConditions';
 import ContactUs from './pages/customer/ContactUs';
+import ShippingPolicy from './pages/customer/ShippingPolicy';
+import Faq from './pages/customer/Faq';
 
 // Admin Pages
 import Login from './pages/admin/Login';
@@ -51,6 +53,8 @@ function App() {
               <Route path="refund-policy" element={<RefundPolicy />} />
               <Route path="terms-conditions" element={<TermsConditions />} />
               <Route path="contact" element={<ContactUs />} />
+              <Route path="shipping-policy" element={<ShippingPolicy />} />
+              <Route path="faqs" element={<Faq />} />
             </Route>
 
             {/* Admin Authentication Route */}
