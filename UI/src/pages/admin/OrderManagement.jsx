@@ -144,7 +144,7 @@ const OrderManagement = () => {
     }
   };
 
-  // Generate and Print Purchase Invoice (Clean 1-Page Layout)
+  // Generate and Print Purchase Invoice (Flexbox 1-Page Layout with Fixed Bottom Wrapper)
   const handlePrintInvoice = (order) => {
     if (!order) return;
 
@@ -235,21 +235,37 @@ const OrderManagement = () => {
         <style>
           @page { size: A4; margin: 8mm; }
           * { box-sizing: border-box; }
-          body {
+          html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             color: #1f2937;
             background: #fff;
-            margin: 0;
-            padding: 8px;
             font-size: 11px;
             line-height: 1.4;
           }
+          body { padding: 6px; }
+
           .invoice-box {
             max-width: 780px;
+            min-height: 274mm;
             margin: auto;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
             padding: 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+          }
+
+          .invoice-body {
+            flex: 1 0 auto;
+          }
+
+          .bottom-wrapper {
+            margin-top: auto;
+            padding-top: 10px;
           }
           
           /* Header: Clean & Uncongested (Only Logo, Shop Name, Motto & Invoice Info) */
@@ -262,7 +278,7 @@ const OrderManagement = () => {
           }
           .header-table td { vertical-align: middle; }
           .shop-logo-img {
-            max-height: 48px;
+            max-height: 46px;
             max-width: 140px;
             object-fit: contain;
             border-radius: 6px;
@@ -377,13 +393,13 @@ const OrderManagement = () => {
             padding: 6px 8px;
           }
 
-          /* Compact Caution & Policy Guidelines */
+          /* Compact Caution & Policy Guidelines (Anchored at Bottom) */
           .caution-box {
             background: #fffbe6;
             border: 1px solid #ffe58f;
             border-radius: 6px;
             padding: 8px 12px;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
           }
           .caution-title {
             font-weight: 800;
@@ -409,10 +425,10 @@ const OrderManagement = () => {
             font-weight: 700;
             color: #0050b3;
             font-size: 11px;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
           }
 
-          /* Clean, Properly Arranged Footer */
+          /* Clean, Properly Arranged Footer Section */
           .footer-section {
             border-top: 2px solid #0288d1;
             padding-top: 8px;
@@ -423,11 +439,11 @@ const OrderManagement = () => {
           .footer-table td { vertical-align: top; padding: 2px 4px; }
           .footer-header { font-weight: 700; color: #111827; margin-bottom: 3px; font-size: 10px; text-transform: uppercase; }
           .social-link { color: #0288d1; text-decoration: none; font-weight: 600; margin-right: 8px; }
-          .footer-notice { text-align: center; margin-top: 6px; font-style: italic; color: #9ca3af; font-size: 9px; }
+          .footer-notice { text-align: center; margin-top: 4px; font-style: italic; color: #9ca3af; font-size: 9px; }
 
           @media print {
-            body { padding: 0; background: #fff; }
-            .invoice-box { border: none; padding: 0; }
+            html, body { height: 100%; padding: 0; background: #fff; }
+            .invoice-box { border: none; padding: 0; min-height: 274mm; height: 100%; }
             .no-print { display: none; }
           }
         </style>
@@ -435,130 +451,136 @@ const OrderManagement = () => {
       <body>
         <div class="invoice-box">
           
-          <!-- Header Table: ONLY Logo, Shop Name, Motto & Invoice Details -->
-          <table class="header-table">
-            <tr>
-              <td>
-                <div style="display: flex; align-items: center; gap: 12px;">
-                  ${logoUrl ? `<img src="${logoUrl}" alt="Logo" class="shop-logo-img" />` : ''}
-                  <div>
-                    <h1 class="shop-title">${shopName}</h1>
-                    <div class="shop-motto">${motto}</div>
-                  </div>
-                </div>
-              </td>
-              <td style="text-align: right;">
-                <h2 class="invoice-badge-title">TAX INVOICE</h2>
-                <div class="invoice-details-meta">
-                  <div><strong>Invoice #:</strong> <span style="font-family: monospace; font-size: 12px; font-weight: 700;">${order.orderNumber}</span></div>
-                  <div><strong>Order Date:</strong> ${orderDateFormatted}</div>
-                  <div><strong>Invoice Date:</strong> ${invoiceDate}</div>
-                  <div style="margin-top: 4px;">
-                    <span class="status-tag ${order.paymentStatus === 'Success' || order.paymentStatus === 'Paid' ? 'status-paid' : 'status-pending'}">
-                      Payment: ${order.paymentStatus || 'Pending'}
-                    </span>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          </table>
-
-          <!-- Customer & Shipping Addresses (2 columns) -->
-          <table class="address-table">
-            <tr>
-              <td class="address-card">
-                <div class="address-title">👤 BILLED TO / CUSTOMER DETAILS</div>
-                <div style="font-weight: 800; font-size: 12px; color: #111827;">${customerName}</div>
-                <div><strong>Mobile:</strong> ${customerPhone}</div>
-                <div><strong>Email:</strong> ${customerEmail}</div>
-              </td>
-              <td style="width: 4%;"></td>
-              <td class="address-card">
-                <div class="address-title">🚚 SHIPPED TO / DELIVERY ADDRESS</div>
-                <div style="font-weight: 800; font-size: 12px; color: #111827;">${shipRecipient}</div>
-                <div><strong>Phone:</strong> ${shipPhone}</div>
-                <div>${fullShipAddress}</div>
-              </td>
-            </tr>
-          </table>
-
-          <!-- Items Table -->
-          <table class="items-table">
-            <thead>
+          <!-- Top Section (Header, Addresses, Products, Summary) -->
+          <div class="invoice-body">
+            <!-- Header Table: ONLY Logo, Shop Name, Motto & Invoice Details -->
+            <table class="header-table">
               <tr>
-                <th style="width: 35px; text-align: center;">#</th>
-                <th>Toy Product Description</th>
-                <th style="width: 60px; text-align: center;">Qty</th>
-                <th style="width: 100px; text-align: right;">Unit Price (₹)</th>
-                <th style="width: 110px; text-align: right;">Subtotal (₹)</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${itemRowsHtml}
-            </tbody>
-          </table>
-
-          <!-- Summary Table -->
-          <table class="summary-table">
-            <tr>
-              <td style="text-align: right;"><strong>Items Subtotal:</strong></td>
-              <td style="text-align: right; font-weight: 600;">₹${itemsSubtotal.toLocaleString('en-IN')}</td>
-            </tr>
-            <tr>
-              <td style="text-align: right;"><strong>Shipping Charge:</strong></td>
-              <td style="text-align: right; color: ${shippingCharge === 0 ? '#15803d' : '#111827'}; font-weight: 600;">
-                ${shippingCharge === 0 ? 'FREE Shipping' : `₹${shippingCharge.toLocaleString('en-IN')}`}
-              </td>
-            </tr>
-            <tr class="summary-total-row">
-              <td style="text-align: right;">GRAND TOTAL:</td>
-              <td style="text-align: right;">₹${order.totalAmount.toLocaleString('en-IN')}</td>
-            </tr>
-          </table>
-
-          <!-- Compact Caution & Policy Guidelines -->
-          <div class="caution-box">
-            <div class="caution-title">⚠️ Customer Guidelines & Return Policy:</div>
-            <ul class="caution-list">
-              <li><strong>7-Day Replacement:</strong> Toys can be returned/replaced within 7 days of delivery with original intact box.</li>
-              <li><strong>Inspection & Video:</strong> Verify package on arrival. Continuous unboxing video required for missing item claims.</li>
-            </ul>
-          </div>
-
-          <!-- Compact Thank You Note -->
-          <div class="thank-you-note">
-            🧸 Thank you for shopping with ${shopName}! We hope your little ones enjoy their new toys. ✨
-          </div>
-
-          <!-- Clean, Properly Arranged Footer Section -->
-          <div class="footer-section">
-            <table class="footer-table">
-              <tr>
-                <td style="width: 36%;">
-                  <div class="footer-header">📍 Store Address</div>
-                  <div>${fullShopAddress}</div>
+                <td>
+                  <div style="display: flex; align-items: center; gap: 12px;">
+                    ${logoUrl ? `<img src="${logoUrl}" alt="Logo" class="shop-logo-img" />` : ''}
+                    <div>
+                      <h1 class="shop-title">${shopName}</h1>
+                      <div class="shop-motto">${motto}</div>
+                    </div>
+                  </div>
                 </td>
-                <td style="width: 34%;">
-                  <div class="footer-header">📞 Contacts & Support</div>
-                  <div>Phone: <strong>${allPhones}</strong></div>
-                  <div>WhatsApp: <strong>${whatsapp}</strong></div>
-                  <div>Email: <strong>${allEmails}</strong></div>
-                </td>
-                <td style="width: 30%; text-align: right;">
-                  <div class="footer-header">🏛️ Legal & Social</div>
-                  <div>GSTIN: <strong>${gstNo}</strong> | PAN: <strong>${panNo}</strong></div>
-                  <div>Hours: <strong>${openingHours}</strong></div>
-                  <div style="margin-top: 2px;">
-                    ${fb ? `<a href="${fb}" target="_blank" class="social-link">FB</a>` : ''}
-                    ${insta ? `<a href="${insta}" target="_blank" class="social-link">Insta</a>` : ''}
-                    ${twitter ? `<a href="${twitter}" target="_blank" class="social-link">Twitter</a>` : ''}
-                    ${yt ? `<a href="${yt}" target="_blank" class="social-link">YouTube</a>` : ''}
+                <td style="text-align: right;">
+                  <h2 class="invoice-badge-title">TAX INVOICE</h2>
+                  <div class="invoice-details-meta">
+                    <div><strong>Invoice #:</strong> <span style="font-family: monospace; font-size: 12px; font-weight: 700;">${order.orderNumber}</span></div>
+                    <div><strong>Order Date:</strong> ${orderDateFormatted}</div>
+                    <div><strong>Invoice Date:</strong> ${invoiceDate}</div>
+                    <div style="margin-top: 4px;">
+                      <span class="status-tag ${order.paymentStatus === 'Success' || order.paymentStatus === 'Paid' ? 'status-paid' : 'status-pending'}">
+                        Payment: ${order.paymentStatus || 'Pending'}
+                      </span>
+                    </div>
                   </div>
                 </td>
               </tr>
             </table>
-            <div class="footer-notice">
-              * This is a computer-generated tax invoice. No signature required.
+
+            <!-- Customer & Shipping Addresses (2 columns) -->
+            <table class="address-table">
+              <tr>
+                <td class="address-card">
+                  <div class="address-title">👤 BILLED TO / CUSTOMER DETAILS</div>
+                  <div style="font-weight: 800; font-size: 12px; color: #111827;">${customerName}</div>
+                  <div><strong>Mobile:</strong> ${customerPhone}</div>
+                  <div><strong>Email:</strong> ${customerEmail}</div>
+                </td>
+                <td style="width: 4%;"></td>
+                <td class="address-card">
+                  <div class="address-title">🚚 SHIPPED TO / DELIVERY ADDRESS</div>
+                  <div style="font-weight: 800; font-size: 12px; color: #111827;">${shipRecipient}</div>
+                  <div><strong>Phone:</strong> ${shipPhone}</div>
+                  <div>${fullShipAddress}</div>
+                </td>
+              </tr>
+            </table>
+
+            <!-- Items Table -->
+            <table class="items-table">
+              <thead>
+                <tr>
+                  <th style="width: 35px; text-align: center;">#</th>
+                  <th>Toy Product Description</th>
+                  <th style="width: 60px; text-align: center;">Qty</th>
+                  <th style="width: 100px; text-align: right;">Unit Price (₹)</th>
+                  <th style="width: 110px; text-align: right;">Subtotal (₹)</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${itemRowsHtml}
+              </tbody>
+            </table>
+
+            <!-- Summary Table -->
+            <table class="summary-table">
+              <tr>
+                <td style="text-align: right;"><strong>Items Subtotal:</strong></td>
+                <td style="text-align: right; font-weight: 600;">₹${itemsSubtotal.toLocaleString('en-IN')}</td>
+              </tr>
+              <tr>
+                <td style="text-align: right;"><strong>Shipping Charge:</strong></td>
+                <td style="text-align: right; color: ${shippingCharge === 0 ? '#15803d' : '#111827'}; font-weight: 600;">
+                  ${shippingCharge === 0 ? 'FREE Shipping' : `₹${shippingCharge.toLocaleString('en-IN')}`}
+                </td>
+              </tr>
+              <tr class="summary-total-row">
+                <td style="text-align: right;">GRAND TOTAL:</td>
+                <td style="text-align: right;">₹${order.totalAmount.toLocaleString('en-IN')}</td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- Bottom Wrapper (Anchored Always at Page Bottom) -->
+          <div class="bottom-wrapper">
+            <!-- Compact Caution & Policy Guidelines -->
+            <div class="caution-box">
+              <div class="caution-title">⚠️ Customer Guidelines & Return Policy:</div>
+              <ul class="caution-list">
+                <li><strong>7-Day Replacement:</strong> Toys can be returned/replaced within 7 days of delivery with original intact box.</li>
+                <li><strong>Inspection & Video:</strong> Verify package on arrival. Continuous unboxing video required for missing item claims.</li>
+              </ul>
+            </div>
+
+            <!-- Compact Thank You Note -->
+            <div class="thank-you-note">
+              🧸 Thank you for shopping with ${shopName}! We hope your little ones enjoy their new toys. ✨
+            </div>
+
+            <!-- Clean, Properly Arranged Footer Section -->
+            <div class="footer-section">
+              <table class="footer-table">
+                <tr>
+                  <td style="width: 36%;">
+                    <div class="footer-header">📍 Store Address</div>
+                    <div>${fullShopAddress}</div>
+                  </td>
+                  <td style="width: 34%;">
+                    <div class="footer-header">📞 Contacts & Support</div>
+                    <div>Phone: <strong>${allPhones}</strong></div>
+                    <div>WhatsApp: <strong>${whatsapp}</strong></div>
+                    <div>Email: <strong>${allEmails}</strong></div>
+                  </td>
+                  <td style="width: 30%; text-align: right;">
+                    <div class="footer-header">🏛️ Legal & Social</div>
+                    <div>GSTIN: <strong>${gstNo}</strong> | PAN: <strong>${panNo}</strong></div>
+                    <div>Hours: <strong>${openingHours}</strong></div>
+                    <div style="margin-top: 2px;">
+                      ${fb ? `<a href="${fb}" target="_blank" class="social-link">FB</a>` : ''}
+                      ${insta ? `<a href="${insta}" target="_blank" class="social-link">Insta</a>` : ''}
+                      ${twitter ? `<a href="${twitter}" target="_blank" class="social-link">Twitter</a>` : ''}
+                      ${yt ? `<a href="${yt}" target="_blank" class="social-link">YouTube</a>` : ''}
+                    </div>
+                  </td>
+                </tr>
+              </table>
+              <div class="footer-notice">
+                * This is a computer-generated tax invoice. No signature required.
+              </div>
             </div>
           </div>
 
