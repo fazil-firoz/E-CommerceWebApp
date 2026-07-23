@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Select, Tag, Space, Typography, Card, Row, Col, Divider, message, DatePicker } from 'antd';
-import { EyeOutlined, SendOutlined, TruckOutlined, SearchOutlined, ReloadOutlined, FilterOutlined, ShopOutlined } from '@ant-design/icons';
+import { Table, Button, Modal, Form, Input, Select, Tag, Space, Typography, Card, Row, Col, Divider, message, DatePicker, Tooltip } from 'antd';
+import { EyeOutlined, SendOutlined, TruckOutlined, SearchOutlined, ReloadOutlined, FilterOutlined, ShopOutlined, PrinterOutlined } from '@ant-design/icons';
+import dayjs from 'dayjs';
 import { orderApi } from '../../api/orderApi';
+import { shopApi } from '../../api/shopApi';
+import { resolveProductImageUrl } from '../../utils/imageHelper';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
@@ -23,6 +26,7 @@ const OrderManagement = () => {
   const [loading, setLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
+  const [shopSettings, setShopSettings] = useState(null);
 
   // Filters state
   const [statusFilter, setStatusFilter] = useState(null);
@@ -34,6 +38,21 @@ const OrderManagement = () => {
   const [pendingStatusChange, setPendingStatusChange] = useState(null); // { orderId, newStatus }
   const [shippingForm] = Form.useForm();
   const [shippingLoading, setShippingLoading] = useState(false);
+
+  // Fetch shop settings for invoice header/footer details
+  useEffect(() => {
+    const fetchShopInfo = async () => {
+      try {
+        const res = await shopApi.getSettings();
+        if (res.success && res.data) {
+          setShopSettings(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch shop settings for invoice', err);
+      }
+    };
+    fetchShopInfo();
+  }, []);
 
   const fetchOrders = async (status = statusFilter, dates = dateRange, search = searchText) => {
     setLoading(true);
@@ -122,6 +141,456 @@ const OrderManagement = () => {
       // form validation error - stays open
     } finally {
       setShippingLoading(false);
+    }
+  };
+
+  // Generate and Print Purchase Invoice
+  const handlePrintInvoice = (order) => {
+    if (!order) return;
+
+    const shopName = shopSettings?.shopName || 'ToyVerse Store';
+    const motto = shopSettings?.motto || 'Quality Toys & Infinite Joy for Kids';
+    const logoUrl = shopSettings?.logoUrl
+      ? resolveProductImageUrl(shopSettings.logoUrl)
+      : 'https://via.placeholder.com/150?text=ToyVerse';
+    
+    // Shop Address
+    const shopAddr1 = shopSettings?.addressLine1 || 'ToyVerse Main Branch';
+    const shopAddr2 = shopSettings?.addressLine2 || '';
+    const shopCity = shopSettings?.city || 'City Center';
+    const shopState = shopSettings?.state || 'State';
+    const shopPincode = shopSettings?.pincode || '600001';
+    const shopCountry = shopSettings?.country || 'India';
+    const fullShopAddress = `${shopAddr1}${shopAddr2 ? ', ' + shopAddr2 : ''}, ${shopCity}, ${shopState} - ${shopPincode}, ${shopCountry}`;
+
+    // Contacts
+    const phone1 = shopSettings?.phone1 || '+91 9876543210';
+    const phone2 = shopSettings?.phone2 ? `, ${shopSettings.phone2}` : '';
+    const phone3 = shopSettings?.phone3 ? `, ${shopSettings.phone3}` : '';
+    const allPhones = `${phone1}${phone2}${phone3}`;
+    const whatsapp = shopSettings?.whatsAppNumber || phone1;
+    const email1 = shopSettings?.email1 || 'support@toyverse.com';
+    const email2 = shopSettings?.email2 ? ` | ${shopSettings.email2}` : '';
+    const allEmails = `${email1}${email2}`;
+
+    // Legal Identifiers
+    const gstNo = shopSettings?.gstNo || '33AAAAA0000A1Z5';
+    const regNo = shopSettings?.regNo || 'REG-2026-TOYVERSE';
+    const panNo = shopSettings?.panNo || 'ABCDE1234F';
+
+    // Social Links & Business Info
+    const fb = shopSettings?.facebookUrl || 'https://facebook.com/toyverse';
+    const insta = shopSettings?.instagramUrl || 'https://instagram.com/toyverse';
+    const twitter = shopSettings?.twitterUrl || 'https://twitter.com/toyverse';
+    const yt = shopSettings?.youTubeUrl || 'https://youtube.com/c/toyverse';
+    const openingHours = shopSettings?.openingHours || 'Mon - Sat: 9:00 AM - 8:00 PM';
+
+    // Customer Details
+    const customerName = order.customer?.name || order.customerPhone || 'Valued Customer';
+    const customerPhone = order.customerPhone || order.customer?.phoneNumber || 'N/A';
+    const customerEmail = order.customerEmail || order.customer?.email || 'N/A';
+
+    // Delivery Address
+    const shipRecipient = order.address?.fullName || customerName;
+    const shipPhone = order.address?.phoneNumber || customerPhone;
+    const shipAddr1 = order.address?.addressLine1 || '';
+    const shipAddr2 = order.address?.addressLine2 || '';
+    const shipCity = order.address?.city || '';
+    const shipState = order.address?.state || '';
+    const shipPin = order.address?.pincode || '';
+    const fullShipAddress = `${shipAddr1}${shipAddr2 ? ', ' + shipAddr2 : ''}, ${shipCity}, ${shipState} - ${shipPin}`;
+
+    const orderDateFormatted = dayjs(order.orderDate).format('DD MMMM YYYY, hh:mm A');
+    const invoiceDate = dayjs(order.orderDate).format('DD/MM/YYYY');
+
+    // Build Product Rows
+    let itemRowsHtml = '';
+    let itemsSubtotal = 0;
+
+    (order.items || []).forEach((item, index) => {
+      const unitPrice = item.unitPrice || 0;
+      const qty = item.quantity || 1;
+      const lineTotal = item.totalPrice || (unitPrice * qty);
+      itemsSubtotal += lineTotal;
+
+      itemRowsHtml += `
+        <tr>
+          <td style="text-align: center;">${index + 1}</td>
+          <td>
+            <strong>${item.productName || 'Toy Item'}</strong>
+          </td>
+          <td style="text-align: center;"><strong>${qty}</strong></td>
+          <td style="text-align: right;">₹${unitPrice.toLocaleString('en-IN')}</td>
+          <td style="text-align: right; font-weight: 700; color: #111827;">₹${lineTotal.toLocaleString('en-IN')}</td>
+        </tr>
+      `;
+    });
+
+    const shippingCharge = order.totalAmount > itemsSubtotal ? (order.totalAmount - itemsSubtotal) : 0;
+
+    const htmlContent = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8" />
+        <title>Invoice #${order.orderNumber} - ${shopName}</title>
+        <style>
+          @page { size: A4; margin: 12mm; }
+          body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            color: #1f2937;
+            background: #fff;
+            margin: 0;
+            padding: 16px;
+            font-size: 13px;
+            line-height: 1.5;
+          }
+          .invoice-box {
+            max-width: 820px;
+            margin: auto;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+          }
+          
+          /* Header */
+          .header-table {
+            width: 100%;
+            border-collapse: collapse;
+            border-bottom: 2px solid #0288d1;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+          }
+          .header-table td { vertical-align: top; }
+          .shop-logo-img {
+            max-height: 65px;
+            max-width: 160px;
+            object-fit: contain;
+            border-radius: 8px;
+            margin-bottom: 6px;
+          }
+          .shop-title {
+            font-size: 22px;
+            font-weight: 800;
+            color: #001529;
+            margin: 0;
+            letter-spacing: -0.5px;
+          }
+          .shop-motto {
+            font-size: 11px;
+            color: #0288d1;
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 4px;
+          }
+          .shop-meta {
+            font-size: 11px;
+            color: #4b5563;
+          }
+          
+          .invoice-badge-title {
+            font-size: 24px;
+            font-weight: 900;
+            color: #0288d1;
+            text-align: right;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 0;
+          }
+          .invoice-details-meta {
+            text-align: right;
+            font-size: 12px;
+            margin-top: 6px;
+          }
+          .status-tag {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+          }
+          .status-paid { background: #dcfce7; color: #15803d; }
+          .status-pending { background: #fef3c7; color: #b45309; }
+          
+          /* Address Section */
+          .address-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          .address-card {
+            width: 48%;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 12px 16px;
+            vertical-align: top;
+          }
+          .address-title {
+            font-size: 11px;
+            font-weight: 800;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            border-bottom: 1px dashed #e5e7eb;
+            padding-bottom: 4px;
+          }
+          
+          /* Products Table */
+          .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+          }
+          .items-table th {
+            background: #001529;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 11px;
+            text-transform: uppercase;
+            padding: 10px 12px;
+            text-align: left;
+          }
+          .items-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 12px;
+          }
+          .items-table tr:nth-child(even) { background: #fafafa; }
+          
+          /* Summary Table */
+          .summary-table {
+            width: 50%;
+            margin-left: auto;
+            border-collapse: collapse;
+            margin-bottom: 24px;
+          }
+          .summary-table td {
+            padding: 6px 12px;
+            font-size: 13px;
+          }
+          .summary-total-row {
+            background: #f0fdf4;
+            border-top: 2px solid #22c55e;
+            font-weight: 800;
+          }
+          .summary-total-row td {
+            font-size: 16px;
+            color: #15803d;
+            padding: 10px 12px;
+          }
+
+          /* Caution & Terms */
+          .caution-box {
+            background: #fffbe6;
+            border: 1px solid #ffe58f;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 16px;
+          }
+          .caution-title {
+            font-weight: 800;
+            color: #d46b08;
+            font-size: 12px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+          }
+          .caution-list {
+            margin: 0;
+            padding-left: 18px;
+            font-size: 11px;
+            color: #595959;
+          }
+          .caution-list li { margin-bottom: 3px; }
+
+          .thank-you-note {
+            text-align: center;
+            background: #e6f7ff;
+            border: 1px dashed #91d5ff;
+            border-radius: 8px;
+            padding: 10px;
+            font-weight: 700;
+            color: #0050b3;
+            font-size: 13px;
+            margin-bottom: 24px;
+          }
+
+          /* Footer */
+          .footer-section {
+            border-top: 2px solid #e5e7eb;
+            padding-top: 14px;
+            font-size: 11px;
+            color: #6b7280;
+          }
+          .footer-table { width: 100%; border-collapse: collapse; }
+          .footer-table td { vertical-align: top; padding: 4px; }
+          .footer-header { font-weight: 700; color: #374151; margin-bottom: 4px; }
+          .social-link { color: #0288d1; text-decoration: none; font-weight: 600; margin-right: 12px; }
+
+          @media print {
+            body { padding: 0; background: #fff; }
+            .invoice-box { border: none; box-shadow: none; padding: 0; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div class="invoice-box">
+          
+          <!-- Header Table -->
+          <table class="header-table">
+            <tr>
+              <td>
+                <img src="${logoUrl}" alt="Logo" class="shop-logo-img" />
+                <h1 class="shop-title">${shopName}</h1>
+                <div class="shop-motto">${motto}</div>
+                <div class="shop-meta">
+                  ${fullShopAddress}<br />
+                  <strong>Phone:</strong> ${allPhones} | <strong>WhatsApp:</strong> ${whatsapp}<br />
+                  <strong>Email:</strong> ${allEmails}<br />
+                  <strong>GSTIN:</strong> ${gstNo} | <strong>Reg No:</strong> ${regNo} | <strong>PAN:</strong> ${panNo}
+                </div>
+              </td>
+              <td style="text-align: right;">
+                <h2 class="invoice-badge-title">TAX INVOICE</h2>
+                <div class="invoice-details-meta">
+                  <div><strong>Invoice #:</strong> <span style="font-family: monospace; font-size: 14px;">${order.orderNumber}</span></div>
+                  <div><strong>Order Date:</strong> ${orderDateFormatted}</div>
+                  <div><strong>Invoice Date:</strong> ${invoiceDate}</div>
+                  <div style="margin-top: 6px;">
+                    <span class="status-tag ${order.paymentStatus === 'Success' || order.paymentStatus === 'Paid' ? 'status-paid' : 'status-pending'}">
+                      Payment: ${order.paymentStatus || 'Pending'}
+                    </span>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Addresses Table -->
+          <table class="address-table">
+            <tr>
+              <td class="address-card">
+                <div class="address-title">👤 BILLED TO / CUSTOMER DETAILS</div>
+                <div style="font-weight: 800; font-size: 14px; color: #111827;">${customerName}</div>
+                <div><strong>Mobile:</strong> ${customerPhone}</div>
+                <div><strong>Email:</strong> ${customerEmail}</div>
+              </td>
+              <td style="width: 4%;"></td>
+              <td class="address-card">
+                <div class="address-title">🚚 SHIPPED TO / DELIVERY ADDRESS</div>
+                <div style="font-weight: 800; font-size: 14px; color: #111827;">${shipRecipient}</div>
+                <div><strong>Phone:</strong> ${shipPhone}</div>
+                <div>${fullShipAddress}</div>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Items Table -->
+          <table class="items-table">
+            <thead>
+              <tr>
+                <th style="width: 40px; text-align: center;">#</th>
+                <th>Toy Product Description</th>
+                <th style="width: 70px; text-align: center;">Qty</th>
+                <th style="width: 110px; text-align: right;">Unit Price (₹)</th>
+                <th style="width: 120px; text-align: right;">Subtotal (₹)</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemRowsHtml}
+            </tbody>
+          </table>
+
+          <!-- Summary Table -->
+          <table class="summary-table">
+            <tr>
+              <td style="text-align: right;"><strong>Items Subtotal:</strong></td>
+              <td style="text-align: right; font-weight: 600;">₹${itemsSubtotal.toLocaleString('en-IN')}</td>
+            </tr>
+            <tr>
+              <td style="text-align: right;"><strong>Shipping / Delivery Charge:</strong></td>
+              <td style="text-align: right; color: ${shippingCharge === 0 ? '#16a34a' : '#111827'}; font-weight: 600;">
+                ${shippingCharge === 0 ? 'FREE Shipping' : `₹${shippingCharge.toLocaleString('en-IN')}`}
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: right; font-size: 11px; color: #6b7280;" colspan="2">
+                * Prices are inclusive of all applicable taxes (GST).
+              </td>
+            </tr>
+            <tr class="summary-total-row">
+              <td style="text-align: right;">GRAND TOTAL:</td>
+              <td style="text-align: right;">₹${order.totalAmount.toLocaleString('en-IN')}</td>
+            </tr>
+          </table>
+
+          <!-- Caution & Important Guidelines -->
+          <div class="caution-box">
+            <div class="caution-title">⚠️ Important Customer Guidelines & Return Policy:</div>
+            <ul class="caution-list">
+              <li><strong>7-Day Replacement Policy:</strong> Toys can be returned or replaced within 7 days of delivery date if damaged or defective with original packaging preserved.</li>
+              <li><strong>Inspection Notice:</strong> Please verify all outer seal packaging and contents immediately upon receiving the delivery parcel.</li>
+              <li><strong>Warranty Support:</strong> Battery-operated and electronic toys carry manufacturer warranties as indicated on product boxes.</li>
+              <li><strong>Unboxing Proof:</strong> For any missing component or transit damage claim, recording a continuous unboxing video is required.</li>
+            </ul>
+          </div>
+
+          <!-- Thank You Note -->
+          <div class="thank-you-note">
+            🧸 Thank you for shopping with ${shopName}! We hope your little ones enjoy their new toys. ✨
+          </div>
+
+          <!-- Footer Section -->
+          <div class="footer-section">
+            <table class="footer-table">
+              <tr>
+                <td style="width: 50%;">
+                  <div class="footer-header">📍 Store Address & Contact Hotlines</div>
+                  <div>${fullShopAddress}</div>
+                  <div>📞 Call Support: <strong>${allPhones}</strong></div>
+                  <div>💬 WhatsApp Hotline: <strong>${whatsapp}</strong></div>
+                  <div>✉️ Email Support: <strong>${allEmails}</strong></div>
+                </td>
+                <td style="width: 50%; text-align: right;">
+                  <div class="footer-header">🌐 Connect With Us & Hours</div>
+                  <div>🕒 Business Hours: <strong>${openingHours}</strong></div>
+                  <div style="margin-top: 4px;">
+                    ${fb ? `<a href="${fb}" target="_blank" class="social-link">Facebook</a>` : ''}
+                    ${insta ? `<a href="${insta}" target="_blank" class="social-link">Instagram</a>` : ''}
+                    ${twitter ? `<a href="${twitter}" target="_blank" class="social-link">Twitter</a>` : ''}
+                    ${yt ? `<a href="${yt}" target="_blank" class="social-link">YouTube</a>` : ''}
+                  </div>
+                  <div style="margin-top: 8px; font-style: italic; color: #9ca3af; font-size: 10px;">
+                    This is a computer-generated tax invoice. No signature required.
+                  </div>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+        </div>
+
+        <script>
+          window.onload = function() {
+            window.print();
+          };
+        </script>
+      </body>
+      </html>
+    `;
+
+    const printWin = window.open('', '_blank');
+    if (printWin) {
+      printWin.document.write(htmlContent);
+      printWin.document.close();
+    } else {
+      message.error('Pop-up blocked! Please allow pop-ups to print invoice.');
     }
   };
 
@@ -270,7 +739,30 @@ const OrderManagement = () => {
 
       {/* Order Detail Modal */}
       <Modal
-        title={<span><EyeOutlined /> Order Details: <strong>{selectedOrder?.orderNumber}</strong></span>}
+        title={
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingRight: '28px' }}>
+            <Space align="center">
+              <EyeOutlined style={{ color: '#1890ff' }} />
+              <span>Order Details: <strong style={{ color: '#001529' }}>{selectedOrder?.orderNumber}</strong></span>
+            </Space>
+            {selectedOrder && (
+              <Button
+                type="primary"
+                icon={<PrinterOutlined />}
+                onClick={() => handlePrintInvoice(selectedOrder)}
+                style={{
+                  borderRadius: '6px',
+                  background: '#001529',
+                  borderColor: '#001529',
+                  fontWeight: 600,
+                  fontSize: '13px'
+                }}
+              >
+                Print Invoice
+              </Button>
+            )}
+          </div>
+        }
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
         footer={null}
@@ -383,7 +875,15 @@ const OrderManagement = () => {
               />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+              <Button
+                type="default"
+                icon={<PrinterOutlined />}
+                onClick={() => handlePrintInvoice(selectedOrder)}
+                style={{ borderRadius: '6px' }}
+              >
+                Print Purchase Invoice
+              </Button>
               <Title level={4} style={{ margin: 0 }}>
                 Total: <span style={{ color: '#ff4d4f' }}>₹{selectedOrder.totalAmount.toLocaleString('en-IN')}</span>
               </Title>
