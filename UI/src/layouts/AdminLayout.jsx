@@ -135,7 +135,7 @@ const AdminLayout = () => {
             </Typography.Text>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
             <Button 
               icon={<HomeOutlined />} 
               onClick={() => navigate('/')}
