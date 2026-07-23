@@ -144,7 +144,7 @@ const OrderManagement = () => {
     }
   };
 
-  // Generate and Print Purchase Invoice
+  // Generate and Print Purchase Invoice (Clean 1-Page Layout)
   const handlePrintInvoice = (order) => {
     if (!order) return;
 
@@ -152,7 +152,7 @@ const OrderManagement = () => {
     const motto = shopSettings?.motto || 'Quality Toys & Infinite Joy for Kids';
     const logoUrl = shopSettings?.logoUrl
       ? resolveProductImageUrl(shopSettings.logoUrl)
-      : 'https://via.placeholder.com/150?text=ToyVerse';
+      : '';
     
     // Shop Address
     const shopAddr1 = shopSettings?.addressLine1 || 'ToyVerse Main Branch';
@@ -200,7 +200,7 @@ const OrderManagement = () => {
     const shipPin = order.address?.pincode || '';
     const fullShipAddress = `${shipAddr1}${shipAddr2 ? ', ' + shipAddr2 : ''}, ${shipCity}, ${shipState} - ${shipPin}`;
 
-    const orderDateFormatted = dayjs(order.orderDate).format('DD MMMM YYYY, hh:mm A');
+    const orderDateFormatted = dayjs(order.orderDate).format('DD MMM YYYY, hh:mm A');
     const invoiceDate = dayjs(order.orderDate).format('DD/MM/YYYY');
 
     // Build Product Rows
@@ -216,9 +216,7 @@ const OrderManagement = () => {
       itemRowsHtml += `
         <tr>
           <td style="text-align: center;">${index + 1}</td>
-          <td>
-            <strong>${item.productName || 'Toy Item'}</strong>
-          </td>
+          <td><strong>${item.productName || 'Toy Item'}</strong></td>
           <td style="text-align: center;"><strong>${qty}</strong></td>
           <td style="text-align: right;">₹${unitPrice.toLocaleString('en-IN')}</td>
           <td style="text-align: right; font-weight: 700; color: #111827;">₹${lineTotal.toLocaleString('en-IN')}</td>
@@ -235,142 +233,138 @@ const OrderManagement = () => {
         <meta charset="utf-8" />
         <title>Invoice #${order.orderNumber} - ${shopName}</title>
         <style>
-          @page { size: A4; margin: 12mm; }
+          @page { size: A4; margin: 8mm; }
+          * { box-sizing: border-box; }
           body {
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
             color: #1f2937;
             background: #fff;
             margin: 0;
-            padding: 16px;
-            font-size: 13px;
-            line-height: 1.5;
+            padding: 8px;
+            font-size: 11px;
+            line-height: 1.4;
           }
           .invoice-box {
-            max-width: 820px;
+            max-width: 780px;
             margin: auto;
             border: 1px solid #e5e7eb;
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border-radius: 8px;
+            padding: 16px;
           }
           
-          /* Header */
+          /* Header: Clean & Uncongested (Only Logo, Shop Name, Motto & Invoice Info) */
           .header-table {
             width: 100%;
             border-collapse: collapse;
             border-bottom: 2px solid #0288d1;
-            padding-bottom: 16px;
-            margin-bottom: 20px;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
           }
-          .header-table td { vertical-align: top; }
+          .header-table td { vertical-align: middle; }
           .shop-logo-img {
-            max-height: 65px;
-            max-width: 160px;
+            max-height: 48px;
+            max-width: 140px;
             object-fit: contain;
-            border-radius: 8px;
-            margin-bottom: 6px;
+            border-radius: 6px;
           }
           .shop-title {
-            font-size: 22px;
+            font-size: 20px;
             font-weight: 800;
             color: #001529;
             margin: 0;
             letter-spacing: -0.5px;
+            line-height: 1.2;
           }
           .shop-motto {
-            font-size: 11px;
+            font-size: 10px;
             color: #0288d1;
             font-weight: 600;
             text-transform: uppercase;
-            margin-bottom: 4px;
-          }
-          .shop-meta {
-            font-size: 11px;
-            color: #4b5563;
+            margin-top: 2px;
           }
           
           .invoice-badge-title {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 900;
             color: #0288d1;
             text-align: right;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
             margin: 0;
           }
           .invoice-details-meta {
             text-align: right;
-            font-size: 12px;
-            margin-top: 6px;
+            font-size: 11px;
+            margin-top: 4px;
           }
           .status-tag {
             display: inline-block;
-            padding: 3px 10px;
-            border-radius: 20px;
-            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 10px;
             font-weight: 700;
             text-transform: uppercase;
           }
           .status-paid { background: #dcfce7; color: #15803d; }
           .status-pending { background: #fef3c7; color: #b45309; }
           
-          /* Address Section */
+          /* Address Cards (Side by Side) */
           .address-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
           }
           .address-card {
             width: 48%;
             background: #f9fafb;
             border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 12px 16px;
+            border-radius: 6px;
+            padding: 8px 12px;
             vertical-align: top;
           }
           .address-title {
-            font-size: 11px;
+            font-size: 10px;
             font-weight: 800;
             color: #6b7280;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
             border-bottom: 1px dashed #e5e7eb;
-            padding-bottom: 4px;
+            padding-bottom: 2px;
           }
           
           /* Products Table */
           .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
           }
           .items-table th {
             background: #001529;
             color: #ffffff;
             font-weight: 700;
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
-            padding: 10px 12px;
+            padding: 6px 10px;
             text-align: left;
           }
           .items-table td {
-            padding: 10px 12px;
+            padding: 5px 10px;
             border-bottom: 1px solid #f3f4f6;
-            font-size: 12px;
+            font-size: 11px;
           }
           .items-table tr:nth-child(even) { background: #fafafa; }
           
           /* Summary Table */
           .summary-table {
-            width: 50%;
+            width: 45%;
             margin-left: auto;
             border-collapse: collapse;
-            margin-bottom: 24px;
+            margin-bottom: 12px;
           }
           .summary-table td {
-            padding: 6px 12px;
-            font-size: 13px;
+            padding: 4px 8px;
+            font-size: 11px;
           }
           .summary-total-row {
             background: #f0fdf4;
@@ -378,63 +372,62 @@ const OrderManagement = () => {
             font-weight: 800;
           }
           .summary-total-row td {
-            font-size: 16px;
+            font-size: 14px;
             color: #15803d;
-            padding: 10px 12px;
+            padding: 6px 8px;
           }
 
-          /* Caution & Terms */
+          /* Compact Caution & Policy Guidelines */
           .caution-box {
             background: #fffbe6;
             border: 1px solid #ffe58f;
-            border-radius: 8px;
-            padding: 14px 16px;
-            margin-bottom: 16px;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 10px;
           }
           .caution-title {
             font-weight: 800;
             color: #d46b08;
-            font-size: 12px;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            font-size: 10px;
+            margin-bottom: 3px;
           }
           .caution-list {
             margin: 0;
-            padding-left: 18px;
-            font-size: 11px;
+            padding-left: 16px;
+            font-size: 10px;
             color: #595959;
           }
-          .caution-list li { margin-bottom: 3px; }
+          .caution-list li { margin-bottom: 2px; }
 
+          /* Compact Thank You Note */
           .thank-you-note {
             text-align: center;
             background: #e6f7ff;
             border: 1px dashed #91d5ff;
-            border-radius: 8px;
-            padding: 10px;
+            border-radius: 6px;
+            padding: 6px;
             font-weight: 700;
             color: #0050b3;
-            font-size: 13px;
-            margin-bottom: 24px;
+            font-size: 11px;
+            margin-bottom: 12px;
           }
 
-          /* Footer */
+          /* Clean, Properly Arranged Footer */
           .footer-section {
-            border-top: 2px solid #e5e7eb;
-            padding-top: 14px;
-            font-size: 11px;
-            color: #6b7280;
+            border-top: 2px solid #0288d1;
+            padding-top: 8px;
+            font-size: 10px;
+            color: #4b5563;
           }
           .footer-table { width: 100%; border-collapse: collapse; }
-          .footer-table td { vertical-align: top; padding: 4px; }
-          .footer-header { font-weight: 700; color: #374151; margin-bottom: 4px; }
-          .social-link { color: #0288d1; text-decoration: none; font-weight: 600; margin-right: 12px; }
+          .footer-table td { vertical-align: top; padding: 2px 4px; }
+          .footer-header { font-weight: 700; color: #111827; margin-bottom: 3px; font-size: 10px; text-transform: uppercase; }
+          .social-link { color: #0288d1; text-decoration: none; font-weight: 600; margin-right: 8px; }
+          .footer-notice { text-align: center; margin-top: 6px; font-style: italic; color: #9ca3af; font-size: 9px; }
 
           @media print {
             body { padding: 0; background: #fff; }
-            .invoice-box { border: none; box-shadow: none; padding: 0; }
+            .invoice-box { border: none; padding: 0; }
             .no-print { display: none; }
           }
         </style>
@@ -442,27 +435,25 @@ const OrderManagement = () => {
       <body>
         <div class="invoice-box">
           
-          <!-- Header Table -->
+          <!-- Header Table: ONLY Logo, Shop Name, Motto & Invoice Details -->
           <table class="header-table">
             <tr>
               <td>
-                <img src="${logoUrl}" alt="Logo" class="shop-logo-img" />
-                <h1 class="shop-title">${shopName}</h1>
-                <div class="shop-motto">${motto}</div>
-                <div class="shop-meta">
-                  ${fullShopAddress}<br />
-                  <strong>Phone:</strong> ${allPhones} | <strong>WhatsApp:</strong> ${whatsapp}<br />
-                  <strong>Email:</strong> ${allEmails}<br />
-                  <strong>GSTIN:</strong> ${gstNo} | <strong>Reg No:</strong> ${regNo} | <strong>PAN:</strong> ${panNo}
+                <div style="display: flex; align-items: center; gap: 12px;">
+                  ${logoUrl ? `<img src="${logoUrl}" alt="Logo" class="shop-logo-img" />` : ''}
+                  <div>
+                    <h1 class="shop-title">${shopName}</h1>
+                    <div class="shop-motto">${motto}</div>
+                  </div>
                 </div>
               </td>
               <td style="text-align: right;">
                 <h2 class="invoice-badge-title">TAX INVOICE</h2>
                 <div class="invoice-details-meta">
-                  <div><strong>Invoice #:</strong> <span style="font-family: monospace; font-size: 14px;">${order.orderNumber}</span></div>
+                  <div><strong>Invoice #:</strong> <span style="font-family: monospace; font-size: 12px; font-weight: 700;">${order.orderNumber}</span></div>
                   <div><strong>Order Date:</strong> ${orderDateFormatted}</div>
                   <div><strong>Invoice Date:</strong> ${invoiceDate}</div>
-                  <div style="margin-top: 6px;">
+                  <div style="margin-top: 4px;">
                     <span class="status-tag ${order.paymentStatus === 'Success' || order.paymentStatus === 'Paid' ? 'status-paid' : 'status-pending'}">
                       Payment: ${order.paymentStatus || 'Pending'}
                     </span>
@@ -472,19 +463,19 @@ const OrderManagement = () => {
             </tr>
           </table>
 
-          <!-- Addresses Table -->
+          <!-- Customer & Shipping Addresses (2 columns) -->
           <table class="address-table">
             <tr>
               <td class="address-card">
                 <div class="address-title">👤 BILLED TO / CUSTOMER DETAILS</div>
-                <div style="font-weight: 800; font-size: 14px; color: #111827;">${customerName}</div>
+                <div style="font-weight: 800; font-size: 12px; color: #111827;">${customerName}</div>
                 <div><strong>Mobile:</strong> ${customerPhone}</div>
                 <div><strong>Email:</strong> ${customerEmail}</div>
               </td>
               <td style="width: 4%;"></td>
               <td class="address-card">
                 <div class="address-title">🚚 SHIPPED TO / DELIVERY ADDRESS</div>
-                <div style="font-weight: 800; font-size: 14px; color: #111827;">${shipRecipient}</div>
+                <div style="font-weight: 800; font-size: 12px; color: #111827;">${shipRecipient}</div>
                 <div><strong>Phone:</strong> ${shipPhone}</div>
                 <div>${fullShipAddress}</div>
               </td>
@@ -495,11 +486,11 @@ const OrderManagement = () => {
           <table class="items-table">
             <thead>
               <tr>
-                <th style="width: 40px; text-align: center;">#</th>
+                <th style="width: 35px; text-align: center;">#</th>
                 <th>Toy Product Description</th>
-                <th style="width: 70px; text-align: center;">Qty</th>
-                <th style="width: 110px; text-align: right;">Unit Price (₹)</th>
-                <th style="width: 120px; text-align: right;">Subtotal (₹)</th>
+                <th style="width: 60px; text-align: center;">Qty</th>
+                <th style="width: 100px; text-align: right;">Unit Price (₹)</th>
+                <th style="width: 110px; text-align: right;">Subtotal (₹)</th>
               </tr>
             </thead>
             <tbody>
@@ -514,14 +505,9 @@ const OrderManagement = () => {
               <td style="text-align: right; font-weight: 600;">₹${itemsSubtotal.toLocaleString('en-IN')}</td>
             </tr>
             <tr>
-              <td style="text-align: right;"><strong>Shipping / Delivery Charge:</strong></td>
-              <td style="text-align: right; color: ${shippingCharge === 0 ? '#16a34a' : '#111827'}; font-weight: 600;">
+              <td style="text-align: right;"><strong>Shipping Charge:</strong></td>
+              <td style="text-align: right; color: ${shippingCharge === 0 ? '#15803d' : '#111827'}; font-weight: 600;">
                 ${shippingCharge === 0 ? 'FREE Shipping' : `₹${shippingCharge.toLocaleString('en-IN')}`}
-              </td>
-            </tr>
-            <tr>
-              <td style="text-align: right; font-size: 11px; color: #6b7280;" colspan="2">
-                * Prices are inclusive of all applicable taxes (GST).
               </td>
             </tr>
             <tr class="summary-total-row">
@@ -530,48 +516,50 @@ const OrderManagement = () => {
             </tr>
           </table>
 
-          <!-- Caution & Important Guidelines -->
+          <!-- Compact Caution & Policy Guidelines -->
           <div class="caution-box">
-            <div class="caution-title">⚠️ Important Customer Guidelines & Return Policy:</div>
+            <div class="caution-title">⚠️ Customer Guidelines & Return Policy:</div>
             <ul class="caution-list">
-              <li><strong>7-Day Replacement Policy:</strong> Toys can be returned or replaced within 7 days of delivery date if damaged or defective with original packaging preserved.</li>
-              <li><strong>Inspection Notice:</strong> Please verify all outer seal packaging and contents immediately upon receiving the delivery parcel.</li>
-              <li><strong>Warranty Support:</strong> Battery-operated and electronic toys carry manufacturer warranties as indicated on product boxes.</li>
-              <li><strong>Unboxing Proof:</strong> For any missing component or transit damage claim, recording a continuous unboxing video is required.</li>
+              <li><strong>7-Day Replacement:</strong> Toys can be returned/replaced within 7 days of delivery with original intact box.</li>
+              <li><strong>Inspection & Video:</strong> Verify package on arrival. Continuous unboxing video required for missing item claims.</li>
             </ul>
           </div>
 
-          <!-- Thank You Note -->
+          <!-- Compact Thank You Note -->
           <div class="thank-you-note">
             🧸 Thank you for shopping with ${shopName}! We hope your little ones enjoy their new toys. ✨
           </div>
 
-          <!-- Footer Section -->
+          <!-- Clean, Properly Arranged Footer Section -->
           <div class="footer-section">
             <table class="footer-table">
               <tr>
-                <td style="width: 50%;">
-                  <div class="footer-header">📍 Store Address & Contact Hotlines</div>
+                <td style="width: 36%;">
+                  <div class="footer-header">📍 Store Address</div>
                   <div>${fullShopAddress}</div>
-                  <div>📞 Call Support: <strong>${allPhones}</strong></div>
-                  <div>💬 WhatsApp Hotline: <strong>${whatsapp}</strong></div>
-                  <div>✉️ Email Support: <strong>${allEmails}</strong></div>
                 </td>
-                <td style="width: 50%; text-align: right;">
-                  <div class="footer-header">🌐 Connect With Us & Hours</div>
-                  <div>🕒 Business Hours: <strong>${openingHours}</strong></div>
-                  <div style="margin-top: 4px;">
-                    ${fb ? `<a href="${fb}" target="_blank" class="social-link">Facebook</a>` : ''}
-                    ${insta ? `<a href="${insta}" target="_blank" class="social-link">Instagram</a>` : ''}
+                <td style="width: 34%;">
+                  <div class="footer-header">📞 Contacts & Support</div>
+                  <div>Phone: <strong>${allPhones}</strong></div>
+                  <div>WhatsApp: <strong>${whatsapp}</strong></div>
+                  <div>Email: <strong>${allEmails}</strong></div>
+                </td>
+                <td style="width: 30%; text-align: right;">
+                  <div class="footer-header">🏛️ Legal & Social</div>
+                  <div>GSTIN: <strong>${gstNo}</strong> | PAN: <strong>${panNo}</strong></div>
+                  <div>Hours: <strong>${openingHours}</strong></div>
+                  <div style="margin-top: 2px;">
+                    ${fb ? `<a href="${fb}" target="_blank" class="social-link">FB</a>` : ''}
+                    ${insta ? `<a href="${insta}" target="_blank" class="social-link">Insta</a>` : ''}
                     ${twitter ? `<a href="${twitter}" target="_blank" class="social-link">Twitter</a>` : ''}
                     ${yt ? `<a href="${yt}" target="_blank" class="social-link">YouTube</a>` : ''}
-                  </div>
-                  <div style="margin-top: 8px; font-style: italic; color: #9ca3af; font-size: 10px;">
-                    This is a computer-generated tax invoice. No signature required.
                   </div>
                 </td>
               </tr>
             </table>
+            <div class="footer-notice">
+              * This is a computer-generated tax invoice. No signature required.
+            </div>
           </div>
 
         </div>
