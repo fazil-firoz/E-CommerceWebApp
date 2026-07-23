@@ -933,7 +933,7 @@ const ReportManagement = () => {
       {/* Top Header Bar */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <Title level={3} style={{ margin: 0, fontWeight: 800 }}>ToyVerse Reports & Analytics</Title>
+          <Title level={3} style={{ margin: 0, fontWeight: 800 }}>{shopSettings?.shopName || 'Store'} Reports & Analytics</Title>
           <Text type="secondary" style={{ fontSize: '13px' }}>Monitor inventory counts, low stock alerts, order items, customer name/phone filters, and revenue totals.</Text>
         </div>
         <Space>

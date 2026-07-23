@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Menu, Button, Space, Typography } from 'antd';
 import { 
@@ -13,6 +13,7 @@ import {
   BarChartOutlined
 } from '@ant-design/icons';
 import { AdminAuthContext } from '../context/AdminAuthContext';
+import { shopApi } from '../api/shopApi';
 
 const { Header, Content, Sider } = Layout;
 
@@ -20,12 +21,27 @@ const AdminLayout = () => {
   const { admin, logout, isAuthenticated } = useContext(AdminAuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const [shopSettings, setShopSettings] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/admin/login');
     }
   }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const fetchShopInfo = async () => {
+      try {
+        const res = await shopApi.getSettings();
+        if (res.success && res.data) {
+          setShopSettings(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch shop settings for admin layout', err);
+      }
+    };
+    fetchShopInfo();
+  }, []);
 
   if (!isAuthenticated) {
     return null; // Don't render anything while redirecting
@@ -69,6 +85,8 @@ const AdminLayout = () => {
     },
   ];
 
+  const shopName = shopSettings?.shopName || 'Shop';
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider 
@@ -87,7 +105,7 @@ const AdminLayout = () => {
           background: '#002140'
         }}>
           <Typography.Title level={4} style={{ color: '#fff', margin: 0, fontWeight: 700 }}>
-            ToyVerse Admin
+            {shopName} Admin
           </Typography.Title>
         </div>
         <Menu 
@@ -98,53 +116,54 @@ const AdminLayout = () => {
           style={{ padding: '16px 0' }}
         />
       </Sider>
-      
+
       <Layout>
         <Header style={{ 
           background: '#fff', 
           padding: '0 24px', 
           display: 'flex', 
-          justifyContent: 'space-between',
+          justify: 'space-between', 
           alignItems: 'center',
-          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.05)'
+          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+          zIndex: 1
         }}>
-          <Typography.Text strong style={{ fontSize: '16px' }}>
-            Welcome, {admin?.fullName || 'Administrator'}
-          </Typography.Text>
+          <Space>
+            <Typography.Text type="secondary">Admin Console</Typography.Text>
+          </Space>
 
-          <Space size="middle">
+          <Space size={16}>
             <Button 
-              type="text" 
               icon={<HomeOutlined />} 
               onClick={() => navigate('/')}
-            >
-              Customer Site
-            </Button>
-            <Button 
-              type="primary" 
-              danger 
-              icon={<LogoutOutlined />} 
-              onClick={() => {
-                logout();
-                navigate('/admin/login');
-              }}
               style={{ borderRadius: '6px' }}
             >
-              Logout
+              View Storefront
             </Button>
+            
+            <Space>
+              <Typography.Text strong>{admin?.username || 'Admin'}</Typography.Text>
+              <Button 
+                type="text" 
+                danger 
+                icon={<LogoutOutlined />} 
+                onClick={logout}
+                style={{ borderRadius: '6px' }}
+              >
+                Logout
+              </Button>
+            </Space>
           </Space>
         </Header>
-        
-        <Content style={{ margin: '24px', minHeight: 280 }}>
-          <div style={{ 
-            padding: 24, 
-            background: '#fff', 
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.02)',
-            minHeight: '100%'
-          }}>
-            <Outlet />
-          </div>
+
+        <Content style={{ 
+          margin: '24px', 
+          padding: '24px', 
+          background: '#fff', 
+          borderRadius: '8px',
+          minHeight: '280px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+        }}>
+          <Outlet />
         </Content>
       </Layout>
     </Layout>

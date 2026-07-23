@@ -10,6 +10,7 @@ import { CartContext } from '../../context/CartContext';
 import { orderApi } from '../../api/orderApi';
 import { paymentApi } from '../../api/paymentApi';
 import { shipmentApi } from '../../api/shipmentApi';
+import { shopApi } from '../../api/shopApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 import './Checkout.css';
 
@@ -23,6 +24,19 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [orderResponse, setOrderResponse] = useState(null);
   const [showMockModal, setShowMockModal] = useState(false);
+  const [shopSettings, setShopSettings] = useState(null);
+
+  useEffect(() => {
+    const fetchShop = async () => {
+      try {
+        const res = await shopApi.getSettings();
+        if (res.success && res.data) setShopSettings(res.data);
+      } catch (err) {}
+    };
+    fetchShop();
+  }, []);
+
+  const shopName = shopSettings?.shopName || 'Store';
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [shippingMethod, setShippingMethod] = useState(null);
 
@@ -109,7 +123,7 @@ const Checkout = () => {
       key: orderData.razorpayKey,
       amount: orderData.amount * 100,
       currency: 'INR',
-      name: 'ToyVerse',
+      name: shopName,
       description: `Order ${orderData.orderNumber}`,
       order_id: orderData.razorpayOrderId,
       handler: async (response) => {
@@ -193,7 +207,7 @@ const Checkout = () => {
         {/* Brand */}
         <div className="checkout-brand">
           <Title level={3} style={{ margin: 0, fontWeight: 800, color: '#1a1a1a' }}>
-            🧸 ToyVerse
+            🧸 {shopName}
           </Title>
         </div>
 

@@ -91,7 +91,7 @@ const Dashboard = () => {
     <Space direction="vertical" size={24} style={{ width: '100%' }}>
       <div>
         <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Admin Dashboard</Title>
-        <Text type="secondary">Real-time metrics for your ToyVerse store</Text>
+        <Text type="secondary">Real-time metrics and store performance overview</Text>
       </div>
 
       <Row gutter={[16, 16]}>
