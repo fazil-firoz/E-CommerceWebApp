@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Button, Space, Typography } from 'antd';
+import { Layout, Menu, Button, Typography } from 'antd';
 import { 
   DashboardOutlined, 
   FolderOutlined, 
@@ -10,7 +10,8 @@ import {
   HomeOutlined,
   ShopOutlined,
   ControlOutlined,
-  BarChartOutlined
+  BarChartOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import { shopApi } from '../api/shopApi';
@@ -121,38 +122,44 @@ const AdminLayout = () => {
         <Header style={{ 
           background: '#fff', 
           padding: '0 24px', 
+          height: '64px',
           display: 'flex', 
           justify: 'space-between', 
           alignItems: 'center',
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
-          zIndex: 1
+          zIndex: 10
         }}>
-          <Space>
-            <Typography.Text type="secondary">Admin Console</Typography.Text>
-          </Space>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Typography.Text strong style={{ fontSize: '15px', color: '#001529' }}>
+              ⚙️ Admin Console
+            </Typography.Text>
+          </div>
 
-          <Space size={16}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
             <Button 
               icon={<HomeOutlined />} 
               onClick={() => navigate('/')}
-              style={{ borderRadius: '6px' }}
+              style={{ borderRadius: '6px', display: 'flex', alignItems: 'center' }}
             >
               View Storefront
             </Button>
             
-            <Space>
-              <Typography.Text strong>{admin?.username || 'Admin'}</Typography.Text>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <UserOutlined style={{ color: '#1890ff' }} />
+                <Typography.Text strong>{admin?.username || 'Admin'}</Typography.Text>
+              </div>
               <Button 
                 type="text" 
                 danger 
                 icon={<LogoutOutlined />} 
                 onClick={logout}
-                style={{ borderRadius: '6px' }}
+                style={{ borderRadius: '6px', display: 'flex', alignItems: 'center' }}
               >
                 Logout
               </Button>
-            </Space>
-          </Space>
+            </div>
+          </div>
         </Header>
 
         <Content style={{ 
