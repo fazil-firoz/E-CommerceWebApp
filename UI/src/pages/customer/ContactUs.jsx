@@ -36,11 +36,20 @@ const ContactUs = () => {
 
   const handleSubmit = async (values) => {
     setSubmitting(true);
-    setTimeout(() => {
-      message.success('Thank you! Your message has been sent. Our team will contact you shortly.');
-      form.resetFields();
+    try {
+      const res = await shopApi.sendContactMessage(values);
+      if (res.success) {
+        message.success(res.message || 'Thank you! Your message has been sent directly to our company inbox.');
+        form.resetFields();
+      } else {
+        message.error(res.message || 'Failed to send message. Please try again.');
+      }
+    } catch (err) {
+      console.error('Contact message error:', err);
+      message.error(err?.response?.data?.message || 'Failed to send message. Please try again later.');
+    } finally {
       setSubmitting(false);
-    }, 1000);
+    }
   };
 
   return (
