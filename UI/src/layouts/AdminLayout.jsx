@@ -1,6 +1,6 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Button, Space, Typography } from 'antd';
+import { Layout, Menu, Button, Typography } from 'antd';
 import { 
   DashboardOutlined, 
   FolderOutlined, 
@@ -10,9 +10,11 @@ import {
   HomeOutlined,
   ShopOutlined,
   ControlOutlined,
-  BarChartOutlined
+  BarChartOutlined,
+  UserOutlined
 } from '@ant-design/icons';
 import { AdminAuthContext } from '../context/AdminAuthContext';
+import { shopApi } from '../api/shopApi';
 
 const { Header, Content, Sider } = Layout;
 
@@ -20,12 +22,27 @@ const AdminLayout = () => {
   const { admin, logout, isAuthenticated } = useContext(AdminAuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const [shopSettings, setShopSettings] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate('/admin/login');
     }
   }, [isAuthenticated, navigate]);
+
+  useEffect(() => {
+    const fetchShopInfo = async () => {
+      try {
+        const res = await shopApi.getSettings();
+        if (res.success && res.data) {
+          setShopSettings(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch shop settings for admin layout', err);
+      }
+    };
+    fetchShopInfo();
+  }, []);
 
   if (!isAuthenticated) {
     return null; // Don't render anything while redirecting
@@ -69,6 +86,8 @@ const AdminLayout = () => {
     },
   ];
 
+  const shopName = shopSettings?.shopName || 'Shop';
+
   return (
     <Layout style={{ minHeight: '100vh' }}>
       <Sider 
@@ -87,7 +106,7 @@ const AdminLayout = () => {
           background: '#002140'
         }}>
           <Typography.Title level={4} style={{ color: '#fff', margin: 0, fontWeight: 700 }}>
-            ToyVerse Admin
+            {shopName} Admin
           </Typography.Title>
         </div>
         <Menu 
@@ -98,53 +117,60 @@ const AdminLayout = () => {
           style={{ padding: '16px 0' }}
         />
       </Sider>
-      
+
       <Layout>
         <Header style={{ 
           background: '#fff', 
           padding: '0 24px', 
+          height: '64px',
           display: 'flex', 
-          justifyContent: 'space-between',
+          justify: 'space-between', 
           alignItems: 'center',
-          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.05)'
+          boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
+          zIndex: 10
         }}>
-          <Typography.Text strong style={{ fontSize: '16px' }}>
-            Welcome, {admin?.fullName || 'Administrator'}
-          </Typography.Text>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Typography.Text strong style={{ fontSize: '15px', color: '#001529' }}>
+              ⚙️ Admin Console
+            </Typography.Text>
+          </div>
 
-          <Space size="middle">
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
             <Button 
-              type="text" 
               icon={<HomeOutlined />} 
               onClick={() => navigate('/')}
+              style={{ borderRadius: '6px', display: 'flex', alignItems: 'center' }}
             >
-              Customer Site
+              View Storefront
             </Button>
-            <Button 
-              type="primary" 
-              danger 
-              icon={<LogoutOutlined />} 
-              onClick={() => {
-                logout();
-                navigate('/admin/login');
-              }}
-              style={{ borderRadius: '6px' }}
-            >
-              Logout
-            </Button>
-          </Space>
-        </Header>
-        
-        <Content style={{ margin: '24px', minHeight: 280 }}>
-          <div style={{ 
-            padding: 24, 
-            background: '#fff', 
-            borderRadius: '12px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.02)',
-            minHeight: '100%'
-          }}>
-            <Outlet />
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                <UserOutlined style={{ color: '#1890ff' }} />
+                <Typography.Text strong>{admin?.username || 'Admin'}</Typography.Text>
+              </div>
+              <Button 
+                type="text" 
+                danger 
+                icon={<LogoutOutlined />} 
+                onClick={logout}
+                style={{ borderRadius: '6px', display: 'flex', alignItems: 'center' }}
+              >
+                Logout
+              </Button>
+            </div>
           </div>
+        </Header>
+
+        <Content style={{ 
+          margin: '24px', 
+          padding: '24px', 
+          background: '#fff', 
+          borderRadius: '8px',
+          minHeight: '280px',
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+        }}>
+          <Outlet />
         </Content>
       </Layout>
     </Layout>

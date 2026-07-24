@@ -6,6 +6,7 @@ import {
 } from '@ant-design/icons';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import { authApi } from '../api/authApi';
+import { shopApi } from '../api/shopApi';
 import './LoginDrawer.css';
 
 const { Text, Title } = Typography;
@@ -23,9 +24,22 @@ const LoginDrawer = ({ open, onClose }) => {
   const [loading, setLoading] = useState(false);
   const [resendTimer, setResendTimer] = useState(0);
   const [emailError, setEmailError] = useState('');
+  const [shopSettings, setShopSettings] = useState(null);
 
   const otpRefs = useRef([]);
   const timerRef = useRef(null);
+
+  useEffect(() => {
+    const fetchShop = async () => {
+      try {
+        const res = await shopApi.getSettings();
+        if (res.success && res.data) setShopSettings(res.data);
+      } catch (err) {}
+    };
+    fetchShop();
+  }, []);
+
+  const shopName = shopSettings?.shopName || 'Store';
 
   // Reset state when drawer opens
   useEffect(() => {
@@ -221,7 +235,7 @@ const LoginDrawer = ({ open, onClose }) => {
   const renderEmailStep = () => (
     <div className="ld-step">
       <div className="ld-step-icon">✉️</div>
-      <Title level={4} className="ld-step-title">Sign in to ToyVerse</Title>
+      <Title level={4} className="ld-step-title">Sign in to {shopName}</Title>
       <Text type="secondary" className="ld-step-desc">
         Enter your email address and we'll send you a one-time password.
       </Text>
@@ -260,7 +274,7 @@ const LoginDrawer = ({ open, onClose }) => {
         <Text type="secondary" style={{ fontSize: '12px' }}>By signing in you agree to our</Text>
       </Divider>
       <Text type="secondary" style={{ fontSize: '12px', display: 'block', textAlign: 'center' }}>
-        <a href="#" style={{ color: '#1677ff' }}>Privacy Policy</a> · <a href="#" style={{ color: '#1677ff' }}>Terms of Service</a>
+        <a href="/privacy-policy" style={{ color: '#1677ff' }}>Privacy Policy</a> · <a href="/terms-conditions" style={{ color: '#1677ff' }}>Terms of Service</a>
       </Text>
     </div>
   );
@@ -371,7 +385,7 @@ const LoginDrawer = ({ open, onClose }) => {
       <div className="ld-header">
         <div className="ld-header-brand">
           <span className="ld-brand-dot">🧸</span>
-          <Text strong style={{ fontSize: '15px' }}>ToyVerse</Text>
+          <Text strong style={{ fontSize: '15px' }}>{shopName}</Text>
         </div>
         <button className="ld-close-btn" onClick={onClose}>✕</button>
       </div>

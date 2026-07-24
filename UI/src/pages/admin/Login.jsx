@@ -44,7 +44,7 @@ const Login = () => {
       }}>
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
           <Title level={3} style={{ fontWeight: 800, margin: 0, color: '#001529' }}>
-            ToyVerse Console
+            Admin Console
           </Title>
           <Text type="secondary">Sign in to manage your toy shop</Text>
         </div>
