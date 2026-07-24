@@ -66,16 +66,23 @@ const CustomerLayout = () => {
     },
   ];
 
-  const shopName = shopSettings?.shopName || 'ToyVerse';
+  const shopName = shopSettings?.shopName || 'Store';
   const motto = shopSettings?.motto || 'Your portal to imagination, joy, and endless play.';
   const logoUrl = shopSettings?.logoUrl ? resolveProductImageUrl(shopSettings.logoUrl) : null;
-  const fullAddress = shopSettings 
-    ? `${shopSettings.addressLine1}${shopSettings.addressLine2 ? ', ' + shopSettings.addressLine2 : ''}, ${shopSettings.city}, ${shopSettings.state} - ${shopSettings.pincode}` 
-    : 'ToyVerse Main Branch, City Center';
+  
+  const addressParts = [
+    shopSettings?.addressLine1,
+    shopSettings?.addressLine2,
+    shopSettings?.city,
+    shopSettings?.state ? (shopSettings?.pincode ? `${shopSettings.state} - ${shopSettings.pincode}` : shopSettings.state) : shopSettings?.pincode,
+    shopSettings?.country
+  ].filter(p => p && p.trim() !== '');
+
+  const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : 'Store Main Branch, City Center, India';
 
   const phone1 = shopSettings?.phone1 || '+91 9876543210';
   const whatsapp = shopSettings?.whatsAppNumber || phone1;
-  const email1 = shopSettings?.email1 || 'support@toyverse.com';
+  const email1 = shopSettings?.email1 || 'support@store.com';
   const openingHours = shopSettings?.openingHours || 'Mon - Sat: 9:00 AM - 8:00 PM';
 
   const fb = shopSettings?.facebookUrl;
@@ -280,15 +287,15 @@ const CustomerLayout = () => {
                 </Space>
                 <Space align="center">
                   <PhoneOutlined style={{ color: '#52c41a' }} />
-                  <span><strong>Call:</strong> {phone1}</span>
+                  <span><strong>Call:</strong> <a href={`tel:${phone1.replace(/[^0-9+]/g, '')}`} style={{ color: '#ffffffd9' }}>{phone1}</a></span>
                 </Space>
                 <Space align="center">
                   <WhatsAppOutlined style={{ color: '#25D366' }} />
-                  <span><strong>WhatsApp:</strong> {whatsapp}</span>
+                  <span><strong>WhatsApp:</strong> <a href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', fontWeight: 600 }}>{whatsapp}</a></span>
                 </Space>
                 <Space align="center">
-                  <MailOutlined style={{ color: '#722ed1' }} />
-                  <span><strong>Email:</strong> {email1}</span>
+                  <MailOutlined style={{ color: '#ec4899' }} />
+                  <span><strong>Email:</strong> <a href={`mailto:${email1}`} style={{ color: '#ffffffd9' }}>{email1}</a></span>
                 </Space>
                 <Space align="center">
                   <ClockCircleOutlined style={{ color: '#faad14' }} />
