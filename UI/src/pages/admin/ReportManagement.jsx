@@ -120,7 +120,7 @@ const ReportManagement = () => {
     } else {
       fetchSalesReport();
     }
-  }, [activeTab]);
+  }, [activeTab, salesPeriod, salesOrderStatus]);
 
   // Export Stock CSV
   const exportStockCSV = () => {
