@@ -1,41 +1,75 @@
 using MailKit.Net.Smtp;
 using MailKit.Security;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using MimeKit;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
 using ToyShop.Application.Common.Interfaces;
+using ToyShop.Domain.Entities;
 
 namespace ToyShop.Infrastructure.Services
 {
     public class EmailService : IEmailService
     {
         private readonly IConfiguration _configuration;
+        private readonly IServiceProvider _serviceProvider;
 
-        public EmailService(IConfiguration configuration)
+        public EmailService(IConfiguration configuration, IServiceProvider serviceProvider)
         {
             _configuration = configuration;
+            _serviceProvider = serviceProvider;
+        }
+
+        private async Task<string> GetShopNameAsync(CancellationToken cancellationToken)
+        {
+            try
+            {
+                using var scope = _serviceProvider.CreateScope();
+                var shopRepo = scope.ServiceProvider.GetService<IRepository<Shop>>();
+                if (shopRepo != null)
+                {
+                    var shop = await shopRepo.Query().FirstOrDefaultAsync(cancellationToken);
+                    if (shop != null && !string.IsNullOrWhiteSpace(shop.ShopName))
+                    {
+                        return shop.ShopName.Trim();
+                    }
+                }
+            }
+            catch
+            {
+                // Fallback if DB query fails
+            }
+
+            var fromName = _configuration["Email:FromName"];
+            if (!string.IsNullOrWhiteSpace(fromName) && fromName != "ToyVerse Shop" && fromName != "OTP Test")
+            {
+                return fromName.Trim();
+            }
+
+            return "Store";
         }
 
         public async Task SendOtpEmailAsync(string toEmail, string otpCode, CancellationToken cancellationToken = default)
         {
+            var shopName = await GetShopNameAsync(cancellationToken);
             var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
             var smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
             var smtpUser = _configuration["Email:SmtpUser"] ?? "";
             var smtpPass = _configuration["Email:SmtpPass"] ?? "";
-            var fromName = _configuration["Email:FromName"] ?? "ToyVerse Shop";
             var fromEmail = _configuration["Email:FromEmail"] ?? smtpUser;
 
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress(fromName, fromEmail));
+            message.From.Add(new MailboxAddress(shopName, fromEmail));
             message.To.Add(MailboxAddress.Parse(toEmail));
-            message.Subject = $"Your ToyVerse OTP: {otpCode}";
+            message.Subject = $"Your {shopName} OTP: {otpCode}";
 
             var body = new BodyBuilder
             {
-                HtmlBody = BuildOtpEmailHtml(otpCode, toEmail),
-                TextBody = $"Your ToyVerse one-time password is: {otpCode}\n\nThis code expires in 10 minutes.\n\nIf you didn't request this, ignore this email."
+                HtmlBody = BuildOtpEmailHtml(otpCode, toEmail, shopName),
+                TextBody = $"Your {shopName} one-time password is: {otpCode}\n\nThis code expires in 10 minutes.\n\nIf you didn't request this, ignore this email."
             };
             message.Body = body.ToMessageBody();
 
@@ -49,26 +83,26 @@ namespace ToyShop.Infrastructure.Services
 
         public async Task SendContactMessageAsync(string name, string phone, string email, string subject, string messageContent, CancellationToken cancellationToken = default)
         {
+            var shopName = await GetShopNameAsync(cancellationToken);
             var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
             var smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
             var smtpUser = _configuration["Email:SmtpUser"] ?? "";
             var smtpPass = _configuration["Email:SmtpPass"] ?? "";
-            var fromName = _configuration["Email:FromName"] ?? "Website Support Desk";
             var companyEmail = _configuration["Email:FromEmail"] ?? smtpUser;
 
             var message = new MimeMessage();
-            message.From.Add(new MailboxAddress($"{name} (Web Inquiry)", companyEmail));
+            message.From.Add(new MailboxAddress($"{name} ({shopName} Web Inquiry)", companyEmail));
             message.To.Add(MailboxAddress.Parse(companyEmail));
             if (!string.IsNullOrWhiteSpace(email) && email.Contains("@"))
             {
                 message.ReplyTo.Add(new MailboxAddress(name, email));
             }
-            message.Subject = $"📩 New Customer Inquiry: {(string.IsNullOrWhiteSpace(subject) ? "Website Contact Form" : subject)} from {name}";
+            message.Subject = $"📩 [{shopName}] New Customer Inquiry: {(string.IsNullOrWhiteSpace(subject) ? "Website Contact Form" : subject)} from {name}";
 
             var body = new BodyBuilder
             {
-                HtmlBody = BuildContactEmailHtml(name, phone, email, subject, messageContent),
-                TextBody = $"New Customer Contact Message\n\nName: {name}\nPhone: {phone}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{messageContent}"
+                HtmlBody = BuildContactEmailHtml(name, phone, email, subject, messageContent, shopName),
+                TextBody = $"New Customer Inquiry for {shopName}\n\nName: {name}\nPhone: {phone}\nEmail: {email}\nSubject: {subject}\n\nMessage:\n{messageContent}"
             };
             message.Body = body.ToMessageBody();
 
@@ -80,7 +114,7 @@ namespace ToyShop.Infrastructure.Services
             await smtp.DisconnectAsync(true, cancellationToken);
         }
 
-        private static string BuildOtpEmailHtml(string otp, string email)
+        private static string BuildOtpEmailHtml(string otp, string email, string shopName)
         {
             var digits = string.Join("</td><td style=\"width:44px;height:52px;background:#fdf2f8;border:2px solid #ec4899;border-radius:10px;text-align:center;vertical-align:middle;font-size:26px;font-weight:800;color:#ec4899;font-family:monospace;\">", otp.ToCharArray());
 
@@ -95,7 +129,7 @@ namespace ToyShop.Infrastructure.Services
         <tr>
           <td style=""background:linear-gradient(135deg,#ec4899,#f472b6);padding:32px;text-align:center;"">
             <div style=""font-size:36px;margin-bottom:8px;"">💖</div>
-            <div style=""color:#fff;font-size:22px;font-weight:800;letter-spacing:-0.5px;"">Store Sign In</div>
+            <div style=""color:#fff;font-size:22px;font-weight:800;letter-spacing:-0.5px;"">{shopName}</div>
             <div style=""color:rgba(255,255,255,0.9);font-size:13px;margin-top:4px;"">Your one-time sign-in code</div>
           </td>
         </tr>
@@ -103,7 +137,7 @@ namespace ToyShop.Infrastructure.Services
           <td style=""padding:40px 40px 32px;"">
             <p style=""margin:0 0 8px;font-size:15px;color:#595959;"">Hi there 👋</p>
             <p style=""margin:0 0 28px;font-size:15px;color:#595959;line-height:1.6;"">
-              Use the code below to sign in to your store account. 
+              Use the code below to sign in to your <strong>{shopName}</strong> account. 
               This code is valid for <strong>10 minutes</strong>.
             </p>
             <table cellpadding=""0"" cellspacing=""8"" align=""center"" style=""margin:0 auto 28px;"">
@@ -113,7 +147,7 @@ namespace ToyShop.Infrastructure.Services
             </table>
             <div style=""background:#fffbe6;border:1px solid #fadc14;border-radius:10px;padding:14px 18px;margin-bottom:24px;"">
               <p style=""margin:0;font-size:13px;color:#614700;"">
-                ⚠️ <strong>Never share this code</strong> with anyone. Our staff will never ask for your OTP.
+                ⚠️ <strong>Never share this code</strong> with anyone. {shopName} staff will never ask for your OTP.
               </p>
             </div>
             <p style=""margin:0;font-size:13px;color:#8c8c8c;line-height:1.6;"">
@@ -125,7 +159,7 @@ namespace ToyShop.Infrastructure.Services
         <tr>
           <td style=""background:#f9f9f9;border-top:1px solid #f0f0f0;padding:20px 40px;text-align:center;"">
             <p style=""margin:0;font-size:12px;color:#bfbfbf;"">
-              Store Support Desk · Automated Security Notification
+              {shopName} Support Desk · Automated Security Notification
             </p>
           </td>
         </tr>
@@ -136,7 +170,7 @@ namespace ToyShop.Infrastructure.Services
 </html>";
         }
 
-        private static string BuildContactEmailHtml(string name, string phone, string email, string subject, string message)
+        private static string BuildContactEmailHtml(string name, string phone, string email, string subject, string message, string shopName)
         {
             return $@"
 <!DOCTYPE html>
@@ -149,7 +183,7 @@ namespace ToyShop.Infrastructure.Services
         <tr>
           <td style=""background:linear-gradient(135deg,#ec4899,#be185d);padding:32px;text-align:center;"">
             <div style=""font-size:36px;margin-bottom:6px;"">📩</div>
-            <div style=""color:#fff;font-size:22px;font-weight:800;"">New Website Contact Message</div>
+            <div style=""color:#fff;font-size:22px;font-weight:800;"">New Message for {shopName}</div>
             <div style=""color:rgba(255,255,255,0.85);font-size:13px;margin-top:4px;"">Received from Customer Inquiry Form</div>
           </td>
         </tr>
@@ -187,7 +221,7 @@ namespace ToyShop.Infrastructure.Services
         </tr>
         <tr>
           <td style=""background:#f9fafb;border-top:1px solid #fce7f3;padding:16px 36px;text-align:center;"">
-            <p style=""margin:0;font-size:12px;color:#9ca3af;"">Store Customer Desk Notification System</p>
+            <p style=""margin:0;font-size:12px;color:#9ca3af;"">{shopName} Customer Desk Notification System</p>
           </td>
         </tr>
       </table>
