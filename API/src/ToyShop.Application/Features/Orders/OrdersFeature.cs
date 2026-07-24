@@ -52,7 +52,7 @@ namespace ToyShop.Application.Features.Orders
 
     /// <summary>
     /// Update order status. When OrderStatus = Shipped (value 2), 
-    /// CourierName and TrackingNumber are required.
+    /// CourierName and TrackingNumber are required and a shipment email is automatically sent.
     /// </summary>
     public record UpdateOrderStatusCommand(
         int OrderId,
@@ -187,6 +187,7 @@ namespace ToyShop.Application.Features.Orders
         private readonly IRepository<Address> _addressRepository;
         private readonly IRepository<Product> _productRepository;
         private readonly IRazorpayService _razorpayService;
+        private readonly IEmailService _emailService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
 
@@ -196,6 +197,7 @@ namespace ToyShop.Application.Features.Orders
             IRepository<Address> addressRepository,
             IRepository<Product> productRepository,
             IRazorpayService razorpayService,
+            IEmailService emailService,
             IUnitOfWork unitOfWork,
             Microsoft.Extensions.Configuration.IConfiguration configuration)
         {
@@ -204,6 +206,7 @@ namespace ToyShop.Application.Features.Orders
             _addressRepository = addressRepository;
             _productRepository = productRepository;
             _razorpayService = razorpayService;
+            _emailService = emailService;
             _unitOfWork = unitOfWork;
             _configuration = configuration;
         }
@@ -243,7 +246,6 @@ namespace ToyShop.Application.Features.Orders
             }
 
             // Find or create customer record
-            // If email provided, match by email; otherwise match by phone
             Customer? customer = null;
             if (!string.IsNullOrWhiteSpace(request.CustomerEmail))
             {
@@ -331,7 +333,11 @@ namespace ToyShop.Application.Features.Orders
 
         public async Task<BaseResponse<bool>> Handle(UpdateOrderStatusCommand request, CancellationToken cancellationToken)
         {
-            var order = await _orderRepository.GetByIdAsync(request.OrderId, cancellationToken);
+            var order = await _orderRepository.Query()
+                .Include(o => o.Customer)
+                .Include(o => o.Address)
+                .FirstOrDefaultAsync(o => o.Id == request.OrderId, cancellationToken);
+
             if (order == null)
                 return BaseResponse<bool>.Fail("Order not found");
 
@@ -357,7 +363,34 @@ namespace ToyShop.Application.Features.Orders
             _orderRepository.Update(order);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return BaseResponse<bool>.Ok(true, $"Order status updated to {order.OrderStatus}");
+            // Send Shipment Notification Email to customer when status changes to Shipped
+            if (newStatus == OrderStatus.Shipped)
+            {
+                var recipientEmail = !string.IsNullOrWhiteSpace(order.CustomerEmail) ? order.CustomerEmail : order.Customer?.Email;
+                if (!string.IsNullOrWhiteSpace(recipientEmail) && recipientEmail.Contains("@"))
+                {
+                    var customerName = order.Address?.FullName ?? order.Customer?.Name ?? "Valued Customer";
+                    try
+                    {
+                        await _emailService.SendShipmentNotificationAsync(
+                            recipientEmail.Trim(),
+                            customerName,
+                            order.OrderNumber,
+                            order.CourierName ?? "Courier",
+                            order.TrackingNumber ?? "N/A",
+                            order.TotalAmount,
+                            cancellationToken
+                        );
+                    }
+                    catch (Exception ex)
+                    {
+                        // Log email error, but order status update remains successful in DB
+                        System.Diagnostics.Debug.WriteLine($"Failed to send shipment email: {ex.Message}");
+                    }
+                }
+            }
+
+            return BaseResponse<bool>.Ok(true, $"Order #{order.OrderNumber} status updated to {order.OrderStatus}. {(newStatus == OrderStatus.Shipped ? "Shipment notification email sent to customer!" : "")}");
         }
     }
 }

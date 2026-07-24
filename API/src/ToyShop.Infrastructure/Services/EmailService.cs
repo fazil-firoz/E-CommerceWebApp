@@ -114,6 +114,35 @@ namespace ToyShop.Infrastructure.Services
             await smtp.DisconnectAsync(true, cancellationToken);
         }
 
+        public async Task SendShipmentNotificationAsync(string toEmail, string customerName, string orderNumber, string courierName, string trackingNumber, decimal totalAmount, CancellationToken cancellationToken = default)
+        {
+            var shopName = await GetShopNameAsync(cancellationToken);
+            var smtpHost = _configuration["Email:SmtpHost"] ?? "smtp.gmail.com";
+            var smtpPort = int.Parse(_configuration["Email:SmtpPort"] ?? "587");
+            var smtpUser = _configuration["Email:SmtpUser"] ?? "";
+            var smtpPass = _configuration["Email:SmtpPass"] ?? "";
+            var fromEmail = _configuration["Email:FromEmail"] ?? smtpUser;
+
+            var message = new MimeMessage();
+            message.From.Add(new MailboxAddress(shopName, fromEmail));
+            message.To.Add(MailboxAddress.Parse(toEmail));
+            message.Subject = $"🚚 Great News! Your Order #{orderNumber} Has Been Shipped! - {shopName}";
+
+            var body = new BodyBuilder
+            {
+                HtmlBody = BuildShipmentEmailHtml(customerName, orderNumber, courierName, trackingNumber, totalAmount, shopName),
+                TextBody = $"Hi {customerName},\n\nGreat news! Your order #{orderNumber} from {shopName} has been shipped.\n\nCourier: {courierName}\nTracking ID: {trackingNumber}\nTotal Amount: ₹{totalAmount}\n\nThank you for shopping with us!"
+            };
+            message.Body = body.ToMessageBody();
+
+            using var smtp = new SmtpClient();
+            smtp.ServerCertificateValidationCallback = (s, c, h, e) => true;
+            await smtp.ConnectAsync(smtpHost, smtpPort, SecureSocketOptions.StartTls, cancellationToken);
+            await smtp.AuthenticateAsync(smtpUser, smtpPass, cancellationToken);
+            await smtp.SendAsync(message, cancellationToken);
+            await smtp.DisconnectAsync(true, cancellationToken);
+        }
+
         private static string BuildOtpEmailHtml(string otp, string email, string shopName)
         {
             var digits = string.Join("</td><td style=\"width:44px;height:52px;background:#fdf2f8;border:2px solid #ec4899;border-radius:10px;text-align:center;vertical-align:middle;font-size:26px;font-weight:800;color:#ec4899;font-family:monospace;\">", otp.ToCharArray());
@@ -189,7 +218,6 @@ namespace ToyShop.Infrastructure.Services
         </tr>
         <tr>
           <td style=""padding:32px 36px;"">
-            
             <table width=""100%"" cellpadding=""0"" cellspacing=""0"" style=""margin-bottom:24px;border-collapse:separate;border-spacing:0 10px;"">
               <tr>
                 <td width=""120"" style=""font-size:13px;font-weight:700;color:#6b7280;"">Customer Name:</td>
@@ -222,6 +250,78 @@ namespace ToyShop.Infrastructure.Services
         <tr>
           <td style=""background:#f9fafb;border-top:1px solid #fce7f3;padding:16px 36px;text-align:center;"">
             <p style=""margin:0;font-size:12px;color:#9ca3af;"">{shopName} Customer Desk Notification System</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>";
+        }
+
+        private static string BuildShipmentEmailHtml(string customerName, string orderNumber, string courierName, string trackingNumber, decimal totalAmount, string shopName)
+        {
+            return $@"
+<!DOCTYPE html>
+<html>
+<head><meta charset=""UTF-8""></head>
+<body style=""margin:0;padding:0;background:#fdf2f8;font-family:Inter,Arial,sans-serif;"">
+  <table width=""100%"" cellpadding=""0"" cellspacing=""0"" style=""background:#fdf2f8;padding:40px 20px;"">
+    <tr><td align=""center"">
+      <table width=""540"" cellpadding=""0"" cellspacing=""0"" style=""background:#ffffff;border-radius:20px;overflow:hidden;box-shadow:0 6px 24px rgba(236,72,153,0.1);border:1px solid #fce7f3;"">
+        <tr>
+          <td style=""background:linear-gradient(135deg,#ec4899,#f472b6);padding:32px;text-align:center;"">
+            <div style=""font-size:40px;margin-bottom:6px;"">🚚</div>
+            <div style=""color:#fff;font-size:24px;font-weight:800;"">Your Package Has Shipped!</div>
+            <div style=""color:rgba(255,255,255,0.9);font-size:14px;margin-top:4px;"">{shopName} Order #{orderNumber}</div>
+          </td>
+        </tr>
+        <tr>
+          <td style=""padding:32px 36px;"">
+            <p style=""margin:0 0 12px;font-size:16px;color:#1f1f1f;font-weight:700;"">Hi {customerName} 👋</p>
+            <p style=""margin:0 0 24px;font-size:14px;color:#4b5563;line-height:1.6;"">
+              Great news! Your package is on its way. We have dispatched your order with <strong>{courierName}</strong>.
+            </p>
+
+            <!-- Tracking Card -->
+            <div style=""background:linear-gradient(135deg,#f0f9ff 0%,#e0f2fe 100%);border:2px solid #38bdf8;border-radius:16px;padding:20px;margin-bottom:24px;text-align:center;"">
+              <div style=""font-size:12px;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;"">
+                Courier Service Provider
+              </div>
+              <div style=""font-size:18px;font-weight:800;color:#0c4a6e;margin-bottom:12px;"">
+                {courierName}
+              </div>
+              <div style=""font-size:12px;font-weight:800;color:#0369a1;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;"">
+                Tracking Number / AWB
+              </div>
+              <div style=""font-size:22px;font-weight:800;color:#ec4899;font-family:monospace;letter-spacing:1px;"">
+                {trackingNumber}
+              </div>
+            </div>
+
+            <!-- Order Summary Details -->
+            <table width=""100%"" cellpadding=""0"" cellspacing=""0"" style=""background:#f9fafb;border-radius:12px;padding:16px;margin-bottom:24px;border:1px solid #f3f4f6;"">
+              <tr>
+                <td style=""font-size:13px;color:#6b7280;"">Order Number:</td>
+                <td align=""right"" style=""font-size:14px;font-weight:700;color:#1f1f1f;"">#{orderNumber}</td>
+              </tr>
+              <tr>
+                <td style=""font-size:13px;color:#6b7280;padding-top:8px;"">Total Amount Paid:</td>
+                <td align=""right"" style=""font-size:14px;font-weight:700;color:#ec4899;padding-top:8px;"">₹{totalAmount:N2}</td>
+              </tr>
+            </table>
+
+            <p style=""margin:0;font-size:13px;color:#6b7280;line-height:1.6;text-align:center;"">
+              You can track your order anytime directly on your store account's <strong>My Orders</strong> tab or on {courierName}'s official website.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style=""background:#f9fafb;border-top:1px solid #fce7f3;padding:20px 36px;text-align:center;"">
+            <p style=""margin:0;font-size:12px;color:#9ca3af;"">
+              Thank you for shopping with {shopName} ♡<br/>
+              Have questions? Reply to this email or contact our support team.
+            </p>
           </td>
         </tr>
       </table>
