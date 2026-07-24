@@ -31,7 +31,8 @@ namespace ToyShop.Application.Features.Orders
         int? OrderStatus = null,
         DateTimeOffset? StartDate = null,
         DateTimeOffset? EndDate = null,
-        string? Search = null
+        string? Search = null,
+        string? CustomerEmail = null
     ) : IRequest<BaseResponse<List<OrderDto>>>;
 
     public record GetOrderByIdQuery(int Id) : IRequest<BaseResponse<OrderDto>>;
@@ -52,7 +53,6 @@ namespace ToyShop.Application.Features.Orders
     /// <summary>
     /// Update order status. When OrderStatus = Shipped (value 2), 
     /// CourierName and TrackingNumber are required.
-    /// Architecture is ready for future: NotifyEmail, NotifyWhatsApp, NotifySms flags.
     /// </summary>
     public record UpdateOrderStatusCommand(
         int OrderId,
@@ -95,6 +95,13 @@ namespace ToyShop.Application.Features.Orders
             if (request.EndDate.HasValue)
             {
                 query = query.Where(o => o.OrderDate <= request.EndDate.Value);
+            }
+
+            if (!string.IsNullOrWhiteSpace(request.CustomerEmail))
+            {
+                var targetEmail = request.CustomerEmail.Trim().ToLower();
+                query = query.Where(o => (o.CustomerEmail != null && o.CustomerEmail.ToLower() == targetEmail) ||
+                                         (o.Customer != null && o.Customer.Email != null && o.Customer.Email.ToLower() == targetEmail));
             }
 
             if (!string.IsNullOrWhiteSpace(request.Search))
@@ -163,7 +170,7 @@ namespace ToyShop.Application.Features.Orders
             Items = o.OrderItems.Select(oi => new OrderItemDto
             {
                 ProductId = oi.ProductId,
-                ProductName = oi.Product != null ? oi.Product.Name : "Unknown Toy",
+                ProductName = oi.Product != null ? oi.Product.Name : "Product Item",
                 Quantity = oi.Quantity,
                 UnitPrice = oi.UnitPrice,
                 TotalPrice = oi.TotalPrice
@@ -241,7 +248,7 @@ namespace ToyShop.Application.Features.Orders
             if (!string.IsNullOrWhiteSpace(request.CustomerEmail))
             {
                 customer = await _customerRepository.Query()
-                    .FirstOrDefaultAsync(c => c.Email == request.CustomerEmail, cancellationToken);
+                    .FirstOrDefaultAsync(c => c.Email.ToLower() == request.CustomerEmail.ToLower(), cancellationToken);
             }
 
             if (customer == null && !string.IsNullOrWhiteSpace(request.CustomerPhone))
@@ -278,7 +285,7 @@ namespace ToyShop.Application.Features.Orders
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             // Generate unique Order Number
-            var orderNumber = "TOY-" + DateTime.UtcNow.ToString("yyyyMMdd") + "-" + new Random().Next(1000, 9999);
+            var orderNumber = "ORD-" + DateTime.UtcNow.ToString("yyyyMMdd") + "-" + new Random().Next(1000, 9999);
 
             // Create Order - store contact directly on order for guest tracking
             var order = new Order

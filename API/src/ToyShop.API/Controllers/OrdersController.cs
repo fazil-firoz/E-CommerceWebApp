@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using ToyShop.Application.DTOs;
@@ -19,6 +20,19 @@ namespace ToyShop.API.Controllers
             [FromQuery] string? search)
         {
             return Ok(await Mediator.Send(new GetOrdersQuery(orderStatus, startDate, endDate, search)));
+        }
+
+        /// <summary>
+        /// Public endpoint to fetch order history for a customer by email (including guest orders placed with that email)
+        /// </summary>
+        [HttpGet("my-orders")]
+        [AllowAnonymous]
+        public async Task<ActionResult<BaseResponse<List<OrderDto>>>> GetMyOrders([FromQuery] string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return BadRequest(BaseResponse<List<OrderDto>>.Fail("Email is required"));
+
+            return Ok(await Mediator.Send(new GetOrdersQuery(CustomerEmail: email.Trim())));
         }
 
         [HttpGet("{id}")]
