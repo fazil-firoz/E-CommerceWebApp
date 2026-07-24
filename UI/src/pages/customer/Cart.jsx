@@ -1,8 +1,9 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Table, Button, InputNumber, Space, Typography, Card, Row, Col, Empty, Popconfirm } from 'antd';
 import { DeleteOutlined, ShoppingCartOutlined, ArrowLeftOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { CartContext } from '../../context/CartContext';
+import { shipmentApi } from '../../api/shipmentApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Text } = Typography;
@@ -10,6 +11,34 @@ const { Title, Text } = Typography;
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useContext(CartContext);
   const navigate = useNavigate();
+
+  const [shippingMethod, setShippingMethod] = useState(null);
+
+  useEffect(() => {
+    const fetchShipping = async () => {
+      try {
+        const res = await shipmentApi.getAll();
+        if (res.success && res.data && res.data.length > 0) {
+          const defaultMethod = res.data.find(m => m.isDefault && m.isActive) || res.data.find(m => m.isActive) || res.data[0];
+          setShippingMethod(defaultMethod);
+        }
+      } catch (err) {
+        console.error('Failed to load shipping method', err);
+      }
+    };
+    fetchShipping();
+  }, []);
+
+  const calculateShippingFee = () => {
+    if (!shippingMethod) return 0;
+    if (shippingMethod.freeShippingThreshold > 0 && cartTotal >= shippingMethod.freeShippingThreshold) {
+      return 0;
+    }
+    return shippingMethod.fee;
+  };
+
+  const shippingCharge = calculateShippingFee();
+  const grandTotal = cartTotal + shippingCharge;
 
   const columns = [
     {
@@ -145,15 +174,19 @@ const Cart = () => {
               <Text strong>₹{cartTotal.toLocaleString('en-IN')}</Text>
             </div>
             
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Text type="secondary">Shipping Delivery:</Text>
-              <Text type="success" strong>FREE</Text>
+              {shippingCharge === 0 ? (
+                <Text type="success" strong>FREE</Text>
+              ) : (
+                <Text strong>₹{shippingCharge.toLocaleString('en-IN')}</Text>
+              )}
             </div>
             
             <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '16px', display: 'flex', justifyContent: 'space-between' }}>
               <Text strong style={{ fontSize: '16px' }}>Grand Total:</Text>
               <Text strong style={{ fontSize: '20px', color: '#ff4d4f' }}>
-                ₹{cartTotal.toLocaleString('en-IN')}
+                ₹{grandTotal.toLocaleString('en-IN')}
               </Text>
             </div>
 
