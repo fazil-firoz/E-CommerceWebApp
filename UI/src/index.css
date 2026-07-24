@@ -7,7 +7,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background-color: #f5f7fa;
+  background-color: #fdf2f8;
   color: #262626;
 }
 
@@ -23,11 +23,11 @@ code {
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #fdf2f8;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #bfbfbf;
+  background: #f9a8d4;
   border-radius: 4px;
 }
 
@@ -43,12 +43,12 @@ code {
 .ant-card-hoverable:hover {
   transform: translateY(-5px);
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08) !important;
-  border-color: #40a9ff !important;
+  border-color: #f472b6 !important;
 }
 
 .category-item-hover:hover {
-  background-color: rgba(24, 144, 255, 0.04) !important;
-  color: #1890ff !important;
+  background-color: rgba(236, 72, 153, 0.04) !important;
+  color: #ec4899 !important;
   padding-left: 20px !important;
 }
 
@@ -60,3 +60,6 @@ code {
 .ant-menu-horizontal {
   line-height: 64px;
 }
+
+.ant-btn-primary { background: #ec4899 !important; border-color: #ec4899 !important; }
+.ant-btn-primary:hover { background: #db2777 !important; border-color: #db2777 !important; }

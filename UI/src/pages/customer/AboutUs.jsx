@@ -49,7 +49,7 @@ const AboutUs = () => {
           <Col xs={24} md={16}>
             <Space align="center" size={12} style={{ marginBottom: '12px' }}>
               <div style={{
-                background: 'linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%)',
+                background: 'linear-gradient(135deg, #ec4899 0%, #ff7a45 100%)',
                 width: '48px', height: '48px',
                 borderRadius: '14px',
                 display: 'flex', alignItems: 'center', justifyContent: 'center'
@@ -89,7 +89,7 @@ const AboutUs = () => {
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Card hoverable style={{ borderRadius: '16px', textAlign: 'center', height: '100%' }}>
-            <HeartOutlined style={{ fontSize: '36px', color: '#ff4d4f', marginBottom: '12px' }} />
+            <HeartOutlined style={{ fontSize: '36px', color: '#ec4899', marginBottom: '12px' }} />
             <Title level={5}>Curated with Love</Title>
             <Text type="secondary" style={{ fontSize: '13px' }}>
               From educational puzzles to action figures, we select toys that inspire imagination and learning.
@@ -98,7 +98,7 @@ const AboutUs = () => {
         </Col>
         <Col xs={24} sm={12} md={6}>
           <Card hoverable style={{ borderRadius: '16px', textAlign: 'center', height: '100%' }}>
-            <RocketOutlined style={{ fontSize: '36px', color: '#1890ff', marginBottom: '12px' }} />
+            <RocketOutlined style={{ fontSize: '36px', color: '#ec4899', marginBottom: '12px' }} />
             <Title level={5}>Express Delivery</Title>
             <Text type="secondary" style={{ fontSize: '13px' }}>
               Fast and secure shipping nationwide so the fun never has to wait.
@@ -140,7 +140,7 @@ const AboutUs = () => {
           <Col xs={24} sm={12} style={{ textAlign: 'right' }}>
             <Space wrap>
               <Link to="/contact">
-                <Text strong style={{ color: '#1890ff', fontSize: '15px' }}>
+                <Text strong style={{ color: '#ec4899', fontSize: '15px' }}>
                   <EnvironmentOutlined /> Visit Contact Page &rarr;
                 </Text>
               </Link>

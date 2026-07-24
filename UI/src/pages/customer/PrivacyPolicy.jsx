@@ -16,7 +16,7 @@ const PrivacyPolicy = () => {
 
       <Card style={{ borderRadius: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
         <Space align="center" size={12} style={{ marginBottom: '8px' }}>
-          <SafetyCertificateOutlined style={{ fontSize: '28px', color: '#1890ff' }} />
+          <SafetyCertificateOutlined style={{ fontSize: '28px', color: '#ec4899' }} />
           <Title level={2} style={{ margin: 0, fontWeight: 800 }}>Privacy Policy</Title>
         </Space>
         <Text type="secondary" style={{ display: 'block', marginBottom: '20px' }}>

@@ -16,7 +16,7 @@ const TermsConditions = () => {
 
       <Card style={{ borderRadius: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
         <Space align="center" size={12} style={{ marginBottom: '8px' }}>
-          <FileTextOutlined style={{ fontSize: '28px', color: '#722ed1' }} />
+          <FileTextOutlined style={{ fontSize: '28px', color: '#be185d' }} />
           <Title level={2} style={{ margin: 0, fontWeight: 800 }}>Terms & Conditions</Title>
         </Space>
         <Text type="secondary" style={{ display: 'block', marginBottom: '20px' }}>

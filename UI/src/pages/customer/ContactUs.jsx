@@ -104,9 +104,9 @@ const ContactUs = () => {
           {/* Store Info Cards */}
           <Col xs={24} md={10}>
             <Space direction="vertical" size={16} style={{ width: '100%' }}>
-              <Card style={{ borderRadius: '14px', borderLeft: '4px solid #1890ff' }}>
+              <Card style={{ borderRadius: '14px', borderLeft: '4px solid #ec4899' }}>
                 <Space align="start" size={14}>
-                  <EnvironmentOutlined style={{ fontSize: '24px', color: '#1890ff' }} />
+                  <EnvironmentOutlined style={{ fontSize: '24px', color: '#ec4899' }} />
                   <div>
                     <Text strong style={{ display: 'block', fontSize: '14px' }}>Store Address</Text>
                     <Text type="secondary">{fullAddress}</Text>
@@ -134,9 +134,9 @@ const ContactUs = () => {
                 </Space>
               </Card>
 
-              <Card style={{ borderRadius: '14px', borderLeft: '4px solid #722ed1' }}>
+              <Card style={{ borderRadius: '14px', borderLeft: '4px solid #be185d' }}>
                 <Space align="start" size={14}>
-                  <MailOutlined style={{ fontSize: '24px', color: '#722ed1' }} />
+                  <MailOutlined style={{ fontSize: '24px', color: '#be185d' }} />
                   <div>
                     <Text strong style={{ display: 'block', fontSize: '14px' }}>Email Support</Text>
                     <Text style={{ fontWeight: 600 }}>{email1}</Text>

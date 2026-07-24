@@ -98,19 +98,19 @@ const ProductListing = () => {
         <Card
           style={{
             borderRadius: '16px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.02)',
+            boxShadow: '0 4px 12px rgba(236, 72, 153, 0.04)',
             position: 'sticky',
             top: '84px',
-            border: '1px solid #f0f0f0'
+            border: '1px solid #fce7f3'
           }}
           title={
             <span style={{ fontWeight: 700, fontSize: '16px' }}>
-              <AppstoreOutlined style={{ marginRight: '8px', color: '#1890ff' }} /> Categories
+              <AppstoreOutlined style={{ marginRight: '8px', color: '#ec4899' }} /> Categories
             </span>
           }
         >
           <List
-            dataSource={[{ id: null, name: 'All Toys' }, ...categories]}
+            dataSource={[{ id: null, name: 'All Items' }, ...categories]}
             renderItem={(item) => {
               const isSelected = item.id === categoryId;
               return (
@@ -123,8 +123,8 @@ const ProductListing = () => {
                     marginBottom: '4px',
                     borderBottom: 'none',
                     fontWeight: isSelected ? 700 : 500,
-                    background: isSelected ? 'rgba(24, 144, 255, 0.08)' : 'transparent',
-                    color: isSelected ? '#1890ff' : '#595959',
+                    background: isSelected ? 'rgba(236, 72, 153, 0.08)' : 'transparent',
+                    color: isSelected ? '#ec4899' : '#6b7280',
                     transition: 'all 0.2s'
                   }}
                 >
@@ -149,11 +149,11 @@ const ProductListing = () => {
             gap: '16px'
           }}>
             <Title level={2} style={{ margin: 0, fontWeight: 800 }}>
-              {categoryId ? categories.find(c => c.id === categoryId)?.name : 'All Toys'}
+              {categoryId ? categories.find(c => c.id === categoryId)?.name : 'All Items'}
             </Title>
 
             <Input.Search
-              placeholder="Search toys..."
+              placeholder="Search items..."
               allowClear
               enterButton={<SearchOutlined />}
               size="large"
@@ -165,12 +165,12 @@ const ProductListing = () => {
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '80px 0' }}>
-              <Spin size="large" tip="Unboxing toys..." />
+              <Spin size="large" tip="Loading items..." />
             </div>
           ) : products.length === 0 ? (
             <Card style={{ borderRadius: '16px', textAlign: 'center', padding: '40px 0' }}>
               <Empty
-                description="No toys match your criteria"
+                description="No items match your criteria"
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
               >
                 <Button type="primary" onClick={() => {
@@ -234,24 +234,24 @@ const ProductListing = () => {
                     }
                     style={{
                       borderRadius: '16px',
-                      boxShadow: '0 4px 10px rgba(0,0,0,0.04)',
-                      border: '1px solid #f0f0f0',
+                      boxShadow: '0 4px 10px rgba(236, 72, 153, 0.04)',
+                      border: '1px solid #fce7f3',
                       overflow: 'hidden'
                     }}
                     bodyStyle={{ padding: '16px' }}
                   >
                     {/* Product info - clickable */}
                     <div onClick={() => navigate(`/products/${prod.id}`)} style={{ cursor: 'pointer', marginBottom: '14px' }}>
-                      <Text strong style={{ fontSize: '15px', color: '#262626', display: 'block', marginBottom: '4px', lineHeight: 1.4 }}>
+                      <Text strong style={{ fontSize: '15px', color: '#1f1f1f', display: 'block', marginBottom: '4px', lineHeight: 1.4 }}>
                         {prod.name}
                       </Text>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                          <Text strong style={{ fontSize: '18px', color: '#ff4d4f' }}>
+                          <Text strong style={{ fontSize: '18px', color: '#ec4899' }}>
                             ₹{prod.price.toLocaleString('en-IN')}
                           </Text>
                           {prod.mrp > prod.price && (
-                            <Text delete style={{ fontSize: '12px', color: '#8c8c8c', marginLeft: '6px' }}>
+                            <Text delete style={{ fontSize: '12px', color: '#d1d5db', marginLeft: '6px' }}>
                               ₹{prod.mrp.toLocaleString('en-IN')}
                             </Text>
                           )}
@@ -259,8 +259,8 @@ const ProductListing = () => {
                         <Text
                           style={{
                             fontSize: '11px',
-                            background: prod.stockQuantity > 0 ? '#f6ffed' : '#fff2f0',
-                            color: prod.stockQuantity > 0 ? '#52c41a' : '#ff4d4f',
+                            background: prod.stockQuantity > 0 ? '#fdf2f8' : '#fff2f0',
+                            color: prod.stockQuantity > 0 ? '#ec4899' : '#ef4444',
                             padding: '2px 8px',
                             borderRadius: '4px',
                             fontWeight: 600
@@ -303,8 +303,8 @@ const ProductListing = () => {
                             height: '36px',
                             fontWeight: 600,
                             fontSize: '13px',
-                            background: prod.stockQuantity > 0 ? '#ff4d4f' : undefined,
-                            borderColor: prod.stockQuantity > 0 ? '#ff4d4f' : undefined
+                            background: prod.stockQuantity > 0 ? '#be185d' : undefined,
+                            borderColor: prod.stockQuantity > 0 ? '#be185d' : undefined
                           }}
                         >
                           Buy Now

@@ -70,7 +70,7 @@ const ProductDetails = () => {
   const isOutOfStock = product.stockQuantity <= 0;
 
   return (
-    <Card style={{ borderRadius: '24px', boxShadow: '0 8px 24px rgba(0,0,0,0.02)', padding: '20px', border: '1px solid #f0f0f0' }}>
+    <Card style={{ borderRadius: '24px', boxShadow: '0 8px 24px rgba(0,0,0,0.02)', padding: '20px', border: '1px solid #fce7f3' }}>
       <Row gutter={[40, 32]}>
         {/* Images Column */}
         <Col xs={24} md={10}>
@@ -78,7 +78,7 @@ const ProductDetails = () => {
             <div style={{
               borderRadius: '20px',
               overflow: 'hidden',
-              border: '1px solid #f0f0f0',
+              border: '1px solid #fce7f3',
               background: '#fff',
               position: 'relative'
             }}>
@@ -138,7 +138,7 @@ const ProductDetails = () => {
                       height: '70px',
                       borderRadius: '10px',
                       overflow: 'hidden',
-                      border: currentSlide === index ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                      border: currentSlide === index ? '2px solid #ec4899' : '1px solid #fce7f3',
                       cursor: 'pointer',
                       background: '#fff',
                       display: 'flex',
@@ -165,7 +165,7 @@ const ProductDetails = () => {
         <Col xs={24} md={14}>
           <Space direction="vertical" size={20} style={{ width: '100%' }}>
             <div>
-              <Tag color="#1890ff" style={{ borderRadius: '4px', fontSize: '13px', padding: '2px 10px' }}>
+              <Tag color="#ec4899" style={{ borderRadius: '4px', fontSize: '13px', padding: '2px 10px' }}>
                 {product.categoryName}
               </Tag>
               <Title level={2} style={{ margin: '12px 0 8px', fontWeight: 800 }}>
@@ -173,15 +173,15 @@ const ProductDetails = () => {
               </Title>
               
               <Space align="baseline" style={{ display: 'flex', flexWrap: 'wrap' }}>
-                <Text strong style={{ fontSize: '32px', color: '#ff4d4f' }}>
+                <Text strong style={{ fontSize: '32px', color: '#ec4899' }}>
                   ₹{product.price.toLocaleString('en-IN')}
                 </Text>
                 {product.mrp > product.price && (
                   <>
-                    <Text delete style={{ color: '#bfbfbf', fontSize: '18px', marginLeft: '8px' }}>
+                    <Text delete style={{ color: '#d1d5db', fontSize: '18px', marginLeft: '8px' }}>
                       ₹{product.mrp.toLocaleString('en-IN')}
                     </Text>
-                    <Text style={{ color: '#52c41a', fontWeight: 600, marginLeft: '8px', fontSize: '15px' }}>
+                    <Text style={{ color: '#ec4899', fontWeight: 600, marginLeft: '8px', fontSize: '15px' }}>
                       ({Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF)
                     </Text>
                   </>
@@ -192,10 +192,10 @@ const ProductDetails = () => {
               </Text>
             </div>
 
-            <Card style={{ background: '#fcfcfc', borderRadius: '12px', border: '1px dashed #d9d9d9' }} bodyStyle={{ padding: '16px' }}>
+            <Card style={{ background: '#fdf2f8', borderRadius: '12px', border: '1px dashed #fce7f3' }} bodyStyle={{ padding: '16px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text strong style={{ color: '#595959' }}>Availability Status:</Text>
-                <Tag color={isOutOfStock ? 'red' : product.stockQuantity < 5 ? 'orange' : 'green'} style={{ fontWeight: 'bold' }}>
+                <Text strong style={{ color: '#6b7280' }}>Availability Status:</Text>
+                <Tag color={isOutOfStock ? 'red' : product.stockQuantity < 5 ? 'orange' : '#ec4899'} style={{ fontWeight: 'bold' }}>
                   {isOutOfStock 
                     ? 'Out of Stock' 
                     : product.stockQuantity < 5 
@@ -208,7 +208,7 @@ const ProductDetails = () => {
 
             <div>
               <Text strong style={{ color: '#262626', fontSize: '15px' }}>Description:</Text>
-              <Paragraph style={{ color: '#595959', marginTop: '6px', fontSize: '15px', lineHeight: '1.6' }}>
+              <Paragraph style={{ color: '#6b7280', marginTop: '6px', fontSize: '15px', lineHeight: '1.6' }}>
                 {product.description || 'No description provided for this toy. Let your imagination discover its features!'}
               </Paragraph>
             </div>
@@ -252,18 +252,18 @@ const ProductDetails = () => {
                   minWidth: '160px', 
                   borderRadius: '12px', 
                   fontWeight: 600,
-                  background: 'linear-gradient(135deg, #fa8c16 0%, #fc5531 100%)',
+                  background: 'linear-gradient(135deg, #ec4899 0%, #be185d 100%)',
                   border: 'none',
-                  boxShadow: isOutOfStock ? 'none' : '0 4px 15px rgba(250, 140, 22, 0.3)'
+                  boxShadow: isOutOfStock ? 'none' : '0 4px 15px rgba(236, 72, 153, 0.3)'
                 }}
               >
                 Buy Now
               </Button>
             </Space>
 
-            <div style={{ marginTop: '24px', borderTop: '1px solid #f0f0f0', paddingTop: '20px' }}>
+            <div style={{ marginTop: '24px', borderTop: '1px solid #fce7f3', paddingTop: '20px' }}>
               <Space size="middle">
-                <SafetyCertificateOutlined style={{ fontSize: '20px', color: '#52c41a' }} />
+                <SafetyCertificateOutlined style={{ fontSize: '20px', color: '#ec4899' }} />
                 <Text type="secondary" style={{ fontSize: '13px' }}>
                   100% Genuine Toys | Secure Payments | Safe & Sanitized Packing
                 </Text>

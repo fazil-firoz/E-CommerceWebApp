@@ -16,7 +16,7 @@ const ShippingPolicy = () => {
 
       <Card style={{ borderRadius: '20px', boxShadow: '0 4px 12px rgba(0,0,0,0.03)' }}>
         <Space align="center" size={12} style={{ marginBottom: '8px' }}>
-          <RocketOutlined style={{ fontSize: '28px', color: '#1890ff' }} />
+          <RocketOutlined style={{ fontSize: '28px', color: '#ec4899' }} />
           <Title level={2} style={{ margin: 0, fontWeight: 800 }}>Shipping & Delivery Policy</Title>
         </Space>
         <Text type="secondary" style={{ display: 'block', marginBottom: '16px' }}>
@@ -37,9 +37,9 @@ const ShippingPolicy = () => {
         <Title level={4}>1. Delivery Timelines & Charges</Title>
         <Row gutter={[16, 16]} style={{ marginTop: '12px', marginBottom: '24px' }}>
           <Col xs={24} sm={12} md={8}>
-            <Card size="small" style={{ borderRadius: '14px', background: '#fafafa', borderLeft: '4px solid #1890ff' }}>
+            <Card size="small" style={{ borderRadius: '14px', background: '#fafafa', borderLeft: '4px solid #ec4899' }}>
               <Space align="center" style={{ marginBottom: '8px' }}>
-                <TruckOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+                <TruckOutlined style={{ fontSize: '20px', color: '#ec4899' }} />
                 <Text strong style={{ fontSize: '15px' }}>Standard Delivery</Text>
               </Space>
               <Paragraph style={{ margin: 0, fontSize: '12px', color: '#595959' }}>

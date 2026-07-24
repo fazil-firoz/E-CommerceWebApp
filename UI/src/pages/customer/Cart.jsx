@@ -13,7 +13,7 @@ const Cart = () => {
 
   const columns = [
     {
-      title: 'Toy Details',
+      title: 'Item Details',
       dataIndex: 'name',
       key: 'name',
       render: (text, record) => (
@@ -21,10 +21,10 @@ const Cart = () => {
           <img
             src={resolveProductImageUrl(record.imageUrl || record.imageUrls?.[0], 'thumb')}
             alt={text}
-            style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #f0f0f0' }}
+            style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #fce7f3' }}
           />
           <div>
-            <Text strong style={{ fontSize: '15px', color: '#262626', display: 'block' }}>
+            <Text strong style={{ fontSize: '15px', color: '#1f1f1f', display: 'block' }}>
               {text}
             </Text>
             <Text type="secondary" style={{ fontSize: '12px' }}>
@@ -77,17 +77,17 @@ const Cart = () => {
 
   if (cartItems.length === 0) {
     return (
-      <Card style={{ borderRadius: '24px', textAlign: 'center', padding: '60px 0', border: '1px solid #f0f0f0' }}>
+      <Card style={{ borderRadius: '24px', textAlign: 'center', padding: '60px 0', border: '1px solid #fce7f3' }}>
         <Empty
-          image={<ShoppingCartOutlined style={{ fontSize: '70px', color: '#bfbfbf' }} />}
+          image={<ShoppingCartOutlined style={{ fontSize: '70px', color: '#d1d5db' }} />}
           description={
-            <span style={{ fontSize: '16px', color: '#8c8c8c' }}>
+            <span style={{ fontSize: '16px', color: '#9ca3af' }}>
               Your shopping cart is currently empty!
             </span>
           }
         >
           <Button type="primary" size="large" onClick={() => navigate('/products')} style={{ borderRadius: '8px' }}>
-            <ArrowLeftOutlined /> Explore Toys
+            <ArrowLeftOutlined /> Explore Items
           </Button>
         </Empty>
       </Card>
@@ -99,7 +99,7 @@ const Cart = () => {
       {/* Table Side */}
       <Col xs={24} lg={16}>
         <Card
-          style={{ borderRadius: '24px', boxShadow: '0 8px 24px rgba(0,0,0,0.02)', border: '1px solid #f0f0f0' }}
+          style={{ borderRadius: '24px', boxShadow: '0 8px 24px rgba(236, 72, 153, 0.04)', border: '1px solid #fce7f3' }}
           title={
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Title level={4} style={{ margin: 0, fontWeight: 700 }}>
@@ -132,8 +132,8 @@ const Cart = () => {
         <Card
           style={{ 
             borderRadius: '24px', 
-            boxShadow: '0 8px 24px rgba(0,0,0,0.02)', 
-            border: '1px solid #f0f0f0',
+            boxShadow: '0 8px 24px rgba(236, 72, 153, 0.04)', 
+            border: '1px solid #fce7f3',
             position: 'sticky',
             top: '84px'
           }}
@@ -150,9 +150,9 @@ const Cart = () => {
               <Text type="success" strong>FREE</Text>
             </div>
             
-            <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '16px', display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ borderTop: '1px solid #fce7f3', paddingTop: '16px', display: 'flex', justifyContent: 'space-between' }}>
               <Text strong style={{ fontSize: '16px' }}>Grand Total:</Text>
-              <Text strong style={{ fontSize: '20px', color: '#ff4d4f' }}>
+              <Text strong style={{ fontSize: '20px', color: '#ec4899' }}>
                 ₹{cartTotal.toLocaleString('en-IN')}
               </Text>
             </div>
@@ -167,9 +167,9 @@ const Cart = () => {
                 height: '48px',
                 borderRadius: '12px',
                 fontWeight: 600,
-                background: 'linear-gradient(135deg, #1890ff 0%, #52c41a 100%)',
+                background: 'linear-gradient(135deg, #ec4899, #f472b6)',
                 border: 'none',
-                boxShadow: '0 4px 15px rgba(82, 196, 26, 0.3)'
+                boxShadow: '0 4px 15px rgba(236, 72, 153, 0.3)'
               }}
             >
               Proceed to Checkout

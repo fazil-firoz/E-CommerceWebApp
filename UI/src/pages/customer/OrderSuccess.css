@@ -13,7 +13,7 @@
 }
 
 .order-success-bg {
-  background: linear-gradient(135deg, #e8f5e9 0%, #f0f9ff 50%, #e8f5e9 100%);
+  background: linear-gradient(135deg, #fdf2f8 0%, #fff5f7 50%, #fdf2f8 100%);
 }
 
 .order-fail-bg {
@@ -53,8 +53,8 @@
 }
 
 .order-success-icon {
-  background: linear-gradient(135deg, #52c41a, #73d13d);
-  box-shadow: 0 8px 24px rgba(82, 196, 26, 0.35);
+  background: linear-gradient(135deg, #ec4899, #f472b6);
+  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.35);
 }
 
 .order-fail-icon {
@@ -123,14 +123,14 @@
 }
 
 @keyframes icon-pulse {
-  0%, 100% { box-shadow: 0 8px 24px rgba(82, 196, 26, 0.35); }
-  50% { box-shadow: 0 8px 32px rgba(82, 196, 26, 0.55); }
+  0%, 100% { box-shadow: 0 8px 24px rgba(236, 72, 153, 0.35); }
+  50% { box-shadow: 0 8px 32px rgba(236, 72, 153, 0.55); }
 }
 
 /* ── Text Content ──────────────────────────────────────────── */
 .order-success-badge {
   display: inline-block;
-  background: linear-gradient(90deg, #52c41a, #73d13d);
+  background: linear-gradient(90deg, #ec4899, #f472b6);
   color: white;
   font-size: 12px;
   font-weight: 700;
@@ -231,9 +231,9 @@
 }
 
 .order-continue-btn {
-  background: linear-gradient(90deg, #0066cc, #0080ff) !important;
+  background: linear-gradient(90deg, #ec4899, #f472b6) !important;
   border: none !important;
-  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3) !important;
+  box-shadow: 0 4px 12px rgba(236, 72, 153, 0.3) !important;
 }
 
 @keyframes fade-up {
