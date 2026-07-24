@@ -158,7 +158,7 @@ const ReportManagement = () => {
       message.warning('No sales data to export');
       return;
     }
-    let csv = 'Order #,Date,Customer Name,Phone,Total Items,Payment Status,Order Status,Total Amount (₹)\n';
+    let csv = 'Order #,Date,Customer Name,Phone,Total Items,Order Status,Total Amount (₹)\n';
     let totalRevenueSum = 0;
     let totalItemsSum = 0;
 
@@ -166,11 +166,11 @@ const ReportManagement = () => {
       totalRevenueSum += item.totalAmount;
       totalItemsSum += item.totalItems;
       const dateStr = dayjs(item.orderDate).format('YYYY-MM-DD HH:mm');
-      csv += `"${item.orderNumber}","${dateStr}","${item.customerName.replace(/"/g, '""')}","${item.customerPhone}",${item.totalItems},"${item.paymentStatus}","${item.orderStatus}",${item.totalAmount}\n`;
+      csv += `"${item.orderNumber}","${dateStr}","${item.customerName.replace(/"/g, '""')}","${item.customerPhone}",${item.totalItems},"${item.orderStatus}",${item.totalAmount}\n`;
     });
 
     // Summary Row
-    csv += `\n"TOTAL SUMMARY (${salesData.items.length} Orders)","","","",${totalItemsSum},"","Sum of Total Revenue",${totalRevenueSum}\n`;
+    csv += `\n"TOTAL SUMMARY (${salesData.items.length} Orders)","","","",${totalItemsSum},"Sum of Total Revenue",${totalRevenueSum}\n`;
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -194,13 +194,13 @@ const ReportManagement = () => {
       return;
     }
 
-    const shopName = shopSettings?.shopName || 'ToyVerse Shop';
+    const shopName = shopSettings?.shopName || 'Store';
     const shopLogo = shopSettings?.logoUrl 
       ? resolveProductImageUrl(shopSettings.logoUrl) 
-      : 'https://via.placeholder.com/150?text=ToyVerse';
-    const shopAddress = shopSettings?.address || 'ToyVerse Main Branch, City Center';
+      : 'https://via.placeholder.com/150?text=Store';
+    const shopAddress = shopSettings?.address || 'Store Main Branch, City Center';
     const shopPhone = shopSettings?.phone || '+91 9876543210';
-    const shopEmail = shopSettings?.email || 'admin@toyverse.com';
+    const shopEmail = shopSettings?.email || 'admin@store.com';
     const generatedDate = dayjs().format('DD MMMM YYYY, hh:mm A');
 
     let totalValuationSum = 0;
@@ -262,7 +262,7 @@ const ReportManagement = () => {
 
     let tableHeaders = isStock
       ? '<th>ID</th><th>Toy Name</th><th>Category</th><th>MRP</th><th>Price</th><th>Stock</th><th>Valuation</th><th>Status</th>'
-      : '<th>Order #</th><th>Date</th><th>Customer</th><th>Phone</th><th>Items</th><th>Payment</th><th>Status</th><th>Total Revenue</th>';
+      : '<th>Order #</th><th>Date</th><th>Customer</th><th>Phone</th><th>Items</th><th>Status</th><th>Total Revenue</th>';
 
     let tableRows = '';
     items.forEach((item) => {
@@ -288,7 +288,6 @@ const ReportManagement = () => {
             <td><strong>${item.customerName}</strong></td>
             <td>${item.customerPhone}</td>
             <td style="text-align: center;">${item.totalItems}</td>
-            <td>${item.paymentStatus}</td>
             <td><span class="badge ${item.orderStatus}">${item.orderStatus}</span></td>
             <td style="color: #d32f2f; font-weight: 700;">₹${item.totalAmount.toLocaleString('en-IN')}</td>
           </tr>
@@ -309,7 +308,7 @@ const ReportManagement = () => {
         <tr class="total-row">
           <td colspan="4"><strong>TOTAL SUMMARY (${items.length} Orders)</strong></td>
           <td style="text-align: center;"><strong>${totalItemsSum} Items</strong></td>
-          <td colspan="2" style="text-align: right;"><strong>SUM OF TOTAL REVENUE:</strong></td>
+          <td style="text-align: right;"><strong>SUM OF TOTAL REVENUE:</strong></td>
           <td style="color: #2e7d32; font-size: 16px; font-weight: 800;">₹${totalRevenueSum.toLocaleString('en-IN')}</td>
         </tr>
       `;
@@ -512,18 +511,6 @@ const ReportManagement = () => {
       key: 'totalItems',
       align: 'center',
       render: (qty) => <Tag color="blue" style={{ fontWeight: 600 }}>{qty} Items</Tag>
-    },
-    {
-      title: 'Payment Status',
-      dataIndex: 'paymentStatus',
-      key: 'paymentStatus',
-      align: 'center',
-      render: (status) => {
-        const s = (status || '').toLowerCase();
-        if (s === 'completed' || s === 'paid') return <Tag color="success">Paid</Tag>;
-        if (s === 'failed') return <Tag color="error">Failed</Tag>;
-        return <Tag color="warning">Pending</Tag>;
-      }
     },
     {
       title: 'Order Status',
