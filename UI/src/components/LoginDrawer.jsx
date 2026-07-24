@@ -545,7 +545,7 @@ const LoginDrawer = ({ open, onClose }) => {
       open={open}
       onClose={onClose}
       placement="right"
-      width={420}
+      width={typeof window !== 'undefined' && window.innerWidth <= 480 ? '100%' : 440}
       title={null}
       closeIcon={null}
       styles={{
@@ -557,13 +557,13 @@ const LoginDrawer = ({ open, onClose }) => {
       {/* Custom header */}
       <div className="ld-header">
         <div className="ld-header-brand">
-          <span className="ld-brand-dot">🧸</span>
-          <Text strong style={{ fontSize: '15px' }}>{shopName}</Text>
+          <span className="ld-brand-dot">💖</span>
+          <Text strong style={{ fontSize: '15px', color: '#1f1f1f' }}>{shopName}</Text>
         </div>
         <button className="ld-close-btn" onClick={onClose}>✕</button>
       </div>
 
-      <div className="ld-body" style={{ padding: isLoggedIn ? '0' : '32px 24px' }}>
+      <div className="ld-body" style={{ padding: isLoggedIn ? '16px 12px' : '24px 20px' }}>
         {isLoggedIn
           ? renderLoggedIn()
           : step === 'email'
