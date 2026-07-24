@@ -8,7 +8,7 @@
 }
 
 .login-drawer .ant-drawer-header {
-  border-bottom: 1px solid #fce7f3;
+  border-bottom: 1px solid #f0f0f0;
 }
 
 /* Header */
@@ -17,7 +17,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 16px 20px;
-  border-bottom: 1px solid #fce7f3;
+  border-bottom: 1px solid #f0f0f0;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(8px);
   position: sticky;
@@ -36,10 +36,10 @@
 }
 
 .ld-close-btn {
-  background: #fdf2f8;
-  border: 1px solid #fce7f3;
+  background: #f5f5f5;
+  border: 1px solid #d9d9d9;
   font-size: 14px;
-  color: #be185d;
+  color: #595959;
   cursor: pointer;
   width: 32px;
   height: 32px;
@@ -52,9 +52,9 @@
 }
 
 .ld-close-btn:hover {
-  background: #ec4899;
+  background: #1890ff;
   color: #ffffff;
-  border-color: #ec4899;
+  border-color: #1890ff;
   transform: rotate(90deg);
 }
 
@@ -117,14 +117,14 @@
   border-radius: 12px !important;
   height: 46px !important;
   font-size: 14px !important;
-  border-color: #fce7f3 !important;
+  border-color: #d9d9d9 !important;
   transition: all 0.2s ease !important;
 }
 
 .ld-input:focus,
 .ld-input:hover {
-  border-color: #ec4899 !important;
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.12) !important;
+  border-color: #1890ff !important;
+  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.12) !important;
 }
 
 .ld-input-error {
@@ -148,15 +148,15 @@
   border-radius: 24px !important;
   font-size: 15px !important;
   font-weight: 700 !important;
-  background: linear-gradient(135deg, #ec4899 0%, #f472b6 100%) !important;
+  background: linear-gradient(135deg, #1890ff 0%, #0050b3 100%) !important;
   border: none !important;
-  box-shadow: 0 4px 16px rgba(236, 72, 153, 0.28) !important;
+  box-shadow: 0 4px 16px rgba(24, 144, 255, 0.28) !important;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
 
 .ld-primary-btn:hover {
   transform: translateY(-2px) !important;
-  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.4) !important;
+  box-shadow: 0 8px 24px rgba(24, 144, 255, 0.4) !important;
 }
 
 /* OTP boxes - Fully Responsive */
@@ -171,30 +171,30 @@
 .ld-otp-box {
   width: 42px;
   height: 50px;
-  border: 2px solid #fce7f3;
+  border: 2px solid #d9d9d9;
   border-radius: 12px;
   text-align: center;
   font-size: 20px;
   font-weight: 800;
   color: #1f1f1f;
-  background: #fdf2f8;
+  background: #fafafa;
   outline: none;
   transition: all 0.2s ease;
-  caret-color: #ec4899;
+  caret-color: #1890ff;
   font-family: 'Outfit', monospace;
-  box-sizing: border-color;
+  box-sizing: border-box;
 }
 
 .ld-otp-box:focus {
-  border-color: #ec4899;
+  border-color: #1890ff;
   background: #ffffff;
-  box-shadow: 0 0 0 3px rgba(236, 72, 153, 0.15);
+  box-shadow: 0 0 0 3px rgba(24, 144, 255, 0.15);
 }
 
 .ld-otp-filled {
-  border-color: #ec4899;
-  background: #fdf2f8;
-  color: #ec4899;
+  border-color: #1890ff;
+  background: #e6f7ff;
+  color: #1890ff;
 }
 
 .ld-otp-loading {
@@ -213,12 +213,12 @@
 .ld-success-tick {
   width: 76px;
   height: 76px;
-  background: linear-gradient(135deg, #ec4899, #f472b6);
+  background: linear-gradient(135deg, #1890ff, #52c41a);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(236, 72, 153, 0.35);
+  box-shadow: 0 8px 24px rgba(24, 144, 255, 0.35);
   animation: ld-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
@@ -265,14 +265,14 @@
   width: 64px;
   height: 64px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #ec4899, #f472b6);
+  background: linear-gradient(135deg, #1890ff, #0050b3);
   color: white;
   font-size: 24px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 6px 18px rgba(236, 72, 153, 0.25);
+  box-shadow: 0 6px 18px rgba(24, 144, 255, 0.25);
 }
 
 /* Custom Tabs Styling */
@@ -281,7 +281,7 @@
 }
 
 .login-drawer .ant-tabs-ink-bar {
-  background: #ec4899 !important;
+  background: #1890ff !important;
   height: 3px !important;
   border-radius: 3px !important;
 }
@@ -293,7 +293,7 @@
 }
 
 .login-drawer .ant-tabs-tab-active .ant-tabs-tab-btn {
-  color: #ec4899 !important;
+  color: #1890ff !important;
   font-weight: 700 !important;
 }
 

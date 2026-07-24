@@ -118,7 +118,7 @@ const ContactUs = () => {
                   loading={submitting}
                   size="large"
                   block
-                  style={{ borderRadius: '8px', background: '#ec4899', borderColor: '#ec4899' }}
+                  style={{ borderRadius: '8px', background: '#001529', borderColor: '#001529' }}
                 >
                   Send Message
                 </Button>
@@ -172,12 +172,12 @@ const ContactUs = () => {
               </Card>
 
               {/* Email Support */}
-              <Card style={{ borderRadius: '14px', borderLeft: '4px solid #ec4899', background: '#fff' }}>
+              <Card style={{ borderRadius: '14px', borderLeft: '4px solid #722ed1', background: '#fff' }}>
                 <Space align="start" size={14}>
-                  <MailOutlined style={{ fontSize: '24px', color: '#ec4899', marginTop: '2px' }} />
+                  <MailOutlined style={{ fontSize: '24px', color: '#722ed1', marginTop: '2px' }} />
                   <div>
                     <Text strong style={{ display: 'block', fontSize: '14px' }}>Email Support</Text>
-                    <a href={`mailto:${email1}`} style={{ fontSize: '14px', fontWeight: 600, color: '#ec4899' }}>
+                    <a href={`mailto:${email1}`} style={{ fontSize: '14px', fontWeight: 600, color: '#722ed1' }}>
                       {email1}
                     </a>
                   </div>

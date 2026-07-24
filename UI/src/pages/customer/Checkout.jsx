@@ -222,7 +222,7 @@ const Checkout = () => {
         {/* Brand */}
         <div className="checkout-brand" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <Title level={3} style={{ margin: 0, fontWeight: 800, color: '#1a1a1a', cursor: 'pointer' }} onClick={() => navigate('/')}>
-            💖 {shopName}
+            🧸 {shopName}
           </Title>
         </div>
 
@@ -230,10 +230,10 @@ const Checkout = () => {
         <div className="checkout-mobile-summary" onClick={() => setOrderSummaryExpanded(!orderSummaryExpanded)}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <ShoppingOutlined />
-            <Text strong style={{ color: '#ec4899' }}>
+            <Text strong style={{ color: '#0066cc' }}>
               {orderSummaryExpanded ? 'Hide' : 'Show'} order summary
             </Text>
-            <RightOutlined style={{ fontSize: '11px', color: '#ec4899', transform: orderSummaryExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
+            <RightOutlined style={{ fontSize: '11px', color: '#0066cc', transform: orderSummaryExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
           </div>
           <Text strong style={{ fontSize: '16px' }}>₹{grandTotal.toLocaleString('en-IN')}</Text>
         </div>
@@ -278,9 +278,9 @@ const Checkout = () => {
             <div className="checkout-section-header" style={{ marginBottom: '14px' }}>
               <Title level={5} style={{ margin: 0, fontWeight: 700 }}>Contact Information</Title>
               {isLoggedIn ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fdf2f8', border: '1px solid #fce7f3', borderRadius: '20px', padding: '4px 12px' }}>
-                  <CheckCircleFilled style={{ color: '#ec4899', fontSize: '13px' }} />
-                  <Text style={{ fontSize: '12px', color: '#be185d', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#e6f7ff', border: '1px solid #bae7ff', borderRadius: '20px', padding: '4px 12px' }}>
+                  <CheckCircleFilled style={{ color: '#1890ff', fontSize: '13px' }} />
+                  <Text style={{ fontSize: '12px', color: '#003a8c', fontWeight: 600 }}>
                     Signed in as <strong>{customer?.email}</strong>
                   </Text>
                 </div>
@@ -288,7 +288,7 @@ const Checkout = () => {
                 <span
                   className="checkout-signin-link"
                   onClick={() => setLoginDrawerOpen(true)}
-                  style={{ color: '#ec4899', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
+                  style={{ color: '#0066cc', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
                 >
                   Already have an account? <strong style={{ textDecoration: 'underline' }}>Sign in</strong>
                 </span>
@@ -462,7 +462,7 @@ const Checkout = () => {
             <Text strong style={{ fontSize: '16px' }}>Total</Text>
             <div>
               <Text type="secondary" style={{ fontSize: '12px', marginRight: '6px' }}>INR</Text>
-              <Text strong style={{ fontSize: '20px', color: '#ec4899' }}>₹{grandTotal.toLocaleString('en-IN')}</Text>
+              <Text strong style={{ fontSize: '20px', color: '#1890ff' }}>₹{grandTotal.toLocaleString('en-IN')}</Text>
             </div>
           </div>
         </div>
@@ -473,12 +473,12 @@ const Checkout = () => {
 
       {/* Mock Payment Modal */}
       <Modal
-        title={<span style={{ color: '#ec4899', fontWeight: 700 }}>🧪 Razorpay Test Mode</span>}
+        title={<span style={{ color: '#0066cc', fontWeight: 700 }}>🧪 Razorpay Test Mode</span>}
         open={showMockModal}
         closable={false}
         footer={[
           <Button key="fail" danger onClick={() => handleMockPayment(false)}>Simulate Failure</Button>,
-          <Button key="success" type="primary" style={{ background: '#ec4899', borderColor: '#ec4899' }} onClick={() => handleMockPayment(true)}>
+          <Button key="success" type="primary" style={{ background: '#52c41a', borderColor: '#52c41a' }} onClick={() => handleMockPayment(true)}>
             Simulate Success ✓
           </Button>
         ]}

@@ -384,8 +384,8 @@ const LoginDrawer = ({ open, onClose }) => {
                                     </div>
                                   ))}
                                   {order.address && (
-                                    <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: '1px dashed #fce7f3', fontSize: '11px', color: '#6b7280' }}>
-                                      <EnvironmentOutlined style={{ color: '#ec4899', marginRight: '4px' }} />
+                                    <div style={{ marginTop: '8px', paddingTop: '6px', borderTop: '1px dashed #f0f0f0', fontSize: '11px', color: '#6b7280' }}>
+                                      <EnvironmentOutlined style={{ color: '#1890ff', marginRight: '4px' }} />
                                       {order.address.addressLine1}, {order.address.city} - {order.address.pincode}
                                     </div>
                                   )}
