@@ -1,12 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Typography, Divider, Modal, message, Spin } from 'antd';
+import { Form, Input, Button, Typography, Divider, Modal, message, Spin, Tag } from 'antd';
 import {
   LockOutlined, ShoppingOutlined, RightOutlined,
   SafetyCertificateOutlined, PhoneOutlined, MailOutlined,
-  EnvironmentOutlined
+  EnvironmentOutlined, CheckCircleFilled, UserOutlined
 } from '@ant-design/icons';
 import { CartContext } from '../../context/CartContext';
+import { useCustomerAuth } from '../../context/CustomerAuthContext';
+import LoginDrawer from '../../components/LoginDrawer';
 import { orderApi } from '../../api/orderApi';
 import { paymentApi } from '../../api/paymentApi';
 import { shipmentApi } from '../../api/shipmentApi';
@@ -18,6 +20,7 @@ const { Title, Text } = Typography;
 
 const Checkout = () => {
   const { cartItems, cartTotal, clearCart } = useContext(CartContext);
+  const { customer, isLoggedIn } = useCustomerAuth();
   const navigate = useNavigate();
 
   const [form] = Form.useForm();
@@ -25,6 +28,7 @@ const Checkout = () => {
   const [orderResponse, setOrderResponse] = useState(null);
   const [showMockModal, setShowMockModal] = useState(false);
   const [shopSettings, setShopSettings] = useState(null);
+  const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
 
   useEffect(() => {
     const fetchShop = async () => {
@@ -35,6 +39,17 @@ const Checkout = () => {
     };
     fetchShop();
   }, []);
+
+  // Prefill customer details when logged in
+  useEffect(() => {
+    if (isLoggedIn && customer) {
+      form.setFieldsValue({
+        email: customer.email || '',
+        fullName: customer.name || form.getFieldValue('fullName') || '',
+        phone: customer.phoneNumber || form.getFieldValue('phone') || ''
+      });
+    }
+  }, [isLoggedIn, customer, form]);
 
   const shopName = shopSettings?.shopName || 'Store';
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
@@ -58,9 +73,9 @@ const Checkout = () => {
   if (cartItems.length === 0) {
     return (
       <div className="checkout-empty">
-        <ShoppingOutlined style={{ fontSize: '48px', color: '#bfbfbf' }} />
+        <ShoppingOutlined style={{ fontSize: '48px', color: '#f9a8d4' }} />
         <Title level={4} style={{ color: '#8c8c8c', marginTop: '16px' }}>Your cart is empty</Title>
-        <Button type="primary" onClick={() => navigate('/products')} style={{ marginTop: '8px' }}>
+        <Button type="primary" onClick={() => navigate('/products')} style={{ marginTop: '8px', background: '#ec4899', borderColor: '#ec4899', borderRadius: '20px' }}>
           Back to Shop
         </Button>
       </div>
@@ -151,7 +166,7 @@ const Checkout = () => {
         email: customerValues.email || '',
         contact: customerValues.phone
       },
-      theme: { color: '#0066cc' },
+      theme: { color: '#ec4899' },
       modal: { ondismiss: () => message.warning('Payment cancelled.') }
     };
     new window.Razorpay(options).open();
@@ -205,9 +220,9 @@ const Checkout = () => {
       {/* Left: Form */}
       <div className="checkout-left">
         {/* Brand */}
-        <div className="checkout-brand">
-          <Title level={3} style={{ margin: 0, fontWeight: 800, color: '#1a1a1a' }}>
-            🧸 {shopName}
+        <div className="checkout-brand" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Title level={3} style={{ margin: 0, fontWeight: 800, color: '#1a1a1a', cursor: 'pointer' }} onClick={() => navigate('/')}>
+            💖 {shopName}
           </Title>
         </div>
 
@@ -215,10 +230,10 @@ const Checkout = () => {
         <div className="checkout-mobile-summary" onClick={() => setOrderSummaryExpanded(!orderSummaryExpanded)}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <ShoppingOutlined />
-            <Text strong style={{ color: '#0066cc' }}>
+            <Text strong style={{ color: '#ec4899' }}>
               {orderSummaryExpanded ? 'Hide' : 'Show'} order summary
             </Text>
-            <RightOutlined style={{ fontSize: '11px', color: '#0066cc', transform: orderSummaryExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
+            <RightOutlined style={{ fontSize: '11px', color: '#ec4899', transform: orderSummaryExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
           </div>
           <Text strong style={{ fontSize: '16px' }}>₹{grandTotal.toLocaleString('en-IN')}</Text>
         </div>
@@ -258,13 +273,26 @@ const Checkout = () => {
 
         <Form form={form} layout="vertical" requiredMark={false}>
 
-          {/* ── CONTACT ─────────────────────────────── */}
+          {/* ── CONTACT & AUTH ─────────────────────────────── */}
           <div className="checkout-section">
-            <div className="checkout-section-header">
-              <Title level={5} style={{ margin: 0 }}>Contact</Title>
-              <span className="checkout-signin-link" onClick={() => message.info('Email OTP login coming soon!')}>
-                Already have an account? <strong>Sign in</strong>
-              </span>
+            <div className="checkout-section-header" style={{ marginBottom: '14px' }}>
+              <Title level={5} style={{ margin: 0, fontWeight: 700 }}>Contact Information</Title>
+              {isLoggedIn ? (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#fdf2f8', border: '1px solid #fce7f3', borderRadius: '20px', padding: '4px 12px' }}>
+                  <CheckCircleFilled style={{ color: '#ec4899', fontSize: '13px' }} />
+                  <Text style={{ fontSize: '12px', color: '#be185d', fontWeight: 600 }}>
+                    Signed in as <strong>{customer?.email}</strong>
+                  </Text>
+                </div>
+              ) : (
+                <span
+                  className="checkout-signin-link"
+                  onClick={() => setLoginDrawerOpen(true)}
+                  style={{ color: '#ec4899', cursor: 'pointer', fontSize: '13px', fontWeight: 600 }}
+                >
+                  Already have an account? <strong style={{ textDecoration: 'underline' }}>Sign in</strong>
+                </span>
+              )}
             </div>
 
             <Form.Item
@@ -279,7 +307,7 @@ const Checkout = () => {
               />
             </Form.Item>
             <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginBottom: '16px', marginTop: '-8px' }}>
-              Enter your email to receive shipment tracking updates.
+              Enter your email to receive shipment tracking updates and order receipt.
             </Text>
 
             <Form.Item
@@ -302,7 +330,7 @@ const Checkout = () => {
 
           {/* ── DELIVERY ─────────────────────────────── */}
           <div className="checkout-section">
-            <Title level={5} style={{ margin: '0 0 16px' }}>Delivery</Title>
+            <Title level={5} style={{ margin: '0 0 16px', fontWeight: 700 }}>Delivery Address</Title>
 
             <Form.Item name="fullName" rules={[{ required: true, message: 'Full name is required' }]} style={{ marginBottom: '12px' }}>
               <Input placeholder="Full name" size="large" className="checkout-input" />
@@ -311,14 +339,14 @@ const Checkout = () => {
             <Form.Item name="addressLine1" rules={[{ required: true, message: 'Address is required' }]} style={{ marginBottom: '12px' }}>
               <Input
                 prefix={<EnvironmentOutlined style={{ color: '#bfbfbf' }} />}
-                placeholder="Address"
+                placeholder="Address line 1"
                 size="large"
                 className="checkout-input"
               />
             </Form.Item>
 
             <Form.Item name="addressLine2" style={{ marginBottom: '12px' }}>
-              <Input placeholder="Apartment, suite, etc. (optional)" size="large" className="checkout-input" />
+              <Input placeholder="Apartment, suite, landmark, etc. (optional)" size="large" className="checkout-input" />
             </Form.Item>
 
             <div className="checkout-row-3">
@@ -343,25 +371,25 @@ const Checkout = () => {
 
           {/* ── PAYMENT ─────────────────────────────── */}
           <div className="checkout-section">
-            <Title level={5} style={{ margin: '0 0 4px' }}>Payment</Title>
+            <Title level={5} style={{ margin: '0 0 4px', fontWeight: 700 }}>Payment Method</Title>
             <Text type="secondary" style={{ fontSize: '13px', display: 'block', marginBottom: '16px' }}>
-              All transactions are secure and encrypted.
+              All transactions are 100% secure and encrypted.
             </Text>
 
             <div className="checkout-payment-box">
               <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <img src="https://razorpay.com/favicon.ico" alt="razorpay" style={{ width: '20px', height: '20px', borderRadius: '4px' }} />
-                <Text strong>Razorpay — UPI, Cards, Net Banking & Wallets</Text>
+                <Text strong>Razorpay — UPI, GPay, Credit/Debit Cards & Net Banking</Text>
               </div>
               <Text type="secondary" style={{ fontSize: '13px', display: 'block', marginTop: '8px' }}>
-                You'll be redirected to Razorpay to complete payment.
+                You'll be redirected to Razorpay to safely complete your payment.
               </Text>
             </div>
           </div>
 
           {/* ── BILLING ADDRESS ─────────────────────── */}
           <div className="checkout-section">
-            <Title level={5} style={{ margin: '0 0 12px' }}>Billing address</Title>
+            <Title level={5} style={{ margin: '0 0 12px', fontWeight: 700 }}>Billing address</Title>
             <div className="checkout-billing-option checkout-billing-selected">
               <div className="checkout-radio-dot" />
               <Text>Same as shipping address</Text>
@@ -382,7 +410,7 @@ const Checkout = () => {
           </Button>
 
           <div className="checkout-footer-links">
-            <SafetyCertificateOutlined style={{ color: '#8c8c8c' }} />
+            <SafetyCertificateOutlined style={{ color: '#ec4899' }} />
             <Text type="secondary" style={{ fontSize: '12px' }}>
               Secured by 256-bit SSL encryption
             </Text>
@@ -434,20 +462,23 @@ const Checkout = () => {
             <Text strong style={{ fontSize: '16px' }}>Total</Text>
             <div>
               <Text type="secondary" style={{ fontSize: '12px', marginRight: '6px' }}>INR</Text>
-              <Text strong style={{ fontSize: '20px' }}>₹{grandTotal.toLocaleString('en-IN')}</Text>
+              <Text strong style={{ fontSize: '20px', color: '#ec4899' }}>₹{grandTotal.toLocaleString('en-IN')}</Text>
             </div>
           </div>
         </div>
       </div>
 
+      {/* Login Drawer Modal */}
+      <LoginDrawer open={loginDrawerOpen} onClose={() => setLoginDrawerOpen(false)} />
+
       {/* Mock Payment Modal */}
       <Modal
-        title={<span style={{ color: '#0066cc', fontWeight: 700 }}>🧪 Razorpay Test Mode</span>}
+        title={<span style={{ color: '#ec4899', fontWeight: 700 }}>🧪 Razorpay Test Mode</span>}
         open={showMockModal}
         closable={false}
         footer={[
           <Button key="fail" danger onClick={() => handleMockPayment(false)}>Simulate Failure</Button>,
-          <Button key="success" type="primary" style={{ background: '#52c41a', border: 'none' }} onClick={() => handleMockPayment(true)}>
+          <Button key="success" type="primary" style={{ background: '#ec4899', borderColor: '#ec4899' }} onClick={() => handleMockPayment(true)}>
             Simulate Success ✓
           </Button>
         ]}
