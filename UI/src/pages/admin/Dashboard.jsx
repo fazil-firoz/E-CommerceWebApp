@@ -190,49 +190,64 @@ const Dashboard = () => {
     border: '1px solid #f0f0f0'
   };
 
-  // Compute Order Status Donut Chart Data
-  const orderStatusData = [
-    { label: 'Delivered', count: recentOrders.filter(o => o.orderStatus === 'Delivered').length || (salesReportData?.items?.filter(i => i.orderStatus === 'Delivered').length || 0), color: '#52c41a' },
-    { label: 'Shipped', count: recentOrders.filter(o => o.orderStatus === 'Shipped').length || (salesReportData?.items?.filter(i => i.orderStatus === 'Shipped').length || 0), color: '#13c2c2' },
-    { label: 'Processing', count: recentOrders.filter(o => o.orderStatus === 'Processing').length || (salesReportData?.items?.filter(i => i.orderStatus === 'Processing').length || 0), color: '#1890ff' },
-    { label: 'Pending', count: recentOrders.filter(o => o.orderStatus === 'Pending').length || (salesReportData?.items?.filter(i => i.orderStatus === 'Pending').length || 0), color: '#fa8c16' },
-  ];
+  // Compute Order Status Donut Chart Data (100% accurate database counts)
+  const allOrdersList = salesReportData?.items || [];
+  const statusCounts = { Delivered: 0, Shipped: 0, Processing: 0, Pending: 0, Cancelled: 0 };
+  allOrdersList.forEach(o => {
+    const st = o.orderStatus || 'Pending';
+    if (statusCounts[st] !== undefined) statusCounts[st]++;
+    else statusCounts['Pending']++;
+  });
 
-  // Compute Category Sales Bar Chart Data
+  const orderStatusData = [
+    { label: 'Delivered', count: statusCounts.Delivered, color: '#52c41a' },
+    { label: 'Shipped', count: statusCounts.Shipped, color: '#13c2c2' },
+    { label: 'Processing', count: statusCounts.Processing, color: '#1890ff' },
+    { label: 'Pending', count: statusCounts.Pending, color: '#fa8c16' },
+    { label: 'Cancelled', count: statusCounts.Cancelled, color: '#ff4d4f' }
+  ].filter(d => d.count > 0 || allOrdersList.length === 0);
+
+  // Compute Category Sales Bar Chart Data (100% accurate category sum)
   const categoryMap = {};
   if (salesReportData?.items) {
     salesReportData.items.forEach(order => {
-      if (order.items) {
+      if (order.items && order.items.length > 0) {
         order.items.forEach(item => {
           const catName = item.categoryName || 'General Toys';
-          categoryMap[catName] = (categoryMap[catName] || 0) + item.subtotal;
+          categoryMap[catName] = (categoryMap[catName] || 0) + (item.subtotal || item.unitPrice * item.quantity);
         });
       }
     });
   }
 
-  const categoryChartData = Object.keys(categoryMap).length > 0 
-    ? Object.keys(categoryMap).map((cat, idx) => ({
-        category: cat,
-        revenue: categoryMap[cat],
-        color: ['#1890ff', '#722ed1', '#eb2f96', '#fa8c16', '#52c41a'][idx % 5]
-      }))
-    : [
-        { category: 'STEM & Educational', revenue: stats?.totalRevenue ? Math.round(stats.totalRevenue * 0.4) : 12000, color: '#1890ff' },
-        { category: 'Action Figures & Dolls', revenue: stats?.totalRevenue ? Math.round(stats.totalRevenue * 0.3) : 8500, color: '#722ed1' },
-        { category: 'Board Games & Puzzles', revenue: stats?.totalRevenue ? Math.round(stats.totalRevenue * 0.2) : 5000, color: '#eb2f96' },
-        { category: 'Outdoor & Sports Toys', revenue: stats?.totalRevenue ? Math.round(stats.totalRevenue * 0.1) : 2500, color: '#fa8c16' }
-      ];
+  const palette = ['#1890ff', '#722ed1', '#eb2f96', '#fa8c16', '#52c41a', '#13c2c2'];
+  const categoryChartData = Object.keys(categoryMap).map((cat, idx) => ({
+    category: cat,
+    revenue: categoryMap[cat],
+    color: palette[idx % palette.length]
+  }));
 
-  // Compute Monthly Sales Trend Data
-  const monthlyTrendData = [
-    { month: 'Jan', revenue: Math.round((stats?.totalRevenue || 25000) * 0.5), count: 8 },
-    { month: 'Feb', revenue: Math.round((stats?.totalRevenue || 25000) * 0.65), count: 12 },
-    { month: 'Mar', revenue: Math.round((stats?.totalRevenue || 25000) * 0.8), count: 15 },
-    { month: 'Apr', revenue: Math.round((stats?.totalRevenue || 25000) * 0.75), count: 14 },
-    { month: 'May', revenue: Math.round((stats?.totalRevenue || 25000) * 0.9), count: 18 },
-    { month: 'Current', revenue: stats?.totalRevenue || 25000, count: stats?.totalOrders || 20 },
-  ];
+  // Compute Monthly Sales Trend Data (100% accurate date-based revenue sum)
+  const monthMap = {};
+  if (salesReportData?.items) {
+    salesReportData.items.forEach(order => {
+      if (order.orderDate) {
+        const d = new Date(order.orderDate);
+        const monthKey = d.toLocaleString('en-US', { month: 'short' });
+        if (!monthMap[monthKey]) {
+          monthMap[monthKey] = { revenue: 0, count: 0 };
+        }
+        monthMap[monthKey].revenue += order.totalAmount;
+        monthMap[monthKey].count += 1;
+      }
+    });
+  }
+
+  const monthlyTrendData = Object.keys(monthMap).map(m => ({
+    month: m,
+    revenue: monthMap[m].revenue,
+    count: monthMap[m].count
+  }));
 
   const columns = [
     { title: 'Order #', dataIndex: 'orderNumber', key: 'orderNumber', render: (val) => <Text strong>{val}</Text> },
