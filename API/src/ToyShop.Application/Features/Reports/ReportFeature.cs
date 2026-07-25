@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ToyShop.Application.Common.Interfaces;
 using ToyShop.Application.DTOs;
 using ToyShop.Domain.Entities;
+using ToyShop.Domain.Enums;
 using ToyShop.Shared.Models;
 
 namespace ToyShop.Application.Features.Reports
@@ -135,6 +136,7 @@ namespace ToyShop.Application.Features.Reports
                     .ThenInclude(i => i.Product)
                         .ThenInclude(p => p.Images)
                 .Include(o => o.Customer)
+                .Where(o => o.PaymentStatus == PaymentStatus.Success)
                 .AsQueryable();
 
             // Date filtering

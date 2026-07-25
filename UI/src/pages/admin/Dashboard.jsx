@@ -194,8 +194,8 @@ const Dashboard = () => {
     border: '1px solid #f0f0f0'
   };
 
-  // Compute Order Status Donut Chart Data (100% accurate database counts)
-  const allOrdersList = salesReportData?.items || recentOrders || [];
+  // Compute Order Status Donut Chart Data (100% accurate paid orders count)
+  const allOrdersList = (salesReportData?.items || recentOrders || []).filter(o => !o.paymentStatus || o.paymentStatus === 'Success');
   const statusCounts = { Delivered: 0, Shipped: 0, Processing: 0, Pending: 0, Cancelled: 0 };
   allOrdersList.forEach(o => {
     const st = o.orderStatus || 'Pending';
