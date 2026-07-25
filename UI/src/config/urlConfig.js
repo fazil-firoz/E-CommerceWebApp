@@ -29,6 +29,7 @@ export const URLS = {
   },
   ADMIN: {
     LOGIN: `${API_BASE_URL}/admin/login`,
+    CHANGE_PASSWORD: `${API_BASE_URL}/admin/change-password`,
     DASHBOARD_STATS: `${API_BASE_URL}/admin/dashboard-stats`,
   },
   AUTH: {
