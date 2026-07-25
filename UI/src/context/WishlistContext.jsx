@@ -1,5 +1,4 @@
 import React, { createContext, useState, useEffect } from 'react';
-import { message } from 'antd';
 
 export const WishlistContext = createContext();
 
@@ -26,16 +25,11 @@ export const WishlistProvider = ({ children }) => {
   const addToWishlist = (product) => {
     if (!isInWishlist(product.id)) {
       setWishlistItems((prev) => [...prev, product]);
-      message.success({
-        content: `Added "${product.name}" to your Wishlist ❤️`,
-        icon: <span style={{ color: '#ff4d4f' }}>❤️</span>
-      });
     }
   };
 
   const removeFromWishlist = (productId) => {
     setWishlistItems((prev) => prev.filter((item) => item.id !== productId));
-    message.info('Removed item from Wishlist');
   };
 
   const toggleWishlist = (product, event) => {
