@@ -339,7 +339,7 @@ const ProductDetails = () => {
               >
                 Buy Now
               </Button>
-              <Button
+              {/* <Button
                 size="large"
                 icon={<ShareAltOutlined />}
                 onClick={handleShareProduct}
@@ -353,7 +353,7 @@ const ProductDetails = () => {
                 }}
               >
                 Share
-              </Button>
+              </Button> */}
             </div>
 
             <div style={{ marginTop: '24px', borderTop: '1px solid #f0f0f0', paddingTop: '20px' }}>

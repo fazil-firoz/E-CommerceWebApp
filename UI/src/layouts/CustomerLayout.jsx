@@ -72,7 +72,7 @@ const CustomerLayout = () => {
     {
       key: '/products',
       icon: <ShopOutlined />,
-      label: <Link to="/products">Toys Catalog</Link>,
+      label: <Link to="/products">Products</Link>,
     },
     {
       key: '/about',
