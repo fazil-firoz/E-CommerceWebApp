@@ -4,6 +4,7 @@ import { EyeOutlined, SendOutlined, TruckOutlined, SearchOutlined, ReloadOutline
 import dayjs from 'dayjs';
 import { orderApi } from '../../api/orderApi';
 import { shopApi } from '../../api/shopApi';
+import { superAdminApi } from '../../api/superAdminApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,8 +39,9 @@ const OrderManagement = () => {
   const [pendingStatusChange, setPendingStatusChange] = useState(null); // { orderId, newStatus }
   const [shippingForm] = Form.useForm();
   const [shippingLoading, setShippingLoading] = useState(false);
+  const [isPrintInvoiceEnabled, setIsPrintInvoiceEnabled] = useState(true);
 
-  // Fetch shop settings for invoice header/footer details
+  // Fetch shop settings for invoice header/footer details & Super Admin control flags
   useEffect(() => {
     const fetchShopInfo = async () => {
       try {
@@ -51,7 +53,20 @@ const OrderManagement = () => {
         console.error('Failed to fetch shop settings for invoice', err);
       }
     };
+
+    const fetchControlFlags = async () => {
+      try {
+        const res = await superAdminApi.getControlFlags();
+        if (res.success && res.data) {
+          setIsPrintInvoiceEnabled(res.data.isPrintInvoiceEnabled !== false);
+        }
+      } catch (err) {
+        console.error('Failed to fetch Super Admin control flags', err);
+      }
+    };
+
     fetchShopInfo();
+    fetchControlFlags();
   }, []);
 
   const fetchOrders = async (status = statusFilter, dates = dateRange, search = searchText) => {
@@ -925,16 +940,24 @@ const OrderManagement = () => {
               );
             })()}
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
-              <Button
-                type="default"
-                icon={<PrinterOutlined />}
-                onClick={() => handlePrintInvoice(selectedOrder)}
-                style={{ borderRadius: '6px' }}
-              >
-                Print Purchase Invoice
-              </Button>
-            </div>
+            {isPrintInvoiceEnabled && (
+              <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginTop: '16px' }}>
+                <Button
+                  type="primary"
+                  icon={<PrinterOutlined />}
+                  onClick={() => handlePrintInvoice(selectedOrder)}
+                  style={{
+                    borderRadius: '6px',
+                    background: '#001529',
+                    borderColor: '#001529',
+                    fontWeight: 600,
+                    fontSize: '13px'
+                  }}
+                >
+                  Print Invoice
+                </Button>
+              </div>
+            )}
 
           </Space>
         )}

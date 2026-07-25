@@ -3,7 +3,7 @@ import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Switch
 import {
   CrownOutlined, LockOutlined, UnlockOutlined, SaveOutlined,
   AppstoreOutlined, SettingOutlined, WhatsAppOutlined, SafetyCertificateOutlined,
-  CheckCircleOutlined, StopOutlined, ReloadOutlined, TagOutlined
+  CheckCircleOutlined, StopOutlined, ReloadOutlined, TagOutlined, PrinterOutlined
 } from '@ant-design/icons';
 import { superAdminApi } from '../../api/superAdminApi';
 
@@ -441,6 +441,36 @@ const SuperAdminManagement = () => {
                     unCheckedChildren={<StopOutlined />}
                     checked={controls.isWhatsAppFloatingWidgetEnabled}
                     onChange={(checked) => setControls({ ...controls, isWhatsAppFloatingWidgetEnabled: checked })}
+                  />
+                </div>
+
+                {/* Print Purchase Invoice Button Toggle */}
+                <div style={{
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #f0f0f0',
+                  background: controls.isPrintInvoiceEnabled !== false ? '#f6ffed' : '#fff1f0',
+                  display: 'flex',
+                  justify: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <Space align="center" size={8}>
+                      <PrinterOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+                      <Text strong style={{ fontSize: '15px' }}>Print Purchase Invoice Button</Text>
+                    </Space>
+                    <div>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        Enables or disables the Print Invoice button inside Order Management
+                      </Text>
+                    </div>
+                  </div>
+
+                  <Switch
+                    checkedChildren={<CheckCircleOutlined />}
+                    unCheckedChildren={<StopOutlined />}
+                    checked={controls.isPrintInvoiceEnabled !== false}
+                    onChange={(checked) => setControls({ ...controls, isPrintInvoiceEnabled: checked })}
                   />
                 </div>
 
