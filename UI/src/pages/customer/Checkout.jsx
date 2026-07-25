@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Form, Input, Button, Typography, Divider, Modal, message, Spin, Tag, Alert } from 'antd';
+import { Form, Input, Button, Typography, Divider, Modal, message, Spin, Tag, Alert, Space } from 'antd';
 import {
   LockOutlined, ShoppingOutlined, RightOutlined,
   SafetyCertificateOutlined, PhoneOutlined, MailOutlined,

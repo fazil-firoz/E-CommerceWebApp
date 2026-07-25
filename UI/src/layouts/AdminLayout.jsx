@@ -142,7 +142,7 @@ const AdminLayout = () => {
     }] : []),
     ...(superAdminControl.isCouponMenuEnabled !== false ? [{
       key: '/admin/coupons',
-      icon: <TagOutlined style={{ color: '#722ed1' }} />,
+      icon: <TagOutlined />,
       label: <Link to="/admin/coupons">Coupons</Link>,
     }] : []),
     ...(superAdminControl.isShipmentSettingsMenuEnabled !== false && superAdminControl.isAppControlMenuEnabled !== false ? [{
