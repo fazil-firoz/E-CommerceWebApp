@@ -291,14 +291,33 @@ const Dashboard = () => {
           <Text type="secondary">Real-time metrics, store performance, and visual analytics</Text>
         </div>
 
-        <Button
-          type={showGraphicalView ? 'primary' : 'default'}
-          icon={showGraphicalView ? <DownOutlined /> : <RightOutlined />}
-          onClick={() => setShowGraphicalView(!showGraphicalView)}
-          style={{ borderRadius: '8px', fontWeight: 600, height: '40px', display: 'flex', alignItems: 'center', gap: '6px' }}
-        >
-          {showGraphicalView ? 'Hide Graphical View' : 'Graphical View (Bar & Pie Charts)'}
-        </Button>
+        <Tooltip title={showGraphicalView ? "Hide Visual Analytics Charts" : "View Graphical Analytics (Bar & Pie Charts)"}>
+          <Button
+            type={showGraphicalView ? 'primary' : 'default'}
+            icon={<BarChartOutlined style={{ color: showGraphicalView ? '#fff' : '#1890ff', fontSize: '15px' }} />}
+            onClick={() => setShowGraphicalView(!showGraphicalView)}
+            style={{ 
+              borderRadius: '20px', 
+              fontWeight: 600, 
+              fontSize: '13px',
+              height: '36px',
+              padding: '0 16px',
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '6px',
+              border: showGraphicalView ? 'none' : '1px solid #d9d9d9',
+              background: showGraphicalView ? '#1890ff' : '#fff',
+              boxShadow: showGraphicalView ? '0 4px 12px rgba(24, 144, 255, 0.3)' : '0 2px 4px rgba(0,0,0,0.03)'
+            }}
+          >
+            <span>Analytics</span>
+            {showGraphicalView ? (
+              <DownOutlined style={{ fontSize: '10px', marginLeft: '2px' }} />
+            ) : (
+              <RightOutlined style={{ fontSize: '10px', color: '#1890ff', marginLeft: '2px' }} />
+            )}
+          </Button>
+        </Tooltip>
       </div>
 
       {/* KPI Statistics Cards */}
