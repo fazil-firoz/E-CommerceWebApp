@@ -310,7 +310,7 @@ const Dashboard = () => {
               boxShadow: showGraphicalView ? '0 4px 12px rgba(24, 144, 255, 0.3)' : '0 2px 4px rgba(0,0,0,0.03)'
             }}
           >
-            <span>Analytics</span>
+            <span></span>
             {showGraphicalView ? (
               <DownOutlined style={{ fontSize: '10px', marginLeft: '2px' }} />
             ) : (

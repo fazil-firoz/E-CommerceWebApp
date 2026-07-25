@@ -28,7 +28,7 @@ const CustomerLayout = () => {
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
   const [shopSettings, setShopSettings] = useState(null);
 
-  // Fetch shop settings for footer data
+  // Fetch shop settings for footer data and WhatsApp widget
   useEffect(() => {
     const fetchShopInfo = async () => {
       try {
@@ -81,7 +81,10 @@ const CustomerLayout = () => {
   const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : 'Store Main Branch, City Center, India';
 
   const phone1 = shopSettings?.phone1 || '+91 9876543210';
-  const whatsapp = shopSettings?.whatsAppNumber || phone1;
+  const whatsappNumberRaw = shopSettings?.whatsAppNumber || shopSettings?.phone1 || '9876543210';
+  const cleanWhatsappNumber = whatsappNumberRaw.replace(/[^0-9]/g, '');
+  const whatsappUrl = `https://wa.me/${cleanWhatsappNumber}?text=${encodeURIComponent(`Hello ${shopName}! I have an inquiry about products on your store.`)}`;
+
   const email1 = shopSettings?.email1 || 'support@store.com';
   const openingHours = shopSettings?.openingHours || 'Mon - Sat: 9:00 AM - 8:00 PM';
 
@@ -95,7 +98,7 @@ const CustomerLayout = () => {
       {/* Sticky Header */}
       <Header style={{
         display: 'flex',
-        justifyContent: 'space-between',
+        justify: 'space-between',
         alignItems: 'center',
         background: '#fff',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
@@ -291,7 +294,7 @@ const CustomerLayout = () => {
                 </Space>
                 <Space align="center">
                   <WhatsAppOutlined style={{ color: '#25D366' }} />
-                  <span><strong>WhatsApp:</strong> <a href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', fontWeight: 600 }}>{whatsapp}</a></span>
+                  <span><strong>WhatsApp:</strong> <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', fontWeight: 600 }}>{whatsappNumberRaw}</a></span>
                 </Space>
                 <Space align="center">
                   <MailOutlined style={{ color: '#ec4899' }} />
@@ -325,6 +328,56 @@ const CustomerLayout = () => {
           </Row>
         </div>
       </Footer>
+
+      {/* 💬 Floating WhatsApp Live Chatbot Button (Fixed Bottom-Right) */}
+      <Tooltip title="Chat with us on WhatsApp" placement="left">
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            position: 'fixed',
+            bottom: '28px',
+            right: '28px',
+            width: '58px',
+            height: '58px',
+            borderRadius: '50%',
+            backgroundColor: '#25D366',
+            color: '#ffffff',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 6px 20px rgba(37, 211, 102, 0.45)',
+            zIndex: 9999,
+            cursor: 'pointer',
+            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+            textDecoration: 'none'
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.transform = 'scale(1.12)';
+            e.currentTarget.style.boxShadow = '0 8px 26px rgba(37, 211, 102, 0.6)';
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.transform = 'scale(1)';
+            e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.45)';
+          }}
+        >
+          <WhatsAppOutlined style={{ fontSize: '32px' }} />
+          {/* Subtle active online badge indicator */}
+          <span
+            style={{
+              position: 'absolute',
+              top: '2px',
+              right: '2px',
+              width: '13px',
+              height: '13px',
+              backgroundColor: '#52c41a',
+              border: '2px solid #ffffff',
+              borderRadius: '50%'
+            }}
+          />
+        </a>
+      </Tooltip>
 
       {/* Customer Login Drawer */}
       <LoginDrawer open={loginDrawerOpen} onClose={() => setLoginDrawerOpen(false)} />
