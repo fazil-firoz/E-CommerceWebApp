@@ -16,6 +16,7 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsShipmentSettingsMenuEnabled { get; set; } = true;
         public bool IsInvoiceSettingsMenuEnabled { get; set; } = true;
         public bool IsTaxSettingsMenuEnabled { get; set; } = true;
+        public bool IsReportsMenuEnabled { get; set; } = true;
         public bool IsAppControlMenuEnabled { get; set; } = true;
         public bool IsWhatsAppFloatingWidgetEnabled { get; set; } = true;
     }
@@ -26,6 +27,7 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsShipmentSettingsMenuEnabled { get; set; }
         public bool IsInvoiceSettingsMenuEnabled { get; set; }
         public bool IsTaxSettingsMenuEnabled { get; set; }
+        public bool IsReportsMenuEnabled { get; set; }
         public bool IsAppControlMenuEnabled { get; set; }
         public bool IsWhatsAppFloatingWidgetEnabled { get; set; }
     }
@@ -74,6 +76,7 @@ namespace ToyShop.Application.Features.SuperAdmin
                     IsShipmentSettingsMenuEnabled = true,
                     IsInvoiceSettingsMenuEnabled = true,
                     IsTaxSettingsMenuEnabled = true,
+                    IsReportsMenuEnabled = true,
                     IsAppControlMenuEnabled = true,
                     IsWhatsAppFloatingWidgetEnabled = true
                 };
@@ -113,6 +116,7 @@ namespace ToyShop.Application.Features.SuperAdmin
             control.IsShipmentSettingsMenuEnabled = request.Request.IsShipmentSettingsMenuEnabled;
             control.IsInvoiceSettingsMenuEnabled = request.Request.IsInvoiceSettingsMenuEnabled;
             control.IsTaxSettingsMenuEnabled = request.Request.IsTaxSettingsMenuEnabled;
+            control.IsReportsMenuEnabled = request.Request.IsReportsMenuEnabled;
             control.IsAppControlMenuEnabled = request.Request.IsShipmentSettingsMenuEnabled;
             control.IsWhatsAppFloatingWidgetEnabled = request.Request.IsWhatsAppFloatingWidgetEnabled;
             control.UpdatedDate = System.DateTimeOffset.UtcNow;
@@ -129,6 +133,7 @@ namespace ToyShop.Application.Features.SuperAdmin
             IsShipmentSettingsMenuEnabled = c.IsShipmentSettingsMenuEnabled,
             IsInvoiceSettingsMenuEnabled = c.IsInvoiceSettingsMenuEnabled,
             IsTaxSettingsMenuEnabled = c.IsTaxSettingsMenuEnabled,
+            IsReportsMenuEnabled = c.IsReportsMenuEnabled,
             IsAppControlMenuEnabled = c.IsShipmentSettingsMenuEnabled,
             IsWhatsAppFloatingWidgetEnabled = c.IsWhatsAppFloatingWidgetEnabled
         };

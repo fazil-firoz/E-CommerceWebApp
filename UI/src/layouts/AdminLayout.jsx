@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Layout, Menu, Button, Typography, Modal, Form, Input, message, Dropdown, Avatar } from 'antd';
-import { 
-  DashboardOutlined, 
-  FolderOutlined, 
-  ShoppingOutlined, 
-  SolutionOutlined, 
+import {
+  DashboardOutlined,
+  FolderOutlined,
+  ShoppingOutlined,
+  SolutionOutlined,
   LogoutOutlined,
   HomeOutlined,
   ShopOutlined,
@@ -134,24 +134,24 @@ const AdminLayout = () => {
       icon: <SolutionOutlined />,
       label: <Link to="/admin/orders">Orders</Link>,
     },
-    {
+    ...(superAdminControl.isReportsMenuEnabled !== false ? [{
       key: '/admin/reports',
       icon: <BarChartOutlined />,
       label: <Link to="/admin/reports">Reports</Link>,
-    },
+    }] : []),
     ...(superAdminControl.isShipmentSettingsMenuEnabled !== false && superAdminControl.isAppControlMenuEnabled !== false ? [{
       key: '/admin/shipment-settings',
-      icon: <TruckOutlined style={{ color: '#1890ff' }} />,
+      icon: <TruckOutlined />,
       label: <Link to="/admin/shipment-settings">Shipment Settings</Link>,
     }] : []),
     ...(superAdminControl.isInvoiceSettingsMenuEnabled !== false ? [{
       key: '/admin/invoice-settings',
-      icon: <FileTextOutlined style={{ color: '#fa8c16' }} />,
+      icon: <FileTextOutlined />,
       label: <Link to="/admin/invoice-settings">Invoice Settings</Link>,
     }] : []),
     ...(superAdminControl.isTaxSettingsMenuEnabled !== false ? [{
       key: '/admin/tax-settings',
-      icon: <PercentageOutlined style={{ color: '#52c41a' }} />,
+      icon: <PercentageOutlined />,
       label: <Link to="/admin/tax-settings">Tax Settings</Link>,
     }] : []),
     ...(superAdminControl.isShopSettingsMenuEnabled !== false ? [{
@@ -188,7 +188,7 @@ const AdminLayout = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider 
+      <Sider
         breakpoint="lg"
         collapsedWidth="0"
         style={{
@@ -196,10 +196,10 @@ const AdminLayout = () => {
           background: '#001529'
         }}
       >
-        <div style={{ 
-          height: '64px', 
-          display: 'flex', 
-          alignItems: 'center', 
+        <div style={{
+          height: '64px',
+          display: 'flex',
+          alignItems: 'center',
           padding: '0 24px',
           background: '#002140'
         }}>
@@ -207,22 +207,22 @@ const AdminLayout = () => {
             {shopName} Admin
           </Typography.Title>
         </div>
-        <Menu 
+        <Menu
           theme="dark"
-          mode="inline" 
-          selectedKeys={[location.pathname]} 
-          items={menuItems} 
+          mode="inline"
+          selectedKeys={[location.pathname]}
+          items={menuItems}
           style={{ padding: '16px 0' }}
         />
       </Sider>
 
       <Layout>
-        <Header style={{ 
-          background: '#fff', 
-          padding: '0 24px', 
+        <Header style={{
+          background: '#fff',
+          padding: '0 24px',
           height: '64px',
-          display: 'flex', 
-          justify: 'space-between', 
+          display: 'flex',
+          justify: 'space-between',
           alignItems: 'center',
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
           zIndex: 10
@@ -234,22 +234,22 @@ const AdminLayout = () => {
           </div>
 
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <Button 
-              icon={<HomeOutlined />} 
+            <Button
+              icon={<HomeOutlined />}
               onClick={() => navigate('/')}
               style={{ borderRadius: '6px', display: 'flex', alignItems: 'center' }}
             >
               View Storefront
             </Button>
-            
+
             <Dropdown menu={{ items: adminProfileDropdownItems }} trigger={['click']} placement="bottomRight">
-              <div 
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '8px', 
-                  background: '#f5f5f5', 
-                  padding: '6px 14px', 
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: '#f5f5f5',
+                  padding: '6px 14px',
                   borderRadius: '20px',
                   cursor: 'pointer',
                   border: '1px solid #e8e8e8',
@@ -267,10 +267,10 @@ const AdminLayout = () => {
           </div>
         </Header>
 
-        <Content style={{ 
-          margin: '24px', 
-          padding: '24px', 
-          background: '#fff', 
+        <Content style={{
+          margin: '24px',
+          padding: '24px',
+          background: '#fff',
           borderRadius: '8px',
           minHeight: '280px',
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'

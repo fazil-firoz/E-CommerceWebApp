@@ -19,7 +19,10 @@ const SuperAdminManagement = () => {
   // Control state
   const [controls, setControls] = useState({
     isShopSettingsMenuEnabled: true,
-    isAppControlMenuEnabled: true,
+    isShipmentSettingsMenuEnabled: true,
+    isInvoiceSettingsMenuEnabled: true,
+    isTaxSettingsMenuEnabled: true,
+    isReportsMenuEnabled: true,
     isWhatsAppFloatingWidgetEnabled: true
   });
 
@@ -308,7 +311,7 @@ const SuperAdminManagement = () => {
                   padding: '14px 16px',
                   borderRadius: '12px',
                   border: '1px solid #f0f0f0',
-                  background: controls.isTaxSettingsMenuEnabled ? '#f6ffed' : '#fff1f0',
+                  background: controls.isTaxSettingsMenuEnabled !== false ? '#f6ffed' : '#fff1f0',
                   display: 'flex',
                   justify: 'space-between',
                   alignItems: 'center'
@@ -328,8 +331,38 @@ const SuperAdminManagement = () => {
                   <Switch
                     checkedChildren={<CheckCircleOutlined />}
                     unCheckedChildren={<StopOutlined />}
-                    checked={controls.isTaxSettingsMenuEnabled}
+                    checked={controls.isTaxSettingsMenuEnabled !== false}
                     onChange={(checked) => setControls({ ...controls, isTaxSettingsMenuEnabled: checked })}
+                  />
+                </div>
+
+                {/* Reports Menu Toggle */}
+                <div style={{
+                  padding: '14px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #f0f0f0',
+                  background: controls.isReportsMenuEnabled !== false ? '#f6ffed' : '#fff1f0',
+                  display: 'flex',
+                  justify: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <Space align="center" size={8}>
+                      <SettingOutlined style={{ fontSize: '18px', color: '#722ed1' }} />
+                      <Text strong style={{ fontSize: '14px' }}>Reports Menu</Text>
+                    </Space>
+                    <div>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        Controls `/admin/reports` menu visibility
+                      </Text>
+                    </div>
+                  </div>
+
+                  <Switch
+                    checkedChildren={<CheckCircleOutlined />}
+                    unCheckedChildren={<StopOutlined />}
+                    checked={controls.isReportsMenuEnabled !== false}
+                    onChange={(checked) => setControls({ ...controls, isReportsMenuEnabled: checked })}
                   />
                 </div>
               </Space>
