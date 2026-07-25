@@ -329,12 +329,13 @@ const CustomerLayout = () => {
         </div>
       </Footer>
 
-      {/* 💬 Floating WhatsApp Live Chatbot Button (Fixed Bottom-Right) */}
+      {/* 💬 Floating WhatsApp Live Chatbot Button (Fixed Bottom-Right with Up & Down Bounce) */}
       <Tooltip title="Chat with us on WhatsApp" placement="left">
         <a
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
+          className="whatsapp-float-widget"
           style={{
             position: 'fixed',
             bottom: '28px',
@@ -347,19 +348,10 @@ const CustomerLayout = () => {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            boxShadow: '0 6px 20px rgba(37, 211, 102, 0.45)',
             zIndex: 9999,
             cursor: 'pointer',
             transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
             textDecoration: 'none'
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.12)';
-            e.currentTarget.style.boxShadow = '0 8px 26px rgba(37, 211, 102, 0.6)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)';
-            e.currentTarget.style.boxShadow = '0 6px 20px rgba(37, 211, 102, 0.45)';
           }}
         >
           <WhatsAppOutlined style={{ fontSize: '32px' }} />

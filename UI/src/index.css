@@ -60,3 +60,25 @@ code {
 .ant-menu-horizontal {
   line-height: 64px;
 }
+
+/* Floating WhatsApp Up & Down Attention Bouncing Animation */
+@keyframes whatsappFloatBounce {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
+  }
+  50% {
+    transform: translateY(-10px);
+    box-shadow: 0 14px 28px rgba(37, 211, 102, 0.6);
+  }
+}
+
+.whatsapp-float-widget {
+  animation: whatsappFloatBounce 2.4s ease-in-out infinite;
+}
+
+.whatsapp-float-widget:hover {
+  animation-play-state: paused;
+  transform: scale(1.12) translateY(-4px) !important;
+  box-shadow: 0 16px 32px rgba(37, 211, 102, 0.7) !important;
+}
