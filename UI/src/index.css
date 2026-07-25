@@ -83,68 +83,82 @@ code {
   box-shadow: 0 16px 32px rgba(37, 211, 102, 0.7) !important;
 }
 
-/* Product Label Badge Shining Effect Animation */
-@keyframes productBadgeShine {
+/* Card-Hugging Corner Ribbon Badge Shining Effect */
+@keyframes productRibbonShine {
   0% {
-    left: -100%;
+    left: -120%;
   }
-  20% {
-    left: 150%;
+  25% {
+    left: 180%;
   }
   100% {
-    left: 150%;
+    left: 180%;
   }
 }
 
-.shining-product-badge {
+.corner-ribbon-wrapper {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 0;
+  left: 0;
+  width: 90px;
+  height: 90px;
+  overflow: hidden;
   z-index: 10;
-  padding: 4px 12px;
-  border-radius: 20px;
-  font-size: 11px;
+  pointer-events: none;
+}
+
+.corner-ribbon {
+  position: absolute;
+  top: 18px;
+  left: -35px;
+  width: 140px;
+  padding: 5px 0;
+  text-align: center;
+  font-size: 10px;
   font-weight: 800;
   color: #ffffff;
   text-transform: uppercase;
-  letter-spacing: 0.6px;
+  letter-spacing: 0.8px;
+  transform: rotate(-45deg);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
   overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
+  line-height: 1.2;
 }
 
-.shining-product-badge::after {
+.corner-ribbon::after {
   content: '';
   position: absolute;
   top: -50%;
-  left: -100%;
+  left: -120%;
   width: 50%;
   height: 200%;
   background: linear-gradient(
     90deg,
     rgba(255, 255, 255, 0) 0%,
-    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0.75) 50%,
     rgba(255, 255, 255, 0) 100%
   );
   transform: rotate(25deg);
-  animation: productBadgeShine 3s infinite ease-in-out;
+  animation: productRibbonShine 3.2s infinite ease-in-out;
 }
 
-/* Color themes for badges */
+/* Ribbon Color themes */
 .badge-theme-new {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .badge-theme-bestseller {
   background: linear-gradient(135deg, #ff7a00 0%, #ff4d00 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .badge-theme-popular {
   background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .badge-theme-limitedstock {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }

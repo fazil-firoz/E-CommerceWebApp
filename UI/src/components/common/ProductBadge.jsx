@@ -10,26 +10,16 @@ export const getBadgeThemeClass = (label) => {
   return 'badge-theme-new';
 };
 
-export const getBadgeEmoji = (label) => {
-  if (!label) return '✨';
-  const clean = label.toLowerCase().replace(/[^a-z0-9]/g, '');
-  if (clean === 'new') return '✨';
-  if (clean === 'bestseller') return '🔥';
-  if (clean === 'popular') return '⭐';
-  if (clean === 'limitedstock') return '⚡';
-  return '✨';
-};
-
 const ProductBadge = ({ label, style = {} }) => {
   if (!label) return null;
 
   const themeClass = getBadgeThemeClass(label);
-  const emoji = getBadgeEmoji(label);
 
   return (
-    <div className={`shining-product-badge ${themeClass}`} style={style}>
-      <span>{emoji}</span>
-      <span>{label}</span>
+    <div className="corner-ribbon-wrapper" style={style}>
+      <div className={`corner-ribbon ${themeClass}`}>
+        {label}
+      </div>
     </div>
   );
 };
