@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Button, Typography, Modal, Form, Input, message } from 'antd';
+import { Layout, Menu, Button, Typography, Modal, Form, Input, message, Dropdown, Avatar } from 'antd';
 import { 
   DashboardOutlined, 
   FolderOutlined, 
@@ -13,7 +13,8 @@ import {
   BarChartOutlined,
   UserOutlined,
   KeyOutlined,
-  LockOutlined
+  LockOutlined,
+  DownOutlined
 } from '@ant-design/icons';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import { shopApi } from '../api/shopApi';
@@ -124,6 +125,24 @@ const AdminLayout = () => {
     },
   ];
 
+  const adminProfileDropdownItems = [
+    {
+      key: 'change-password',
+      icon: <KeyOutlined style={{ color: '#fa8c16' }} />,
+      label: <span style={{ fontWeight: 500 }}>Change Password</span>,
+      onClick: () => setPasswordModalOpen(true),
+    },
+    {
+      type: 'divider',
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined style={{ color: '#ff4d4f' }} />,
+      label: <span style={{ fontWeight: 500, color: '#ff4d4f' }}>Logout</span>,
+      onClick: logout,
+    },
+  ];
+
   const shopName = shopSettings?.shopName || 'Shop';
 
   return (
@@ -173,7 +192,7 @@ const AdminLayout = () => {
             </Typography.Text>
           </div>
 
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
             <Button 
               icon={<HomeOutlined />} 
               onClick={() => navigate('/')}
@@ -182,31 +201,28 @@ const AdminLayout = () => {
               View Storefront
             </Button>
             
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#f5f5f5', padding: '4px 10px', borderRadius: '6px' }}>
-                <UserOutlined style={{ color: '#1890ff' }} />
-                <Typography.Text strong style={{ fontSize: '13px' }}>{admin?.username || 'Admin'}</Typography.Text>
+            <Dropdown menu={{ items: adminProfileDropdownItems }} trigger={['click']} placement="bottomRight">
+              <div 
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '8px', 
+                  background: '#f5f5f5', 
+                  padding: '6px 14px', 
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  border: '1px solid #e8e8e8',
+                  transition: 'all 0.2s ease',
+                  userSelect: 'none'
+                }}
+              >
+                <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
+                <Typography.Text strong style={{ fontSize: '13px', color: '#141414' }}>
+                  {admin?.username || 'Admin'}
+                </Typography.Text>
+                <DownOutlined style={{ fontSize: '10px', color: '#8c8c8c' }} />
               </div>
-
-              <Button
-                type="default"
-                icon={<KeyOutlined style={{ color: '#fa8c16' }} />}
-                onClick={() => setPasswordModalOpen(true)}
-                style={{ borderRadius: '6px', display: 'flex', alignItems: 'center', fontSize: '13px' }}
-              >
-                Change Password
-              </Button>
-
-              <Button 
-                type="text" 
-                danger 
-                icon={<LogoutOutlined />} 
-                onClick={logout}
-                style={{ borderRadius: '6px', display: 'flex', alignItems: 'center', fontSize: '13px' }}
-              >
-                Logout
-              </Button>
-            </div>
+            </Dropdown>
           </div>
         </Header>
 
