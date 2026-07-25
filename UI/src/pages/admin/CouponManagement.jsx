@@ -3,6 +3,7 @@ import { Table, Button, Card, Tag, Switch, Space, Modal, Form, Input, InputNumbe
 import { TagOutlined, PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, InfoCircleOutlined, SearchOutlined, CheckCircleOutlined, StopOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { couponApi } from '../../api/couponApi';
+import { shopApi } from '../../api/shopApi';
 
 const { Title, Text } = Typography;
 
@@ -13,6 +14,7 @@ const CouponManagement = () => {
   const [editingCoupon, setEditingCoupon] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [searchText, setSearchText] = useState('');
+  const [shopSettings, setShopSettings] = useState(null);
   const [form] = Form.useForm();
 
   const fetchCoupons = async () => {
@@ -33,7 +35,17 @@ const CouponManagement = () => {
 
   useEffect(() => {
     fetchCoupons();
+    const fetchShop = async () => {
+      try {
+        const res = await shopApi.getSettings();
+        if (res.success && res.data) setShopSettings(res.data);
+      } catch (err) {}
+    };
+    fetchShop();
   }, []);
+
+  const shopName = shopSettings?.shopName || 'Store';
+  const shopPrefix = shopName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 8) || 'STORE';
 
   const handleOpenAddModal = () => {
     setEditingCoupon(null);
@@ -242,7 +254,7 @@ const CouponManagement = () => {
       {/* Top Banner Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
-          <div style={{
+          {/* <div style={{
             width: '52px',
             height: '52px',
             borderRadius: '14px',
@@ -253,7 +265,7 @@ const CouponManagement = () => {
             boxShadow: '0 6px 16px rgba(114, 46, 209, 0.3)'
           }}>
             <TagOutlined style={{ fontSize: '26px', color: '#fff' }} />
-          </div>
+          </div> */}
           <div>
             <Title level={3} style={{ margin: 0, fontWeight: 800 }}>
               Coupon Code Management
@@ -272,15 +284,15 @@ const CouponManagement = () => {
             type="primary"
             icon={<PlusOutlined />}
             onClick={handleOpenAddModal}
-            style={{
-              borderRadius: '8px',
-              background: 'linear-gradient(135deg, #722ed1, #1890ff)',
-              borderColor: 'transparent',
-              fontWeight: 700,
-              height: '40px',
-              padding: '0 20px',
-              boxShadow: '0 4px 14px rgba(114, 46, 209, 0.3)'
-            }}
+            // style={{
+            //   borderRadius: '8px',
+            //   background: 'linear-gradient(135deg, #722ed1, #1890ff)',
+            //   borderColor: 'transparent',
+            //   fontWeight: 700,
+            //   height: '40px',
+            //   padding: '0 20px',
+            //   boxShadow: '0 4px 14px rgba(114, 46, 209, 0.3)'
+            // }}
           >
             Create Coupon Code
           </Button>
@@ -368,10 +380,10 @@ const CouponManagement = () => {
             name="code"
             rules={[
               { required: true, message: 'Please enter coupon code' },
-              { pattern: /^[A-Za-z0-9_-]+$/, message: 'Code must be alphanumeric (e.g. WELCOME10)' }
+              { pattern: /^[A-Za-z0-9_-]+$/, message: `Code must be alphanumeric (e.g. ${shopPrefix}10)` }
             ]}
           >
-            <Input placeholder="e.g. TOYSHOP10" size="large" style={{ textTransform: 'uppercase', borderRadius: '8px', fontWeight: 700, letterSpacing: '1px' }} />
+            <Input placeholder={`e.g. ${shopPrefix}10`} size="large" style={{ textTransform: 'uppercase', borderRadius: '8px', fontWeight: 700, letterSpacing: '1px' }} />
           </Form.Item>
 
           <Row gutter={16}>
@@ -415,15 +427,15 @@ const CouponManagement = () => {
               type="primary"
               htmlType="submit"
               loading={submitting}
-              style={{
-                borderRadius: '8px',
-                background: 'linear-gradient(135deg, #722ed1, #1890ff)',
-                borderColor: 'transparent',
-                fontWeight: 700,
-                height: '40px',
-                padding: '0 24px',
-                boxShadow: '0 4px 14px rgba(114, 46, 209, 0.3)'
-              }}
+              // style={{
+              //   borderRadius: '8px',
+              //   background: 'linear-gradient(135deg, #722ed1, #1890ff)',
+              //   borderColor: 'transparent',
+              //   fontWeight: 700,
+              //   height: '40px',
+              //   padding: '0 24px',
+              //   boxShadow: '0 4px 14px rgba(114, 46, 209, 0.3)'
+              // }}
             >
               {editingCoupon ? 'Save Changes' : 'Create Coupon Code'}
             </Button>

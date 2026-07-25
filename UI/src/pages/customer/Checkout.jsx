@@ -61,6 +61,7 @@ const Checkout = () => {
   }, [isLoggedIn, customer, form]);
 
   const shopName = shopSettings?.shopName || 'Store';
+  const shopPrefix = shopName.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().slice(0, 8) || 'STORE';
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [shippingMethod, setShippingMethod] = useState(null);
 
@@ -595,7 +596,7 @@ const Checkout = () => {
               <Space.Compact style={{ width: '100%' }}>
                 <Input
                   prefix={<TagOutlined style={{ color: '#722ed1' }} />}
-                  placeholder="Enter Coupon Code (e.g. TOYSHOP10)"
+                  placeholder={`Enter Coupon Code (e.g. ${shopPrefix}10)`}
                   value={couponCodeInput}
                   onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
                   onPressEnter={handleApplyCoupon}
