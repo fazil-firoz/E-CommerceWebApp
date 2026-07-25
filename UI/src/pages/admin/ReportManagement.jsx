@@ -186,11 +186,22 @@ const ReportManagement = () => {
   const getEffectiveOrderRevenue = (item) => {
     const itemsSubtotal = (item.orderItems || []).reduce((sum, itm) => sum + (itm.subtotal || (itm.unitPrice * itm.quantity)), 0);
     const discountAmt = item.discountAmount || 0;
-    let shippingCharge = item.shippingCharge;
-    if (shippingCharge === undefined || shippingCharge === null || (shippingCharge === 0 && Math.abs(item.totalAmount - (itemsSubtotal - discountAmt)) < 0.01 && itemsSubtotal > 0)) {
-      shippingCharge = 55; // Standard delivery charge fallback
+    
+    if (item.shippingCharge !== undefined && item.shippingCharge !== null && item.shippingCharge > 0) {
+      return item.totalAmount;
     }
-    return Math.max(item.totalAmount, itemsSubtotal + shippingCharge - discountAmt);
+    
+    // If order subtotal >= 500, shipping is FREE!
+    if (itemsSubtotal >= 500) {
+      return item.totalAmount;
+    }
+    
+    // Only add 55 fallback for small legacy orders < 500 where shipping charge was omitted from DB
+    if (itemsSubtotal < 500 && Math.abs(item.totalAmount - (itemsSubtotal - discountAmt)) < 0.01) {
+      return item.totalAmount + 55;
+    }
+    
+    return item.totalAmount;
   };
 
   // PDF Export Function with Header, Logo, Sum of Total Revenue, and Footer
@@ -579,9 +590,13 @@ const ReportManagement = () => {
     const discountAmt = record.discountAmount || 0;
     const couponCode = record.couponCode || '';
 
-    let shippingCharge = record.shippingCharge;
-    if (shippingCharge === undefined || shippingCharge === null || (shippingCharge === 0 && Math.abs(record.totalAmount - (itemsSubtotal - discountAmt)) < 0.01 && itemsSubtotal > 0)) {
-      shippingCharge = 55;
+    let shippingCharge = 0;
+    if (record.shippingCharge !== undefined && record.shippingCharge !== null && record.shippingCharge > 0) {
+      shippingCharge = record.shippingCharge;
+    } else if (itemsSubtotal < 500 && Math.abs(record.totalAmount - (itemsSubtotal - discountAmt)) < 0.01) {
+      shippingCharge = 55; // Legacy small order < 500 fallback
+    } else {
+      shippingCharge = 0; // Free shipping for orders >= 500
     }
     const computedNetTotal = Math.max(record.totalAmount, itemsSubtotal + shippingCharge - discountAmt);
 
