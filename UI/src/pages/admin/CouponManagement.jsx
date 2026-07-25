@@ -39,7 +39,7 @@ const CouponManagement = () => {
       try {
         const res = await shopApi.getSettings();
         if (res.success && res.data) setShopSettings(res.data);
-      } catch (err) {}
+      } catch (err) { }
     };
     fetchShop();
   }, []);
@@ -151,22 +151,27 @@ const CouponManagement = () => {
       dataIndex: 'code',
       key: 'code',
       render: (code) => (
-        <span style={{
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '6px',
-          padding: '6px 14px',
-          background: 'linear-gradient(135deg, #722ed1 0%, #1890ff 100%)',
-          color: '#ffffff',
-          fontWeight: 800,
-          fontSize: '14px',
-          borderRadius: '8px',
-          boxShadow: '0 2px 8px rgba(114, 46, 209, 0.25)',
-          letterSpacing: '0.5px'
-        }}>
+        <span
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '4px',
+            padding: '4px 10px',
+            background: '#fff',
+            border: '1px solid #d9d9d9',
+            borderBottom: '2px solid #bfbfbf',
+            borderRadius: '6px',
+            color: '#555',
+            fontSize: '13px',
+            fontWeight: 600,
+            fontFamily: 'monospace',
+            boxShadow: '0 2px 6px rgba(0, 0, 0, 0.12)',
+            transition: 'all 0.2s ease',
+          }}
+        >
           🏷️ {code}
         </span>
-      )
+      ),
     },
     {
       title: 'Discount %',
@@ -284,15 +289,15 @@ const CouponManagement = () => {
             type="primary"
             icon={<PlusOutlined />}
             onClick={handleOpenAddModal}
-            // style={{
-            //   borderRadius: '8px',
-            //   background: 'linear-gradient(135deg, #722ed1, #1890ff)',
-            //   borderColor: 'transparent',
-            //   fontWeight: 700,
-            //   height: '40px',
-            //   padding: '0 20px',
-            //   boxShadow: '0 4px 14px rgba(114, 46, 209, 0.3)'
-            // }}
+          // style={{
+          //   borderRadius: '8px',
+          //   background: 'linear-gradient(135deg, #722ed1, #1890ff)',
+          //   borderColor: 'transparent',
+          //   fontWeight: 700,
+          //   height: '40px',
+          //   padding: '0 20px',
+          //   boxShadow: '0 4px 14px rgba(114, 46, 209, 0.3)'
+          // }}
           >
             Create Coupon Code
           </Button>
@@ -427,15 +432,15 @@ const CouponManagement = () => {
               type="primary"
               htmlType="submit"
               loading={submitting}
-              // style={{
-              //   borderRadius: '8px',
-              //   background: 'linear-gradient(135deg, #722ed1, #1890ff)',
-              //   borderColor: 'transparent',
-              //   fontWeight: 700,
-              //   height: '40px',
-              //   padding: '0 24px',
-              //   boxShadow: '0 4px 14px rgba(114, 46, 209, 0.3)'
-              // }}
+            // style={{
+            //   borderRadius: '8px',
+            //   background: 'linear-gradient(135deg, #722ed1, #1890ff)',
+            //   borderColor: 'transparent',
+            //   fontWeight: 700,
+            //   height: '40px',
+            //   padding: '0 24px',
+            //   boxShadow: '0 4px 14px rgba(114, 46, 209, 0.3)'
+            // }}
             >
               {editingCoupon ? 'Save Changes' : 'Create Coupon Code'}
             </Button>

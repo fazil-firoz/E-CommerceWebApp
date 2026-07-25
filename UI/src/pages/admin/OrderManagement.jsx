@@ -224,7 +224,9 @@ const OrderManagement = () => {
       `;
     });
 
-    const shippingCharge = order.totalAmount > itemsSubtotal ? (order.totalAmount - itemsSubtotal) : 0;
+    const couponDiscount = order.discountAmount || 0;
+    const couponCode = order.couponCode || '';
+    const shippingCharge = Math.max(0, (order.totalAmount + couponDiscount) - itemsSubtotal);
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -528,8 +530,14 @@ const OrderManagement = () => {
                   ${shippingCharge === 0 ? 'FREE Shipping' : `₹${shippingCharge.toLocaleString('en-IN')}`}
                 </td>
               </tr>
+              ${couponDiscount > 0 ? `
+              <tr style="color: #15803d;">
+                <td style="text-align: right;"><strong>Less: Coupon Discount (${couponCode || 'COUPON'}):</strong></td>
+                <td style="text-align: right; font-weight: 700; color: #15803d;">- ₹${couponDiscount.toLocaleString('en-IN')}</td>
+              </tr>
+              ` : ''}
               <tr class="summary-total-row">
-                <td style="text-align: right;">GRAND TOTAL:</td>
+                <td style="text-align: right;">GRAND TOTAL / NET PAYABLE:</td>
                 <td style="text-align: right;">₹${order.totalAmount.toLocaleString('en-IN')}</td>
               </tr>
             </table>
@@ -885,7 +893,39 @@ const OrderManagement = () => {
               />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
+            {/* Financial Summary Breakdown */}
+            {(() => {
+              const modalSubtotal = (selectedOrder.items || []).reduce((sum, i) => sum + (i.totalPrice || (i.unitPrice * i.quantity)), 0);
+              const modalDiscount = selectedOrder.discountAmount || 0;
+              return (
+                <div style={{ padding: '12px 16px', background: '#fafafa', borderRadius: '10px', border: '1px solid #f0f0f0', marginTop: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '280px' }}>
+                      <Text type="secondary">Items Subtotal:</Text>
+                      <Text strong>₹{modalSubtotal.toLocaleString('en-IN')}</Text>
+                    </div>
+                    {modalDiscount > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '280px' }}>
+                        <Text style={{ color: '#52c41a', fontWeight: 600 }}>
+                          Less: Coupon Discount ({selectedOrder.couponCode || 'COUPON'}):
+                        </Text>
+                        <Text strong style={{ color: '#52c41a' }}>
+                          - ₹{modalDiscount.toLocaleString('en-IN')}
+                        </Text>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '280px', borderTop: '1px solid #e8e8e8', paddingTop: '6px' }}>
+                      <Text strong style={{ fontSize: '15px' }}>Net Total Payable:</Text>
+                      <Text strong style={{ fontSize: '18px', color: '#ff4d4f' }}>
+                        ₹{selectedOrder.totalAmount.toLocaleString('en-IN')}
+                      </Text>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '12px' }}>
               <Button
                 type="default"
                 icon={<PrinterOutlined />}
@@ -894,9 +934,6 @@ const OrderManagement = () => {
               >
                 Print Purchase Invoice
               </Button>
-              <Title level={4} style={{ margin: 0 }}>
-                Total: <span style={{ color: '#ff4d4f' }}>₹{selectedOrder.totalAmount.toLocaleString('en-IN')}</span>
-              </Title>
             </div>
 
           </Space>
