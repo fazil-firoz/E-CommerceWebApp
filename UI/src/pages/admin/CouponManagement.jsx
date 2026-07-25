@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Card, Tag, Switch, Space, Modal, Form, Input, InputNumber, DatePicker, Typography, Popconfirm, message, Spin, Row, Col, Alert } from 'antd';
-import { TagOutlined, PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, InfoCircleOutlined, SearchOutlined } from '@ant-design/icons';
+import { Table, Button, Card, Tag, Switch, Space, Modal, Form, Input, InputNumber, DatePicker, Typography, Popconfirm, message, Spin, Row, Col, Alert, Statistic } from 'antd';
+import { TagOutlined, PlusOutlined, EditOutlined, DeleteOutlined, ReloadOutlined, InfoCircleOutlined, SearchOutlined, CheckCircleOutlined, StopOutlined, ClockCircleOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { couponApi } from '../../api/couponApi';
 
@@ -126,9 +126,12 @@ const CouponManagement = () => {
     }
   };
 
-  const filteredCoupons = coupons.filter(c => 
+  const filteredCoupons = coupons.filter(c =>
     c.code.toLowerCase().includes(searchText.toLowerCase())
   );
+
+  const activeCount = coupons.filter(c => c.isActive && dayjs(c.expiryDate).isAfter(dayjs())).length;
+  const expiredCount = coupons.filter(c => dayjs(c.expiryDate).isBefore(dayjs())).length;
 
   const columns = [
     {
@@ -136,22 +139,42 @@ const CouponManagement = () => {
       dataIndex: 'code',
       key: 'code',
       render: (code) => (
-        <Tag color="purple" style={{ fontSize: '14px', padding: '4px 12px', fontWeight: 800, borderRadius: '6px' }}>
+        <span style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '6px',
+          padding: '6px 14px',
+          background: 'linear-gradient(135deg, #722ed1 0%, #1890ff 100%)',
+          color: '#ffffff',
+          fontWeight: 800,
+          fontSize: '14px',
+          borderRadius: '8px',
+          boxShadow: '0 2px 8px rgba(114, 46, 209, 0.25)',
+          letterSpacing: '0.5px'
+        }}>
           🏷️ {code}
-        </Tag>
+        </span>
       )
     },
     {
       title: 'Discount %',
       dataIndex: 'discountPercentage',
       key: 'discountPercentage',
-      render: (pct) => <Text strong style={{ color: '#52c41a', fontSize: '15px' }}>{pct}% OFF</Text>
+      render: (pct) => (
+        <span style={{ fontWeight: 800, color: '#52c41a', fontSize: '15px' }}>
+          {pct}% OFF
+        </span>
+      )
     },
     {
-      title: 'Min Order Amount',
+      title: 'Min Purchase Amount',
       dataIndex: 'minPurchaseAmount',
       key: 'minPurchaseAmount',
-      render: (amt) => amt > 0 ? <Text>₹{amt.toLocaleString('en-IN')}</Text> : <Tag color="gray">No Minimum</Tag>
+      render: (amt) => amt > 0 ? (
+        <Text strong style={{ color: '#1f1f1f' }}>₹{amt.toLocaleString('en-IN')}</Text>
+      ) : (
+        <Tag color="default" style={{ borderRadius: '6px' }}>No Minimum</Tag>
+      )
     },
     {
       title: 'Expiry Date',
@@ -162,8 +185,10 @@ const CouponManagement = () => {
         const isExpired = d.isBefore(dayjs());
         return (
           <Space direction="vertical" size={2}>
-            <Text style={{ color: isExpired ? '#ff4d4f' : 'inherit' }}>{d.format('DD MMM YYYY')}</Text>
-            {isExpired && <Tag color="error">Expired</Tag>}
+            <Text style={{ color: isExpired ? '#ff4d4f' : '#262626', fontWeight: isExpired ? 700 : 500 }}>
+              {d.format('DD MMM YYYY')}
+            </Text>
+            {isExpired && <Tag color="error" style={{ borderRadius: '4px' }}>Expired</Tag>}
           </Space>
         );
       }
@@ -176,8 +201,9 @@ const CouponManagement = () => {
         <Switch
           checked={isActive}
           onChange={(checked) => handleToggleActive(record, checked)}
-          checkedChildren="ACTIVE"
-          unCheckedChildren="OFF"
+          checkedChildren={<CheckCircleOutlined />}
+          unCheckedChildren={<StopOutlined />}
+          style={{ background: isActive ? '#52c41a' : undefined }}
         />
       )
     },
@@ -190,6 +216,7 @@ const CouponManagement = () => {
             type="text"
             icon={<EditOutlined style={{ color: '#1890ff' }} />}
             onClick={() => handleOpenEditModal(record)}
+            style={{ fontWeight: 600 }}
           >
             Edit
           </Button>
@@ -201,7 +228,7 @@ const CouponManagement = () => {
             cancelText="Cancel"
             okButtonProps={{ danger: true }}
           >
-            <Button type="text" danger icon={<DeleteOutlined />}>
+            <Button type="text" danger icon={<DeleteOutlined />} style={{ fontWeight: 600 }}>
               Delete
             </Button>
           </Popconfirm>
@@ -211,32 +238,73 @@ const CouponManagement = () => {
   ];
 
   return (
-    <Space direction="vertical" size={20} style={{ width: '100%' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <Title level={3} style={{ margin: 0, fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <TagOutlined style={{ color: '#722ed1' }} /> Coupon Code Management
-          </Title>
-          <Text type="secondary" style={{ fontSize: '13px' }}>
-            Create and manage promotional discount coupons, minimum purchase rules, and expiry dates.
-          </Text>
+    <Space direction="vertical" size={24} style={{ width: '100%' }}>
+      {/* Top Banner Header */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '14px' }}>
+          <div style={{
+            width: '52px',
+            height: '52px',
+            borderRadius: '14px',
+            background: 'linear-gradient(135deg, #722ed1, #1890ff)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 6px 16px rgba(114, 46, 209, 0.3)'
+          }}>
+            <TagOutlined style={{ fontSize: '26px', color: '#fff' }} />
+          </div>
+          <div>
+            <Title level={3} style={{ margin: 0, fontWeight: 800 }}>
+              Coupon Code Management
+            </Title>
+            <Text type="secondary" style={{ fontSize: '13px' }}>
+              Create and manage promotional discount coupons, minimum purchase rules, and expiry dates.
+            </Text>
+          </div>
         </div>
 
         <Space size={12}>
-          <Button icon={<ReloadOutlined />} onClick={fetchCoupons}>
+          <Button icon={<ReloadOutlined />} onClick={fetchCoupons} loading={loading} style={{ borderRadius: '8px', height: '40px' }}>
             Refresh
           </Button>
           <Button
             type="primary"
             icon={<PlusOutlined />}
             onClick={handleOpenAddModal}
-            style={{ borderRadius: '8px', background: 'linear-gradient(135deg, #722ed1, #1890ff)', borderColor: 'transparent', fontWeight: 700 }}
+            style={{
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #722ed1, #1890ff)',
+              borderColor: 'transparent',
+              fontWeight: 700,
+              height: '40px',
+              padding: '0 20px',
+              boxShadow: '0 4px 14px rgba(114, 46, 209, 0.3)'
+            }}
           >
             Create Coupon Code
           </Button>
         </Space>
       </div>
+
+      {/* Metrics Summary Bar */}
+      <Row gutter={[16, 16]}>
+        <Col xs={12} sm={8}>
+          <Card style={{ borderRadius: '12px', border: '1px solid #f0f0f0', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }} bodyStyle={{ padding: '16px' }}>
+            <Statistic title="Total Coupons" value={coupons.length} prefix={<TagOutlined style={{ color: '#722ed1' }} />} valueStyle={{ fontWeight: 800, color: '#722ed1' }} />
+          </Card>
+        </Col>
+        <Col xs={12} sm={8}>
+          <Card style={{ borderRadius: '12px', border: '1px solid #f0f0f0', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }} bodyStyle={{ padding: '16px' }}>
+            <Statistic title="Active & Valid" value={activeCount} prefix={<CheckCircleOutlined style={{ color: '#52c41a' }} />} valueStyle={{ fontWeight: 800, color: '#52c41a' }} />
+          </Card>
+        </Col>
+        <Col xs={24} sm={8}>
+          <Card style={{ borderRadius: '12px', border: '1px solid #f0f0f0', boxShadow: '0 2px 8px rgba(0,0,0,0.03)' }} bodyStyle={{ padding: '16px' }}>
+            <Statistic title="Expired Coupons" value={expiredCount} prefix={<ClockCircleOutlined style={{ color: '#ff4d4f' }} />} valueStyle={{ fontWeight: 800, color: '#ff4d4f' }} />
+          </Card>
+        </Col>
+      </Row>
 
       <Alert
         message="Coupon Discount Logic & Calculation Rule"
@@ -247,15 +315,15 @@ const CouponManagement = () => {
         style={{ borderRadius: '12px' }}
       />
 
-      <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
-        <div style={{ marginBottom: '16px', maxWidth: '300px' }}>
+      <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', border: '1px solid #f0f0f0' }}>
+        <div style={{ marginBottom: '20px', maxWidth: '320px' }}>
           <Input
             prefix={<SearchOutlined style={{ color: '#bfbfbf' }} />}
             placeholder="Search coupon codes..."
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             allowClear
-            style={{ borderRadius: '8px' }}
+            style={{ borderRadius: '8px', height: '38px' }}
           />
         </div>
 
@@ -271,9 +339,22 @@ const CouponManagement = () => {
       {/* Add / Edit Coupon Modal */}
       <Modal
         title={
-          <span style={{ fontWeight: 800, fontSize: '18px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <TagOutlined style={{ color: '#722ed1' }} /> {editingCoupon ? 'Edit Coupon Code' : 'Create New Coupon Code'}
-          </span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <div style={{
+              width: '36px',
+              height: '36px',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #722ed1, #1890ff)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <TagOutlined style={{ color: '#fff', fontSize: '18px' }} />
+            </div>
+            <span style={{ fontWeight: 800, fontSize: '17px' }}>
+              {editingCoupon ? 'Edit Coupon Code' : 'Create New Coupon Code'}
+            </span>
+          </div>
         }
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
@@ -281,7 +362,7 @@ const CouponManagement = () => {
         destroyOnClose
         style={{ borderRadius: '16px' }}
       >
-        <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ marginTop: '16px' }}>
+        <Form form={form} layout="vertical" onFinish={handleSubmit} style={{ marginTop: '20px' }}>
           <Form.Item
             label="Coupon Code"
             name="code"
@@ -290,26 +371,26 @@ const CouponManagement = () => {
               { pattern: /^[A-Za-z0-9_-]+$/, message: 'Code must be alphanumeric (e.g. WELCOME10)' }
             ]}
           >
-            <Input placeholder="e.g. TOYSHOP10" style={{ textTransform: 'uppercase', borderRadius: '6px', fontWeight: 700 }} />
+            <Input placeholder="e.g. TOYSHOP10" size="large" style={{ textTransform: 'uppercase', borderRadius: '8px', fontWeight: 700, letterSpacing: '1px' }} />
           </Form.Item>
 
-          <Row gutter={12}>
+          <Row gutter={16}>
             <Col span={12}>
               <Form.Item
                 label="Discount Percentage (%)"
                 name="discountPercentage"
                 rules={[{ required: true, message: 'Required' }]}
               >
-                <InputNumber min={1} max={100} prefix="%" style={{ width: '100%', borderRadius: '6px' }} placeholder="10" />
+                <InputNumber min={1} max={100} prefix="%" size="large" style={{ width: '100%', borderRadius: '8px' }} placeholder="10" />
               </Form.Item>
             </Col>
             <Col span={12}>
               <Form.Item
                 label="Min Purchase Amount (₹)"
                 name="minPurchaseAmount"
-                help="e.g. 500 (0 = No Minimum)"
+                help="0 = No Minimum"
               >
-                <InputNumber min={0} prefix="₹" style={{ width: '100%', borderRadius: '6px' }} placeholder="500" />
+                <InputNumber min={0} prefix="₹" size="large" style={{ width: '100%', borderRadius: '8px' }} placeholder="500" />
               </Form.Item>
             </Col>
           </Row>
@@ -319,22 +400,32 @@ const CouponManagement = () => {
             name="expiryDate"
             rules={[{ required: true, message: 'Please pick an expiry date' }]}
           >
-            <DatePicker style={{ width: '100%', borderRadius: '6px' }} format="DD MMM YYYY" />
+            <DatePicker size="large" style={{ width: '100%', borderRadius: '8px' }} format="DD MMM YYYY" />
           </Form.Item>
 
-          <Form.Item label="Initial Status" name="isActive" valuePropName="checked">
+          <Form.Item label="Initial Active Status" name="isActive" valuePropName="checked">
             <Switch checkedChildren="ACTIVE" unCheckedChildren="OFF" />
           </Form.Item>
 
-          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '24px' }}>
-            <Button onClick={() => setModalVisible(false)}>Cancel</Button>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '10px', marginTop: '28px' }}>
+            <Button onClick={() => setModalVisible(false)} style={{ borderRadius: '8px', height: '40px' }}>
+              Cancel
+            </Button>
             <Button
               type="primary"
               htmlType="submit"
               loading={submitting}
-              style={{ borderRadius: '8px', background: 'linear-gradient(135deg, #722ed1, #1890ff)', borderColor: 'transparent', fontWeight: 700 }}
+              style={{
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #722ed1, #1890ff)',
+                borderColor: 'transparent',
+                fontWeight: 700,
+                height: '40px',
+                padding: '0 24px',
+                boxShadow: '0 4px 14px rgba(114, 46, 209, 0.3)'
+              }}
             >
-              {editingCoupon ? 'Save Changes' : 'Create Coupon'}
+              {editingCoupon ? 'Save Changes' : 'Create Coupon Code'}
             </Button>
           </div>
         </Form>
