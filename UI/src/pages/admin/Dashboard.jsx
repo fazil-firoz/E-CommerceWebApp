@@ -153,7 +153,11 @@ const MonthlyTrendBarChart = ({ data }) => {
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
+  const [salesReportData, setSalesReportData] = useState(null);
   const [categoriesList, setCategoriesList] = useState([]);
+  const [showGraphicalView, setShowGraphicalView] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchDashboardData = async () => {
