@@ -14,11 +14,13 @@ import {
   UserOutlined,
   KeyOutlined,
   LockOutlined,
-  DownOutlined
+  DownOutlined,
+  CrownOutlined
 } from '@ant-design/icons';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import { shopApi } from '../api/shopApi';
 import { adminApi } from '../api/adminApi';
+import { superAdminApi } from '../api/superAdminApi';
 
 const { Header, Content, Sider } = Layout;
 
@@ -27,6 +29,11 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [shopSettings, setShopSettings] = useState(null);
+  const [superAdminControl, setSuperAdminControl] = useState({
+    isShopSettingsMenuEnabled: true,
+    isAppControlMenuEnabled: true,
+    isWhatsAppFloatingWidgetEnabled: true
+  });
 
   // Change Password Modal state
   const [passwordModalOpen, setPasswordModalOpen] = useState(false);
@@ -50,7 +57,23 @@ const AdminLayout = () => {
         console.error('Failed to fetch shop settings for admin layout', err);
       }
     };
+
+    const fetchSuperAdminControls = async () => {
+      try {
+        const res = await superAdminApi.getControl();
+        if (res.success && res.data) {
+          setSuperAdminControl(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch Super Admin controls', err);
+      }
+    };
+
     fetchShopInfo();
+    fetchSuperAdminControls();
+
+    window.addEventListener('superAdminControlUpdated', fetchSuperAdminControls);
+    return () => window.removeEventListener('superAdminControlUpdated', fetchSuperAdminControls);
   }, []);
 
   if (!isAuthenticated) {
@@ -113,15 +136,20 @@ const AdminLayout = () => {
       icon: <BarChartOutlined />,
       label: <Link to="/admin/reports">Reports</Link>,
     },
-    {
+    ...(superAdminControl.isAppControlMenuEnabled ? [{
       key: '/admin/app-control',
       icon: <ControlOutlined />,
       label: <Link to="/admin/app-control">App Control</Link>,
-    },
-    {
+    }] : []),
+    ...(superAdminControl.isShopSettingsMenuEnabled ? [{
       key: '/admin/shop-settings',
       icon: <ShopOutlined />,
       label: <Link to="/admin/shop-settings">Shop Settings</Link>,
+    }] : []),
+    {
+      key: '/admin/super-admin',
+      icon: <CrownOutlined style={{ color: '#722ed1' }} />,
+      label: <Link to="/admin/super-admin">Super Admin</Link>,
     },
   ];
 

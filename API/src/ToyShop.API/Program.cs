@@ -147,6 +147,24 @@ using (var scope = app.Services.CreateScope())
               SELECT 1, 'ToyShop Wonderland', 'Bringing Smiles & Pure Joy to Every Kid!', '/logo.png', '/favicon.ico', 'contact@toyshop.com', 'support@toyshop.com', '+91 98765 43210', '+91 98765 43211', '+91 80000 11223', '+91 98765 43210', '123 Fun & Games Street', 'Near Central Toy Park, MG Road', 'Kochi', 'Kerala', '682001', 'India', '32ABCDE1234F1Z5', 'REG-TOY-2026-99', 'ABCDE1234F', 'https://facebook.com', 'https://instagram.com', 'https://twitter.com', 'https://youtube.com', 'Mon - Sat: 9:00 AM - 9:00 PM', NOW(), 'System', FALSE
               WHERE NOT EXISTS (SELECT 1 FROM ""Shops"" WHERE ""Id"" = 1);
 
+              CREATE TABLE IF NOT EXISTS ""SuperAdminControls"" (
+                  ""Id"" SERIAL PRIMARY KEY,
+                  ""IsShopSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE,
+                  ""IsAppControlMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE,
+                  ""IsWhatsAppFloatingWidgetEnabled"" BOOLEAN NOT NULL DEFAULT TRUE,
+                  ""CreatedDate"" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  ""CreatedBy"" VARCHAR(255) DEFAULT 'System',
+                  ""UpdatedDate"" TIMESTAMPTZ NULL,
+                  ""UpdatedBy"" VARCHAR(255) NULL,
+                  ""DeletedDate"" TIMESTAMPTZ NULL,
+                  ""DeletedBy"" VARCHAR(255) NULL,
+                  ""IsDeleted"" BOOLEAN NOT NULL DEFAULT FALSE
+              );
+
+              INSERT INTO ""SuperAdminControls"" (""Id"", ""IsShopSettingsMenuEnabled"", ""IsAppControlMenuEnabled"", ""IsWhatsAppFloatingWidgetEnabled"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
+              SELECT 1, TRUE, TRUE, TRUE, NOW(), 'System', FALSE
+              WHERE NOT EXISTS (SELECT 1 FROM ""SuperAdminControls"" WHERE ""Id"" = 1);
+
               SELECT setval('""Categories_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Categories""), 1));
               SELECT setval('""Products_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Products""), 1));
               SELECT setval('""ProductImages_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""ProductImages""), 1));
@@ -156,7 +174,8 @@ using (var scope = app.Services.CreateScope())
               SELECT setval('""OrderItems_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""OrderItems""), 1));
               SELECT setval('""Payments_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Payments""), 1));
               SELECT setval('""Admins_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Admins""), 1));
-              SELECT setval('""Shops_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Shops""), 1));"
+              SELECT setval('""Shops_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Shops""), 1));
+              SELECT setval('""SuperAdminControls_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""SuperAdminControls""), 1));"
         );
     }
     catch (System.Exception ex)

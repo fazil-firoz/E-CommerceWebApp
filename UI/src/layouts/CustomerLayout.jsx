@@ -13,6 +13,7 @@ import { AdminAuthContext } from '../context/AdminAuthContext';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import LoginDrawer from '../components/LoginDrawer';
 import { shopApi } from '../api/shopApi';
+import { superAdminApi } from '../api/superAdminApi';
 import { resolveProductImageUrl } from '../utils/imageHelper';
 
 const { Header, Content, Footer } = Layout;
@@ -27,8 +28,11 @@ const CustomerLayout = () => {
 
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
   const [shopSettings, setShopSettings] = useState(null);
+  const [superAdminControl, setSuperAdminControl] = useState({
+    isWhatsAppFloatingWidgetEnabled: true
+  });
 
-  // Fetch shop settings for footer data and WhatsApp widget
+  // Fetch shop settings for footer data and Super Admin control flags
   useEffect(() => {
     const fetchShopInfo = async () => {
       try {
@@ -40,7 +44,23 @@ const CustomerLayout = () => {
         console.error('Failed to fetch shop info for footer', err);
       }
     };
+
+    const fetchSuperAdminControls = async () => {
+      try {
+        const res = await superAdminApi.getControl();
+        if (res.success && res.data) {
+          setSuperAdminControl(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch Super Admin control flags', err);
+      }
+    };
+
     fetchShopInfo();
+    fetchSuperAdminControls();
+
+    window.addEventListener('superAdminControlUpdated', fetchSuperAdminControls);
+    return () => window.removeEventListener('superAdminControlUpdated', fetchSuperAdminControls);
   }, []);
 
   const menuItems = [
@@ -330,46 +350,48 @@ const CustomerLayout = () => {
       </Footer>
 
       {/* 💬 Floating WhatsApp Live Chatbot Button (Fixed Bottom-Right with Up & Down Bounce) */}
-      <Tooltip title="Chat with us on WhatsApp" placement="left">
-        <a
-          href={whatsappUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="whatsapp-float-widget"
-          style={{
-            position: 'fixed',
-            bottom: '28px',
-            right: '28px',
-            width: '58px',
-            height: '58px',
-            borderRadius: '50%',
-            backgroundColor: '#25D366',
-            color: '#ffffff',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 9999,
-            cursor: 'pointer',
-            transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
-            textDecoration: 'none'
-          }}
-        >
-          <WhatsAppOutlined style={{ fontSize: '32px' }} />
-          {/* Subtle active online badge indicator */}
-          <span
+      {superAdminControl.isWhatsAppFloatingWidgetEnabled && (
+        <Tooltip title="Chat with us on WhatsApp" placement="left">
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="whatsapp-float-widget"
             style={{
-              position: 'absolute',
-              top: '2px',
-              right: '2px',
-              width: '13px',
-              height: '13px',
-              backgroundColor: '#52c41a',
-              border: '2px solid #ffffff',
-              borderRadius: '50%'
+              position: 'fixed',
+              bottom: '28px',
+              right: '28px',
+              width: '58px',
+              height: '58px',
+              borderRadius: '50%',
+              backgroundColor: '#25D366',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+              cursor: 'pointer',
+              transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+              textDecoration: 'none'
             }}
-          />
-        </a>
-      </Tooltip>
+          >
+            <WhatsAppOutlined style={{ fontSize: '32px' }} />
+            {/* Subtle active online badge indicator */}
+            <span
+              style={{
+                position: 'absolute',
+                top: '2px',
+                right: '2px',
+                width: '13px',
+                height: '13px',
+                backgroundColor: '#52c41a',
+                border: '2px solid #ffffff',
+                borderRadius: '50%'
+              }}
+            />
+          </a>
+        </Tooltip>
+      )}
 
       {/* Customer Login Drawer */}
       <LoginDrawer open={loginDrawerOpen} onClose={() => setLoginDrawerOpen(false)} />

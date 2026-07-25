@@ -35,5 +35,10 @@ export const URLS = {
   AUTH: {
     SEND_OTP: `${API_BASE_URL}/auth/send-otp`,
     VERIFY_OTP: `${API_BASE_URL}/auth/verify-otp`,
+  },
+  SUPER_ADMIN: {
+    GET_CONTROL: `${API_BASE_URL}/superadmin/control`,
+    VERIFY: `${API_BASE_URL}/superadmin/verify`,
+    UPDATE_CONTROL: `${API_BASE_URL}/superadmin/control`,
   }
 };

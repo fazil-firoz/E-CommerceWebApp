@@ -32,6 +32,7 @@ import OrderManagement from './pages/admin/OrderManagement';
 import ShopManagement from './pages/admin/ShopManagement';
 import AppControl from './pages/admin/AppControl';
 import ReportManagement from './pages/admin/ReportManagement';
+import SuperAdminManagement from './pages/admin/SuperAdminManagement';
 
 function App() {
   return (
@@ -69,6 +70,7 @@ function App() {
               <Route path="reports" element={<ReportManagement />} />
               <Route path="app-control" element={<AppControl />} />
               <Route path="shop-settings" element={<ShopManagement />} />
+              <Route path="super-admin" element={<SuperAdminManagement />} />
             </Route>
           </Routes>
         </CartProvider>
