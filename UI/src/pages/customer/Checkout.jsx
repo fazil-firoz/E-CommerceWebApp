@@ -4,7 +4,8 @@ import { Form, Input, Button, Typography, Divider, Modal, message, Spin, Tag, Al
 import {
   LockOutlined, ShoppingOutlined, RightOutlined,
   SafetyCertificateOutlined, PhoneOutlined, MailOutlined,
-  EnvironmentOutlined, CheckCircleFilled, UserOutlined, ThunderboltOutlined
+  EnvironmentOutlined, CheckCircleFilled, UserOutlined, ThunderboltOutlined,
+  PlusOutlined, MinusOutlined
 } from '@ant-design/icons';
 import { CartContext } from '../../context/CartContext';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
@@ -19,13 +20,14 @@ import './Checkout.css';
 const { Title, Text } = Typography;
 
 const Checkout = () => {
-  const { cartItems, cartTotal, clearCart } = useContext(CartContext);
+  const { cartItems, cartTotal, updateQuantity, clearCart } = useContext(CartContext);
   const { customer, isLoggedIn } = useCustomerAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Buy Now single item override (if user clicked "Buy Now" instead of adding to cart)
-  const buyNowItem = location.state?.buyNowItem;
+  // Buy Now single item state (if user clicked "Buy Now" instead of adding to cart)
+  const [buyNowItem, setBuyNowItem] = useState(location.state?.buyNowItem || null);
+
   const checkoutItems = buyNowItem ? [buyNowItem] : cartItems;
   const checkoutTotal = buyNowItem ? (buyNowItem.price * buyNowItem.quantity) : cartTotal;
 
@@ -75,6 +77,20 @@ const Checkout = () => {
     };
     fetchShipping();
   }, []);
+
+  const handleUpdateQuantity = (item, newQty) => {
+    if (newQty < 1) return;
+    if (item.stockQuantity && newQty > item.stockQuantity) {
+      message.warning(`Only ${item.stockQuantity} items available in stock`);
+      return;
+    }
+
+    if (buyNowItem) {
+      setBuyNowItem(prev => ({ ...prev, quantity: newQty }));
+    } else {
+      updateQuantity(item.id, newQty);
+    }
+  };
 
   if (checkoutItems.length === 0) {
     return (
@@ -254,7 +270,7 @@ const Checkout = () => {
             <div>
               <Text strong style={{ color: '#003a8c', fontSize: '14px' }}>Express Buy Now Checkout</Text>
               <Text type="secondary" style={{ display: 'block', fontSize: '12px' }}>
-                Purchasing <strong>{buyNowItem.name}</strong> (Qty: {buyNowItem.quantity}). Items in your main cart are kept safe for later.
+                Purchasing <strong>{buyNowItem.name}</strong>. You can adjust quantity below. Main cart items are kept safe.
               </Text>
             </div>
           </div>
@@ -275,12 +291,33 @@ const Checkout = () => {
         {orderSummaryExpanded && (
           <div className="checkout-mobile-items">
             {checkoutItems.map(item => (
-              <div key={item.id} className="checkout-item-row">
+              <div key={item.id} className="checkout-item-row" style={{ alignItems: 'center' }}>
                 <div className="checkout-item-img-wrap">
                   <img src={resolveProductImageUrl(item.imageUrl || item.imageUrls?.[0], 'thumb')} alt={item.name} />
                   <span className="checkout-item-qty">{item.quantity}</span>
                 </div>
-                <Text style={{ flex: 1, fontSize: '14px' }}>{item.name}</Text>
+                <div style={{ flex: 1, paddingRight: '8px' }}>
+                  <Text style={{ fontSize: '14px', display: 'block' }}>{item.name}</Text>
+                  <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid #d9d9d9', borderRadius: '6px', marginTop: '4px' }}>
+                    <Button
+                      type="text"
+                      size="small"
+                      icon={<MinusOutlined style={{ fontSize: '10px' }} />}
+                      onClick={(e) => { e.stopPropagation(); handleUpdateQuantity(item, item.quantity - 1); }}
+                      disabled={item.quantity <= 1}
+                      style={{ width: '24px', height: '24px', padding: 0 }}
+                    />
+                    <span style={{ padding: '0 6px', fontSize: '12px', fontWeight: 600 }}>{item.quantity}</span>
+                    <Button
+                      type="text"
+                      size="small"
+                      icon={<PlusOutlined style={{ fontSize: '10px' }} />}
+                      onClick={(e) => { e.stopPropagation(); handleUpdateQuantity(item, item.quantity + 1); }}
+                      disabled={item.stockQuantity && item.quantity >= item.stockQuantity}
+                      style={{ width: '24px', height: '24px', padding: 0 }}
+                    />
+                  </div>
+                </div>
                 <Text strong>₹{(item.price * item.quantity).toLocaleString('en-IN')}</Text>
               </div>
             ))}
@@ -454,16 +491,34 @@ const Checkout = () => {
       <div className="checkout-right">
         <div className="checkout-summary-panel">
           {checkoutItems.map(item => (
-            <div key={item.id} className="checkout-item-row">
+            <div key={item.id} className="checkout-item-row" style={{ alignItems: 'center' }}>
               <div className="checkout-item-img-wrap">
                 <img src={resolveProductImageUrl(item.imageUrl || item.imageUrls?.[0], 'thumb')} alt={item.name} />
                 <span className="checkout-item-qty">{item.quantity}</span>
               </div>
-              <div style={{ flex: 1 }}>
+              <div style={{ flex: 1, paddingRight: '8px' }}>
                 <Text strong style={{ fontSize: '14px', display: 'block' }}>{item.name}</Text>
-                <Text type="secondary" style={{ fontSize: '12px' }}>Qty: {item.quantity}</Text>
+                <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid #d9d9d9', borderRadius: '6px', marginTop: '4px' }}>
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<MinusOutlined style={{ fontSize: '10px' }} />}
+                    onClick={(e) => { e.stopPropagation(); handleUpdateQuantity(item, item.quantity - 1); }}
+                    disabled={item.quantity <= 1}
+                    style={{ width: '24px', height: '24px', padding: 0 }}
+                  />
+                  <span style={{ padding: '0 8px', fontSize: '12px', fontWeight: 600 }}>{item.quantity}</span>
+                  <Button
+                    type="text"
+                    size="small"
+                    icon={<PlusOutlined style={{ fontSize: '10px' }} />}
+                    onClick={(e) => { e.stopPropagation(); handleUpdateQuantity(item, item.quantity + 1); }}
+                    disabled={item.stockQuantity && item.quantity >= item.stockQuantity}
+                    style={{ width: '24px', height: '24px', padding: 0 }}
+                  />
+                </div>
               </div>
-              <Text strong>₹{(item.price * item.quantity).toLocaleString('en-IN')}</Text>
+              <Text strong style={{ fontSize: '15px' }}>₹{(item.price * item.quantity).toLocaleString('en-IN')}</Text>
             </div>
           ))}
 
