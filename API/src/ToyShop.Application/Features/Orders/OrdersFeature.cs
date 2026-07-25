@@ -80,6 +80,7 @@ namespace ToyShop.Application.Features.Orders
                 .Include(o => o.Address)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
+                .Where(o => o.PaymentStatus == PaymentStatus.Success)
                 .AsQueryable();
 
             if (request.OrderStatus.HasValue)

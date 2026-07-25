@@ -55,16 +55,6 @@ const Dashboard = () => {
     { title: 'Customer', dataIndex: ['customer', 'name'], key: 'customerName' },
     { title: 'Date', dataIndex: 'orderDate', key: 'orderDate', render: (date) => new Date(date).toLocaleDateString() },
     { 
-      title: 'Payment', 
-      dataIndex: 'paymentStatus', 
-      key: 'paymentStatus', 
-      render: (status) => (
-        <Tag color={status === 'Success' ? 'green' : status === 'Failed' ? 'red' : 'orange'}>
-          {status}
-        </Tag>
-      ) 
-    },
-    { 
       title: 'Order Status', 
       dataIndex: 'orderStatus', 
       key: 'orderStatus', 

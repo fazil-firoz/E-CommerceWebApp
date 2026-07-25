@@ -164,13 +164,15 @@ namespace ToyShop.Application.Features.Admin
 
         public async Task<BaseResponse<DashboardStatsDto>> Handle(GetDashboardStatsQuery request, CancellationToken cancellationToken)
         {
-            var totalOrders = await _orderRepository.Query().CountAsync(cancellationToken);
+            var totalOrders = await _orderRepository.Query()
+                .Where(o => o.PaymentStatus == PaymentStatus.Success)
+                .CountAsync(cancellationToken);
             
             // Use explicit UTC DateTimeOffset - PostgreSQL timestamptz only accepts offset=0
-            var todayStart = new DateTimeOffset(DateTime.UtcNow.Date, TimeSpan.Zero);
-            var todayEnd = todayStart.AddDays(1);
+            var todayStart = new DateTimeOffset(DateTime.UtcNow.Date, TimeSpan.Zero).AddDays(-1);
+            var todayEnd = todayStart.AddDays(2);
             var todaysOrders = await _orderRepository.Query()
-                .Where(o => o.OrderDate >= todayStart && o.OrderDate < todayEnd)
+                .Where(o => o.PaymentStatus == PaymentStatus.Success && o.OrderDate >= todayStart && o.OrderDate < todayEnd)
                 .CountAsync(cancellationToken);
 
             var totalProducts = await _productRepository.Query()
@@ -182,7 +184,7 @@ namespace ToyShop.Application.Features.Admin
                 .SumAsync(o => o.TotalAmount, cancellationToken);
 
             var pendingOrders = await _orderRepository.Query()
-                .Where(o => o.OrderStatus == OrderStatus.Pending)
+                .Where(o => o.PaymentStatus == PaymentStatus.Success && o.OrderStatus == OrderStatus.Pending)
                 .CountAsync(cancellationToken);
 
             var stats = new DashboardStatsDto
