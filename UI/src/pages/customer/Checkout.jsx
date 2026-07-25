@@ -70,6 +70,7 @@ const Checkout = () => {
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponDiscountAmount, setCouponDiscountAmount] = useState(0);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
+  const [couponErrorMsg, setCouponErrorMsg] = useState('');
 
   useEffect(() => {
     const fetchShipping = async () => {
@@ -92,8 +93,9 @@ const Checkout = () => {
   const grandTotal = Math.max(0, grossTotal - couponDiscountAmount);
 
   const handleApplyCoupon = async () => {
+    setCouponErrorMsg('');
     if (!couponCodeInput.trim()) {
-      message.warning('Please enter a coupon code');
+      setCouponErrorMsg('Please enter a coupon code');
       return;
     }
     setValidatingCoupon(true);
@@ -104,12 +106,12 @@ const Checkout = () => {
         const discountAmt = Math.round(grossTotal * (discountPct / 100) * 100) / 100;
         setAppliedCoupon(res.data);
         setCouponDiscountAmount(discountAmt);
-        message.success(res.message || `Coupon ${res.data.code} applied! (${discountPct}% OFF)`);
+        setCouponErrorMsg('');
       } else {
-        message.error(res.message || 'Invalid coupon code');
+        setCouponErrorMsg(res.message || 'Invalid or expired coupon code');
       }
     } catch (err) {
-      message.error('Failed to validate coupon code');
+      setCouponErrorMsg('Failed to validate coupon code');
     } finally {
       setValidatingCoupon(false);
     }
@@ -119,7 +121,7 @@ const Checkout = () => {
     setAppliedCoupon(null);
     setCouponDiscountAmount(0);
     setCouponCodeInput('');
-    message.info('Coupon removed');
+    setCouponErrorMsg('');
   };
 
   const handleUpdateQuantity = (item, newQty) => {
@@ -593,24 +595,44 @@ const Checkout = () => {
                 </Button>
               </div>
             ) : (
-              <Space.Compact style={{ width: '100%' }}>
-                <Input
-                  prefix={<TagOutlined style={{ color: '#722ed1' }} />}
-                  placeholder={`Enter Coupon Code (e.g. ${shopPrefix}10)`}
-                  value={couponCodeInput}
-                  onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
-                  onPressEnter={handleApplyCoupon}
-                  style={{ borderRadius: '8px 0 0 8px', textTransform: 'uppercase', fontWeight: 600 }}
-                />
-                <Button
-                  type="primary"
-                  loading={validatingCoupon}
-                  onClick={handleApplyCoupon}
-                  style={{ borderRadius: '0 8px 8px 0', background: '#722ed1', borderColor: '#722ed1', fontWeight: 700 }}
-                >
-                  Apply
-                </Button>
-              </Space.Compact>
+              <div>
+                <Space.Compact style={{ width: '100%' }}>
+                  <Input
+                    prefix={<TagOutlined style={{ color: '#722ed1' }} />}
+                    placeholder={`Enter Coupon Code (e.g. ${shopPrefix}10)`}
+                    value={couponCodeInput}
+                    onChange={(e) => {
+                      setCouponCodeInput(e.target.value.toUpperCase());
+                      if (couponErrorMsg) setCouponErrorMsg('');
+                    }}
+                    onPressEnter={handleApplyCoupon}
+                    status={couponErrorMsg ? 'error' : ''}
+                    style={{ borderRadius: '8px 0 0 8px', textTransform: 'uppercase', fontWeight: 600 }}
+                  />
+                  <Button
+                    type="primary"
+                    loading={validatingCoupon}
+                    onClick={handleApplyCoupon}
+                    style={{ borderRadius: '0 8px 8px 0', background: '#722ed1', borderColor: '#722ed1', fontWeight: 700 }}
+                  >
+                    Apply
+                  </Button>
+                </Space.Compact>
+
+                {couponErrorMsg && (
+                  <div style={{
+                    marginTop: '6px',
+                    color: '#ff4d4f',
+                    fontSize: '12px',
+                    fontWeight: 600,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '4px'
+                  }}>
+                    <span>⚠️</span> {couponErrorMsg}
+                  </div>
+                )}
+              </div>
             )}
           </div>
 
