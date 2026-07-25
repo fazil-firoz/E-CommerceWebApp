@@ -8,4 +8,5 @@ export const shopApi = {
     headers: { 'Content-Type': 'multipart/form-data' }
   }),
   verifySuperAdmin: (data) => apiClient.post(`${URLS.BASE_URL}/shop/verify-super-admin`, data),
+  sendContactMessage: (data) => apiClient.post(`${URLS.BASE_URL}/shop/contact-us`, data),
 };

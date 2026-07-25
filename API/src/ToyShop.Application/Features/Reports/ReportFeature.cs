@@ -141,12 +141,13 @@ namespace ToyShop.Application.Features.Reports
                 var preset = request.PeriodPreset.ToLower();
                 if (preset == "daily" || preset == "today")
                 {
-                    var todayStart = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero);
+                    // Include all orders from today (accounting for local timezone offset up to UTC-12 to UTC+14)
+                    var todayStart = new DateTimeOffset(now.Year, now.Month, now.Day, 0, 0, 0, TimeSpan.Zero).AddDays(-1);
                     query = query.Where(o => o.OrderDate >= todayStart);
                 }
                 else if (preset == "monthly" || preset == "this_month")
                 {
-                    var monthStart = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero);
+                    var monthStart = new DateTimeOffset(now.Year, now.Month, 1, 0, 0, 0, TimeSpan.Zero).AddDays(-1);
                     query = query.Where(o => o.OrderDate >= monthStart);
                 }
                 else if (preset == "yearly" || preset == "this_year")

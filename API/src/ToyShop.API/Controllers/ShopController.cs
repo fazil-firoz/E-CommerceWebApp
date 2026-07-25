@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using ToyShop.Application.Common.Interfaces;
 using ToyShop.Application.DTOs;
 using ToyShop.Application.Features.Shop;
 using ToyShop.Shared.Models;
@@ -30,6 +31,36 @@ namespace ToyShop.API.Controllers
         public async Task<ActionResult<BaseResponse<ShopDto>>> Get()
         {
             return Ok(await Mediator.Send(new GetShopQuery()));
+        }
+
+        /// <summary>
+        /// Public endpoint for customers to submit contact messages sent via SMTP
+        /// </summary>
+        [HttpPost("contact-us")]
+        [AllowAnonymous]
+        public async Task<ActionResult<BaseResponse<bool>>> SendContactMessage([FromBody] ContactMessageRequest request, [FromServices] IEmailService emailService)
+        {
+            if (request == null || string.IsNullOrWhiteSpace(request.Name) || string.IsNullOrWhiteSpace(request.Message))
+            {
+                return BadRequest(BaseResponse<bool>.Fail("Name and Message are required"));
+            }
+
+            try
+            {
+                await emailService.SendContactMessageAsync(
+                    request.Name.Trim(),
+                    request.Phone?.Trim() ?? "",
+                    request.Email?.Trim() ?? "",
+                    request.Subject?.Trim() ?? "Website Contact Form",
+                    request.Message.Trim()
+                );
+
+                return Ok(BaseResponse<bool>.Ok(true, "Thank you! Your message has been sent successfully."));
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(BaseResponse<bool>.Fail($"Failed to send message: {ex.Message}"));
+            }
         }
 
         /// <summary>
@@ -104,6 +135,18 @@ namespace ToyShop.API.Controllers
             var relativePath = $"/uploads/shopdata/{uniqueFileName}";
             return Ok(BaseResponse<string>.Ok(relativePath, "Logo uploaded successfully"));
         }
+    }
+
+    /// <summary>
+    /// Request model for Contact Us form
+    /// </summary>
+    public class ContactMessageRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Phone { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Subject { get; set; } = string.Empty;
+        public string Message { get; set; } = string.Empty;
     }
 
     /// <summary>
