@@ -12,6 +12,7 @@ namespace ToyShop.Domain.Entities
         public int AddressId { get; set; }
         public DateTimeOffset OrderDate { get; set; } = DateTimeOffset.UtcNow;
         public decimal TotalAmount { get; set; }
+        public decimal ShippingCharge { get; set; } = 0;
         public string? CouponCode { get; set; }
         public decimal DiscountAmount { get; set; } = 0;
         public OrderStatus OrderStatus { get; set; } = OrderStatus.Pending;

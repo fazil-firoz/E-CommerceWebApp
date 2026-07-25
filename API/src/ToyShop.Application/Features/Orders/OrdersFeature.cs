@@ -49,7 +49,8 @@ namespace ToyShop.Application.Features.Orders
         string Pincode,
         List<CreateOrderItemInput> Items,
         string? CouponCode = null,
-        decimal DiscountAmount = 0
+        decimal DiscountAmount = 0,
+        decimal ShippingCharge = 0
     ) : IRequest<BaseResponse<RazorpayOrderResponseDto>>;
 
     /// <summary>
@@ -144,6 +145,7 @@ namespace ToyShop.Application.Features.Orders
             Id = o.Id,
             OrderNumber = o.OrderNumber,
             TotalAmount = o.TotalAmount,
+            ShippingCharge = o.ShippingCharge,
             CouponCode = o.CouponCode,
             DiscountAmount = o.DiscountAmount,
             OrderStatus = o.OrderStatus.ToString(),
@@ -294,8 +296,9 @@ namespace ToyShop.Application.Features.Orders
             // Generate unique Order Number
             var orderNumber = "ORD-" + DateTime.UtcNow.ToString("yyyyMMdd") + "-" + new Random().Next(1000, 9999);
 
-            // Apply discount if provided
-            var finalTotalAmount = request.DiscountAmount > 0 ? Math.Max(0, totalAmount - request.DiscountAmount) : totalAmount;
+            // Apply discount & shipping charge
+            var grossOrderTotal = totalAmount + request.ShippingCharge;
+            var finalTotalAmount = request.DiscountAmount > 0 ? Math.Max(0, grossOrderTotal - request.DiscountAmount) : grossOrderTotal;
 
             // Create Order - store contact directly on order for guest tracking
             var order = new Order
@@ -304,6 +307,7 @@ namespace ToyShop.Application.Features.Orders
                 CustomerId = customer.Id,
                 AddressId = address.Id,
                 TotalAmount = finalTotalAmount,
+                ShippingCharge = request.ShippingCharge,
                 CouponCode = request.CouponCode,
                 DiscountAmount = request.DiscountAmount,
                 OrderStatus = OrderStatus.Pending,

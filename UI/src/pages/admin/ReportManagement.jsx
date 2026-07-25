@@ -183,6 +183,16 @@ const ReportManagement = () => {
     message.success('Sales report exported as Excel CSV');
   };
 
+  const getEffectiveOrderRevenue = (item) => {
+    const itemsSubtotal = (item.orderItems || []).reduce((sum, itm) => sum + (itm.subtotal || (itm.unitPrice * itm.quantity)), 0);
+    const discountAmt = item.discountAmount || 0;
+    let shippingCharge = item.shippingCharge;
+    if (shippingCharge === undefined || shippingCharge === null || (shippingCharge === 0 && Math.abs(item.totalAmount - (itemsSubtotal - discountAmt)) < 0.01 && itemsSubtotal > 0)) {
+      shippingCharge = 55; // Standard delivery charge fallback
+    }
+    return Math.max(item.totalAmount, itemsSubtotal + shippingCharge - discountAmt);
+  };
+
   // PDF Export Function with Header, Logo, Sum of Total Revenue, and Footer
   const exportPDF = (type) => {
     const isStock = type === 'stock';
@@ -210,7 +220,10 @@ const ReportManagement = () => {
     if (isStock) {
       items.forEach(i => { totalValuationSum += i.totalStockValue; });
     } else {
-      items.forEach(i => { totalRevenueSum += i.totalAmount; totalItemsSum += i.totalItems; });
+      items.forEach(i => {
+        totalRevenueSum += getEffectiveOrderRevenue(i);
+        totalItemsSum += i.totalItems;
+      });
     }
 
     let summaryHtml = '';
@@ -284,6 +297,7 @@ const ReportManagement = () => {
         const discountText = item.discountAmount > 0
           ? `<span style="color: #2e7d32; font-weight: 700;">-${item.couponCode ? ` (${item.couponCode})` : ''} ₹${item.discountAmount.toLocaleString('en-IN')}</span>`
           : '<span style="color: #8c8c8c;">None</span>';
+        const netRev = getEffectiveOrderRevenue(item);
         tableRows += `
           <tr>
             <td style="color: #0288d1; font-weight: 700;">${item.orderNumber}</td>
@@ -293,7 +307,7 @@ const ReportManagement = () => {
             <td style="text-align: center;">${item.totalItems}</td>
             <td style="text-align: center;">${discountText}</td>
             <td><span class="badge ${item.orderStatus}">${item.orderStatus}</span></td>
-            <td style="color: #d32f2f; font-weight: 700;">₹${item.totalAmount.toLocaleString('en-IN')}</td>
+            <td style="color: #d32f2f; font-weight: 700;">₹${netRev.toLocaleString('en-IN')}</td>
           </tr>
         `;
       }
@@ -552,7 +566,10 @@ const ReportManagement = () => {
       dataIndex: 'totalAmount',
       key: 'totalAmount',
       align: 'right',
-      render: (val) => <Text strong style={{ fontSize: '16px', color: '#ff4d4f' }}>₹{val.toLocaleString('en-IN')}</Text>
+      render: (_, record) => {
+        const netRev = getEffectiveOrderRevenue(record);
+        return <Text strong style={{ fontSize: '16px', color: '#ff4d4f' }}>₹{netRev.toLocaleString('en-IN')}</Text>;
+      }
     }
   ];
 
@@ -561,6 +578,12 @@ const ReportManagement = () => {
     const itemsSubtotal = (record.orderItems || []).reduce((sum, item) => sum + (item.subtotal || (item.unitPrice * item.quantity)), 0);
     const discountAmt = record.discountAmount || 0;
     const couponCode = record.couponCode || '';
+
+    let shippingCharge = record.shippingCharge;
+    if (shippingCharge === undefined || shippingCharge === null || (shippingCharge === 0 && Math.abs(record.totalAmount - (itemsSubtotal - discountAmt)) < 0.01 && itemsSubtotal > 0)) {
+      shippingCharge = 55;
+    }
+    const computedNetTotal = Math.max(record.totalAmount, itemsSubtotal + shippingCharge - discountAmt);
 
     const itemColumns = [
       {
@@ -630,12 +653,18 @@ const ReportManagement = () => {
           alignItems: 'flex-end',
           gap: '6px'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '300px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '320px' }}>
             <Text type="secondary">Items Subtotal:</Text>
             <Text strong>₹{itemsSubtotal.toLocaleString('en-IN')}</Text>
           </div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '320px' }}>
+            <Text type="secondary">Shipping Charge:</Text>
+            <Text strong style={{ color: shippingCharge === 0 ? '#52c41a' : '#262626' }}>
+              {shippingCharge === 0 ? '₹0 (FREE)' : `+ ₹${shippingCharge.toLocaleString('en-IN')}`}
+            </Text>
+          </div>
           {discountAmt > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '300px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '320px' }}>
               <Text style={{ color: '#52c41a', fontWeight: 600 }}>
                 Less: Coupon Discount ({couponCode || 'COUPON'}):
               </Text>
@@ -644,10 +673,10 @@ const ReportManagement = () => {
               </Text>
             </div>
           )}
-          <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '300px', borderTop: '1px solid #f0f0f0', paddingTop: '6px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '320px', borderTop: '1px solid #f0f0f0', paddingTop: '6px' }}>
             <Text strong style={{ fontSize: '15px' }}>Net Total Revenue:</Text>
             <Text strong style={{ fontSize: '16px', color: '#ff4d4f' }}>
-              ₹{record.totalAmount.toLocaleString('en-IN')}
+              ₹{computedNetTotal.toLocaleString('en-IN')}
             </Text>
           </div>
         </div>
@@ -774,7 +803,7 @@ const ReportManagement = () => {
               <Card style={{ borderRadius: '14px', background: '#f6ffed', border: '1px solid #b7eb8f' }}>
                 <Statistic
                   title={<Text type="secondary" style={{ fontSize: '12px' }}>Sum of Total Revenue</Text>}
-                  value={salesData.items.reduce((sum, item) => sum + item.totalAmount, 0)}
+                  value={salesData.items.reduce((sum, item) => sum + getEffectiveOrderRevenue(item), 0)}
                   precision={2}
                   prefix="₹"
                   valueStyle={{ color: '#2e7d32', fontWeight: 800, fontSize: '22px' }}
@@ -794,7 +823,7 @@ const ReportManagement = () => {
               <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
                 <Statistic
                   title={<Text type="secondary" style={{ fontSize: '12px' }}>Avg Order Value (AOV)</Text>}
-                  value={salesData.items.length > 0 ? Math.round(salesData.items.reduce((sum, item) => sum + item.totalAmount, 0) / salesData.items.length) : 0}
+                  value={salesData.items.length > 0 ? Math.round(salesData.items.reduce((sum, item) => sum + getEffectiveOrderRevenue(item), 0) / salesData.items.length) : 0}
                   precision={2}
                   prefix="₹"
                 />
