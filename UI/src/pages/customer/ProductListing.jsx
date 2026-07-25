@@ -5,6 +5,7 @@ import { SearchOutlined, AppstoreOutlined, ShoppingCartOutlined, ThunderboltOutl
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
 import { CartContext } from '../../context/CartContext';
+import ProductBadge from '../../components/common/ProductBadge';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Text } = Typography;
@@ -212,6 +213,7 @@ const ProductListing = () => {
                         }}
                         onClick={() => navigate(`/products/${prod.id}`)}
                       >
+                        <ProductBadge label={prod.badgeLabel} />
                         {(() => {
                           const mainImage = prod.images?.find(img => img.isMain) || { imageUrl: prod.imageUrls?.[0], zoomScale: 1.0 };
                           const zoom = mainImage?.zoomScale || 1.0;

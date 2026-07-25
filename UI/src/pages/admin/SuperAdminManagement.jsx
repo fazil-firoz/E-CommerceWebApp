@@ -474,6 +474,36 @@ const SuperAdminManagement = () => {
                   />
                 </div>
 
+                {/* Product Badge & Labels Dropdown Toggle */}
+                <div style={{
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #f0f0f0',
+                  background: controls.isProductBadgeEnabled !== false ? '#f6ffed' : '#fff1f0',
+                  display: 'flex',
+                  justify: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <Space align="center" size={8}>
+                      <TagOutlined style={{ fontSize: '20px', color: '#fa8c16' }} />
+                      <Text strong style={{ fontSize: '15px' }}>Product Badge / Label Dropdown</Text>
+                    </Space>
+                    <div>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        Enables or disables product badge selection (New, Best Seller, Popular, Limited Stock) in Product Creation
+                      </Text>
+                    </div>
+                  </div>
+
+                  <Switch
+                    checkedChildren={<CheckCircleOutlined />}
+                    unCheckedChildren={<StopOutlined />}
+                    checked={controls.isProductBadgeEnabled !== false}
+                    onChange={(checked) => setControls({ ...controls, isProductBadgeEnabled: checked })}
+                  />
+                </div>
+
                 <Alert
                   type="info"
                   showIcon

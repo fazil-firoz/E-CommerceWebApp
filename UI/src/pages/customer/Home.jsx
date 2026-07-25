@@ -4,6 +4,7 @@ import { Card, Col, Row, Button, Typography, Space, Spin, message } from 'antd';
 import { RightOutlined, FireOutlined, AppstoreOutlined } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
+import ProductBadge from '../../components/common/ProductBadge';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Paragraph, Text } = Typography;
@@ -172,6 +173,7 @@ const Home = () => {
                       }}
                       onClick={() => navigate(`/products/${prod.id}`)}
                     >
+                      <ProductBadge label={prod.badgeLabel} />
                       <img
                         alt={prod.name}
                         src={resolveProductImageUrl(mainImageUrl, 'thumb')}

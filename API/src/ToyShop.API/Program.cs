@@ -168,12 +168,14 @@ using (var scope = app.Services.CreateScope())
               ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""CouponCode"" VARCHAR(100) NULL;
               ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""DiscountAmount"" NUMERIC NOT NULL DEFAULT 0.0;
 
+              ALTER TABLE ""Products"" ADD COLUMN IF NOT EXISTS ""BadgeLabel"" VARCHAR(100) NULL;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsShipmentSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsInvoiceSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsTaxSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsReportsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsCouponMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsPrintInvoiceEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
+              ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsProductBadgeEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
 
               INSERT INTO ""SuperAdminControls"" (""Id"", ""IsShopSettingsMenuEnabled"", ""IsShipmentSettingsMenuEnabled"", ""IsInvoiceSettingsMenuEnabled"", ""IsTaxSettingsMenuEnabled"", ""IsReportsMenuEnabled"", ""IsCouponMenuEnabled"", ""IsAppControlMenuEnabled"", ""IsWhatsAppFloatingWidgetEnabled"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
               SELECT 1, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, NOW(), 'System', FALSE

@@ -82,3 +82,69 @@ code {
   transform: scale(1.12) translateY(-4px) !important;
   box-shadow: 0 16px 32px rgba(37, 211, 102, 0.7) !important;
 }
+
+/* Product Label Badge Shining Effect Animation */
+@keyframes productBadgeShine {
+  0% {
+    left: -100%;
+  }
+  20% {
+    left: 150%;
+  }
+  100% {
+    left: 150%;
+  }
+}
+
+.shining-product-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 10;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 800;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.shining-product-badge::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -100%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.65) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(25deg);
+  animation: productBadgeShine 3s infinite ease-in-out;
+}
+
+/* Color themes for badges */
+.badge-theme-new {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+}
+
+.badge-theme-bestseller {
+  background: linear-gradient(135deg, #ff7a00 0%, #ff4d00 100%);
+}
+
+.badge-theme-popular {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+}
+
+.badge-theme-limitedstock {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}

@@ -17,6 +17,7 @@ import {
 import { productApi } from '../../api/productApi';
 import { shopApi } from '../../api/shopApi';
 import { CartContext } from '../../context/CartContext';
+import ProductBadge from '../../components/common/ProductBadge';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Text, Paragraph } = Typography;
@@ -150,6 +151,7 @@ const ProductDetails = () => {
               background: '#fff',
               position: 'relative'
             }}>
+              <ProductBadge label={product.badgeLabel} />
               <Carousel
                 ref={carouselRef}
                 dots={true}

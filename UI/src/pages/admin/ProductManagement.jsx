@@ -3,6 +3,7 @@ import { Table, Button, Modal, Form, Input, InputNumber, Select, Switch, Space, 
 import { PlusOutlined, EditOutlined, DeleteOutlined, SearchOutlined, ReloadOutlined } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
+import { superAdminApi } from '../../api/superAdminApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 import { URLS } from '../../config/urlConfig';
 
@@ -18,6 +19,7 @@ const ProductManagement = () => {
   const [fileList, setFileList] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [searchText, setSearchText] = useState('');
+  const [isProductBadgeEnabled, setIsProductBadgeEnabled] = useState(true);
   const [form] = Form.useForm();
 
   const fetchProducts = async (catId = selectedCategory, search = searchText) => {
@@ -52,6 +54,15 @@ const ProductManagement = () => {
   useEffect(() => {
     fetchProducts();
     fetchCategories();
+    const fetchControls = async () => {
+      try {
+        const res = await superAdminApi.getControlFlags();
+        if (res.success && res.data) {
+          setIsProductBadgeEnabled(res.data.isProductBadgeEnabled !== false);
+        }
+      } catch (err) {}
+    };
+    fetchControls();
   }, []);
 
   const handleOpenAdd = () => {
@@ -92,7 +103,8 @@ const ProductManagement = () => {
       price: product.price,
       stockQuantity: product.stockQuantity,
       description: product.description,
-      isActive: product.isActive
+      isActive: product.isActive,
+      badgeLabel: product.badgeLabel || undefined
     });
     setModalOpen(true);
   };
@@ -280,6 +292,19 @@ const ProductManagement = () => {
         <Tag color={active ? 'green' : 'red'}>
           {active ? 'Active' : 'Inactive'}
         </Tag>
+      )
+    },
+    {
+      title: 'Badge Label',
+      dataIndex: 'badgeLabel',
+      key: 'badgeLabel',
+      align: 'center',
+      render: (label) => label ? (
+        <Tag color={label === 'New' ? 'green' : label === 'Best Seller' ? 'orange' : label === 'Popular' ? 'purple' : 'volcano'} style={{ fontWeight: 700 }}>
+          {label}
+        </Tag>
+      ) : (
+        <Text type="secondary" style={{ fontSize: '12px' }}>—</Text>
       )
     },
     {
@@ -490,6 +515,17 @@ const ProductManagement = () => {
               ℹ️ Note: Prices include all applicable taxes (Price Include tax).
             </Text>
           </div>
+
+          {isProductBadgeEnabled && (
+            <Form.Item name="badgeLabel" label="Product Badge / Label (Optional)">
+              <Select placeholder="-- Select Badge / Label (Optional) --" allowClear>
+                <Option value="New">✨ New</Option>
+                <Option value="Best Seller">🔥 Best Seller</Option>
+                <Option value="Popular">⭐ Popular</Option>
+                <Option value="Limited Stock">⚡ Limited Stock</Option>
+              </Select>
+            </Form.Item>
+          )}
 
           <Form.Item
             name="description"
