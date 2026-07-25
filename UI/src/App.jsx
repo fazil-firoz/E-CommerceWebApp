@@ -34,6 +34,7 @@ import ShipmentManagement from './pages/admin/ShipmentManagement';
 import InvoiceManagement from './pages/admin/InvoiceManagement';
 import TaxManagement from './pages/admin/TaxManagement';
 import ReportManagement from './pages/admin/ReportManagement';
+import CouponManagement from './pages/admin/CouponManagement';
 import SuperAdminManagement from './pages/admin/SuperAdminManagement';
 
 function App() {
@@ -70,6 +71,7 @@ function App() {
               <Route path="products" element={<ProductManagement />} />
               <Route path="orders" element={<OrderManagement />} />
               <Route path="reports" element={<ReportManagement />} />
+              <Route path="coupons" element={<CouponManagement />} />
               <Route path="shipment-settings" element={<ShipmentManagement />} />
               <Route path="app-control" element={<ShipmentManagement />} />
               <Route path="invoice-settings" element={<InvoiceManagement />} />

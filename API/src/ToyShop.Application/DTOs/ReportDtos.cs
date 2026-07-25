@@ -46,6 +46,8 @@ namespace ToyShop.Application.DTOs
         public string CustomerPhone { get; set; } = string.Empty;
         public int TotalItems { get; set; }
         public decimal TotalAmount { get; set; }
+        public string? CouponCode { get; set; }
+        public decimal DiscountAmount { get; set; }
         public string OrderStatus { get; set; } = string.Empty;
         public string PaymentStatus { get; set; } = string.Empty;
         public List<SalesReportOrderItemDto> OrderItems { get; set; } = new List<SalesReportOrderItemDto>();

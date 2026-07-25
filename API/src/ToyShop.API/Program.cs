@@ -165,14 +165,38 @@ using (var scope = app.Services.CreateScope())
                   ""IsDeleted"" BOOLEAN NOT NULL DEFAULT FALSE
               );
 
+              ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""CouponCode"" VARCHAR(100) NULL;
+              ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""DiscountAmount"" NUMERIC NOT NULL DEFAULT 0.0;
+
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsShipmentSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsInvoiceSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsTaxSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsReportsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
+              ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsCouponMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
 
-              INSERT INTO ""SuperAdminControls"" (""Id"", ""IsShopSettingsMenuEnabled"", ""IsShipmentSettingsMenuEnabled"", ""IsInvoiceSettingsMenuEnabled"", ""IsTaxSettingsMenuEnabled"", ""IsReportsMenuEnabled"", ""IsAppControlMenuEnabled"", ""IsWhatsAppFloatingWidgetEnabled"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
-              SELECT 1, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, NOW(), 'System', FALSE
+              INSERT INTO ""SuperAdminControls"" (""Id"", ""IsShopSettingsMenuEnabled"", ""IsShipmentSettingsMenuEnabled"", ""IsInvoiceSettingsMenuEnabled"", ""IsTaxSettingsMenuEnabled"", ""IsReportsMenuEnabled"", ""IsCouponMenuEnabled"", ""IsAppControlMenuEnabled"", ""IsWhatsAppFloatingWidgetEnabled"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
+              SELECT 1, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, NOW(), 'System', FALSE
               WHERE NOT EXISTS (SELECT 1 FROM ""SuperAdminControls"" WHERE ""Id"" = 1);
+
+              CREATE TABLE IF NOT EXISTS ""CouponCodes"" (
+                  ""Id"" SERIAL PRIMARY KEY,
+                  ""Code"" VARCHAR(100) NOT NULL,
+                  ""DiscountPercentage"" NUMERIC NOT NULL DEFAULT 0.0,
+                  ""ExpiryDate"" TIMESTAMPTZ NOT NULL,
+                  ""MinPurchaseAmount"" NUMERIC NOT NULL DEFAULT 0.0,
+                  ""IsActive"" BOOLEAN NOT NULL DEFAULT TRUE,
+                  ""CreatedDate"" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  ""CreatedBy"" VARCHAR(255) DEFAULT 'System',
+                  ""UpdatedDate"" TIMESTAMPTZ NULL,
+                  ""UpdatedBy"" VARCHAR(255) NULL,
+                  ""DeletedDate"" TIMESTAMPTZ NULL,
+                  ""DeletedBy"" VARCHAR(255) NULL,
+                  ""IsDeleted"" BOOLEAN NOT NULL DEFAULT FALSE
+              );
+
+              INSERT INTO ""CouponCodes"" (""Code"", ""DiscountPercentage"", ""ExpiryDate"", ""MinPurchaseAmount"", ""IsActive"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
+              SELECT 'TOYSHOP10', 10, NOW() + INTERVAL '30 days', 500, TRUE, NOW(), 'System', FALSE
+              WHERE NOT EXISTS (SELECT 1 FROM ""CouponCodes"" WHERE ""Code"" = 'TOYSHOP10');
 
               SELECT setval('""Categories_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Categories""), 1));
               SELECT setval('""Products_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Products""), 1));
@@ -184,7 +208,8 @@ using (var scope = app.Services.CreateScope())
               SELECT setval('""Payments_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Payments""), 1));
               SELECT setval('""Admins_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Admins""), 1));
               SELECT setval('""Shops_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Shops""), 1));
-              SELECT setval('""SuperAdminControls_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""SuperAdminControls""), 1));"
+              SELECT setval('""SuperAdminControls_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""SuperAdminControls""), 1));
+              SELECT setval('""CouponCodes_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""CouponCodes""), 1));"
         );
     }
     catch (System.Exception ex)

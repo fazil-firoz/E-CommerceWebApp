@@ -5,7 +5,7 @@ import {
   LockOutlined, ShoppingOutlined, RightOutlined,
   SafetyCertificateOutlined, PhoneOutlined, MailOutlined,
   EnvironmentOutlined, CheckCircleFilled, UserOutlined, ThunderboltOutlined,
-  PlusOutlined, MinusOutlined
+  PlusOutlined, MinusOutlined, TagOutlined, CloseOutlined
 } from '@ant-design/icons';
 import { CartContext } from '../../context/CartContext';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
@@ -14,6 +14,7 @@ import { orderApi } from '../../api/orderApi';
 import { paymentApi } from '../../api/paymentApi';
 import { shipmentApi } from '../../api/shipmentApi';
 import { shopApi } from '../../api/shopApi';
+import { couponApi } from '../../api/couponApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 import './Checkout.css';
 
@@ -63,6 +64,12 @@ const Checkout = () => {
   const [orderSummaryExpanded, setOrderSummaryExpanded] = useState(false);
   const [shippingMethod, setShippingMethod] = useState(null);
 
+  // Coupon state
+  const [couponCodeInput, setCouponCodeInput] = useState('');
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+  const [couponDiscountAmount, setCouponDiscountAmount] = useState(0);
+  const [validatingCoupon, setValidatingCoupon] = useState(false);
+
   useEffect(() => {
     const fetchShipping = async () => {
       try {
@@ -77,6 +84,42 @@ const Checkout = () => {
     };
     fetchShipping();
   }, []);
+
+  const isFreeShipping = shippingMethod?.freeShippingThreshold > 0 && checkoutTotal >= shippingMethod.freeShippingThreshold;
+  const shippingCharge = isFreeShipping ? 0 : (shippingMethod?.fee || 0);
+  const grossTotal = checkoutTotal + shippingCharge;
+  const grandTotal = Math.max(0, grossTotal - couponDiscountAmount);
+
+  const handleApplyCoupon = async () => {
+    if (!couponCodeInput.trim()) {
+      message.warning('Please enter a coupon code');
+      return;
+    }
+    setValidatingCoupon(true);
+    try {
+      const res = await couponApi.validate(couponCodeInput.trim(), grossTotal);
+      if (res.success && res.data && res.data.isValid) {
+        const discountPct = res.data.discountPercentage;
+        const discountAmt = Math.round(grossTotal * (discountPct / 100) * 100) / 100;
+        setAppliedCoupon(res.data);
+        setCouponDiscountAmount(discountAmt);
+        message.success(res.message || `Coupon ${res.data.code} applied! (${discountPct}% OFF)`);
+      } else {
+        message.error(res.message || 'Invalid coupon code');
+      }
+    } catch (err) {
+      message.error('Failed to validate coupon code');
+    } finally {
+      setValidatingCoupon(false);
+    }
+  };
+
+  const handleRemoveCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponDiscountAmount(0);
+    setCouponCodeInput('');
+    message.info('Coupon removed');
+  };
 
   const handleUpdateQuantity = (item, newQty) => {
     if (newQty < 1) return;
@@ -128,7 +171,9 @@ const Checkout = () => {
         city: values.city,
         state: values.state,
         pincode: values.pincode,
-        items: checkoutItems.map(item => ({ productId: item.id, quantity: item.quantity }))
+        items: checkoutItems.map(item => ({ productId: item.id, quantity: item.quantity })),
+        couponCode: appliedCoupon ? appliedCoupon.code : null,
+        discountAmount: couponDiscountAmount || 0
       };
 
       const res = await orderApi.create(payload);
@@ -234,17 +279,6 @@ const Checkout = () => {
       setLoading(false);
     }
   };
-
-  const calculateShippingFee = () => {
-    if (!shippingMethod) return 0;
-    if (shippingMethod.freeShippingThreshold > 0 && checkoutTotal >= shippingMethod.freeShippingThreshold) {
-      return 0;
-    }
-    return shippingMethod.fee;
-  };
-
-  const shippingCharge = calculateShippingFee();
-  const grandTotal = checkoutTotal + shippingCharge;
 
   return (
     <div className="checkout-wrapper">
@@ -524,6 +558,61 @@ const Checkout = () => {
 
           <Divider style={{ margin: '16px 0' }} />
 
+          {/* Coupon Code Input & Tag */}
+          <div style={{ marginBottom: '16px' }}>
+            <Text type="secondary" style={{ fontSize: '13px', display: 'block', marginBottom: '6px' }}>
+              Have a promotional Coupon Code?
+            </Text>
+            {appliedCoupon ? (
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '8px 12px',
+                background: '#f6ffed',
+                border: '1px solid #b7eb8f',
+                borderRadius: '8px'
+              }}>
+                <div>
+                  <Tag color="success" style={{ fontWeight: 800, fontSize: '13px' }}>
+                    🏷️ {appliedCoupon.code} ({appliedCoupon.discountPercentage}% OFF)
+                  </Tag>
+                  <Text style={{ fontSize: '12px', color: '#52c41a', display: 'block', marginTop: '2px' }}>
+                    Saved ₹{couponDiscountAmount.toLocaleString('en-IN')}!
+                  </Text>
+                </div>
+                <Button
+                  type="text"
+                  danger
+                  size="small"
+                  icon={<CloseOutlined />}
+                  onClick={handleRemoveCoupon}
+                >
+                  Remove
+                </Button>
+              </div>
+            ) : (
+              <Space.Compact style={{ width: '100%' }}>
+                <Input
+                  prefix={<TagOutlined style={{ color: '#722ed1' }} />}
+                  placeholder="Enter Coupon Code (e.g. TOYSHOP10)"
+                  value={couponCodeInput}
+                  onChange={(e) => setCouponCodeInput(e.target.value.toUpperCase())}
+                  onPressEnter={handleApplyCoupon}
+                  style={{ borderRadius: '8px 0 0 8px', textTransform: 'uppercase', fontWeight: 600 }}
+                />
+                <Button
+                  type="primary"
+                  loading={validatingCoupon}
+                  onClick={handleApplyCoupon}
+                  style={{ borderRadius: '0 8px 8px 0', background: '#722ed1', borderColor: '#722ed1', fontWeight: 700 }}
+                >
+                  Apply
+                </Button>
+              </Space.Compact>
+            )}
+          </div>
+
           <div className="checkout-summary-row">
             <Text type="secondary">Subtotal</Text>
             <Text>₹{checkoutTotal.toLocaleString('en-IN')}</Text>
@@ -542,6 +631,17 @@ const Checkout = () => {
               <Text strong>₹{shippingCharge.toLocaleString('en-IN')}</Text>
             )}
           </div>
+
+          {couponDiscountAmount > 0 && (
+            <div className="checkout-summary-row">
+              <Text style={{ color: '#52c41a', fontWeight: 600 }}>
+                Coupon Discount ({appliedCoupon?.code})
+              </Text>
+              <Text style={{ color: '#52c41a', fontWeight: 700 }}>
+                - ₹{couponDiscountAmount.toLocaleString('en-IN')}
+              </Text>
+            </div>
+          )}
 
           <Divider style={{ margin: '12px 0' }} />
 

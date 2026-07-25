@@ -9,6 +9,7 @@ namespace ToyShop.Domain.Entities
         public bool IsInvoiceSettingsMenuEnabled { get; set; } = true;
         public bool IsTaxSettingsMenuEnabled { get; set; } = true;
         public bool IsReportsMenuEnabled { get; set; } = true;
+        public bool IsCouponMenuEnabled { get; set; } = true;
         public bool IsAppControlMenuEnabled { get; set; } = true;
         public bool IsWhatsAppFloatingWidgetEnabled { get; set; } = true;
     }

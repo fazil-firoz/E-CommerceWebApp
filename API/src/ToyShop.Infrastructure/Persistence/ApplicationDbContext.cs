@@ -31,6 +31,7 @@ namespace ToyShop.Infrastructure.Persistence
         public DbSet<Shop> Shops => Set<Shop>();
         public DbSet<ShipmentMethod> ShipmentMethods => Set<ShipmentMethod>();
         public DbSet<SuperAdminControl> SuperAdminControls => Set<SuperAdminControl>();
+        public DbSet<CouponCode> CouponCodes => Set<CouponCode>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

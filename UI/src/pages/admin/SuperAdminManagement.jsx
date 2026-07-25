@@ -3,7 +3,7 @@ import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Switch
 import {
   CrownOutlined, LockOutlined, UnlockOutlined, SaveOutlined,
   AppstoreOutlined, SettingOutlined, WhatsAppOutlined, SafetyCertificateOutlined,
-  CheckCircleOutlined, StopOutlined, ReloadOutlined
+  CheckCircleOutlined, StopOutlined, ReloadOutlined, TagOutlined
 } from '@ant-design/icons';
 import { superAdminApi } from '../../api/superAdminApi';
 
@@ -363,6 +363,36 @@ const SuperAdminManagement = () => {
                     unCheckedChildren={<StopOutlined />}
                     checked={controls.isReportsMenuEnabled !== false}
                     onChange={(checked) => setControls({ ...controls, isReportsMenuEnabled: checked })}
+                  />
+                </div>
+
+                {/* Coupon Code Menu Toggle */}
+                <div style={{
+                  padding: '14px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #f0f0f0',
+                  background: controls.isCouponMenuEnabled !== false ? '#f6ffed' : '#fff1f0',
+                  display: 'flex',
+                  justify: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <Space align="center" size={8}>
+                      <TagOutlined style={{ fontSize: '18px', color: '#722ed1' }} />
+                      <Text strong style={{ fontSize: '14px' }}>Coupon Code Menu</Text>
+                    </Space>
+                    <div>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        Controls `/admin/coupons` menu visibility
+                      </Text>
+                    </div>
+                  </div>
+
+                  <Switch
+                    checkedChildren={<CheckCircleOutlined />}
+                    unCheckedChildren={<StopOutlined />}
+                    checked={controls.isCouponMenuEnabled !== false}
+                    onChange={(checked) => setControls({ ...controls, isCouponMenuEnabled: checked })}
                   />
                 </div>
               </Space>

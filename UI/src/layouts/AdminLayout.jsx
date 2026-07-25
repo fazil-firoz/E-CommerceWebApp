@@ -18,7 +18,8 @@ import {
   CrownOutlined,
   TruckOutlined,
   FileTextOutlined,
-  PercentageOutlined
+  PercentageOutlined,
+  TagOutlined
 } from '@ant-design/icons';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import { shopApi } from '../api/shopApi';
@@ -138,6 +139,11 @@ const AdminLayout = () => {
       key: '/admin/reports',
       icon: <BarChartOutlined />,
       label: <Link to="/admin/reports">Reports</Link>,
+    }] : []),
+    ...(superAdminControl.isCouponMenuEnabled !== false ? [{
+      key: '/admin/coupons',
+      icon: <TagOutlined style={{ color: '#722ed1' }} />,
+      label: <Link to="/admin/coupons">Coupons</Link>,
     }] : []),
     ...(superAdminControl.isShipmentSettingsMenuEnabled !== false && superAdminControl.isAppControlMenuEnabled !== false ? [{
       key: '/admin/shipment-settings',

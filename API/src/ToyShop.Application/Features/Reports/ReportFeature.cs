@@ -262,6 +262,8 @@ namespace ToyShop.Application.Features.Reports
                     CustomerPhone = o.CustomerPhone ?? o.Customer?.PhoneNumber ?? "N/A",
                     TotalItems = itemsCount,
                     TotalAmount = o.TotalAmount,
+                    CouponCode = o.CouponCode,
+                    DiscountAmount = o.DiscountAmount,
                     OrderStatus = oStatus,
                     PaymentStatus = pStatus,
                     OrderItems = orderItemDtos
