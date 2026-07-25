@@ -111,7 +111,7 @@ const SuperAdminManagement = () => {
             </div>
             <Title level={4} style={{ margin: 0, fontWeight: 800 }}>Super Admin Access Required</Title>
             <Text type="secondary" style={{ fontSize: '13px' }}>
-              Enter Super Admin credentials (configured in appsettings.json) to unlock system menu and feature controllers.
+              Enter Super Admin credentials to unlock system menu and feature controllers.
             </Text>
           </div>
 
@@ -212,10 +212,10 @@ const SuperAdminManagement = () => {
                 Toggle menu visibilities for regular admins. When disabled, the menu will be completely hidden from the navigation sidebar and blocked from access.
               </Paragraph>
 
-              <Space direction="vertical" size={20} style={{ width: '100%' }}>
+              <Space direction="vertical" size={16} style={{ width: '100%' }}>
                 {/* Shop Settings Menu Toggle */}
                 <div style={{
-                  padding: '16px',
+                  padding: '14px 16px',
                   borderRadius: '12px',
                   border: '1px solid #f0f0f0',
                   background: controls.isShopSettingsMenuEnabled ? '#f6ffed' : '#fff1f0',
@@ -226,7 +226,7 @@ const SuperAdminManagement = () => {
                   <div>
                     <Space align="center" size={8}>
                       <SettingOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
-                      <Text strong style={{ fontSize: '15px' }}>Shop Settings Menu</Text>
+                      <Text strong style={{ fontSize: '14px' }}>Shop Settings Menu</Text>
                     </Space>
                     <div>
                       <Text type="secondary" style={{ fontSize: '12px' }}>
@@ -243,24 +243,24 @@ const SuperAdminManagement = () => {
                   />
                 </div>
 
-                {/* App Control Menu Toggle */}
+                {/* Shipment Settings Menu Toggle */}
                 <div style={{
-                  padding: '16px',
+                  padding: '14px 16px',
                   borderRadius: '12px',
                   border: '1px solid #f0f0f0',
-                  background: controls.isAppControlMenuEnabled ? '#f6ffed' : '#fff1f0',
+                  background: controls.isShipmentSettingsMenuEnabled ? '#f6ffed' : '#fff1f0',
                   display: 'flex',
                   justify: 'space-between',
                   alignItems: 'center'
                 }}>
                   <div>
                     <Space align="center" size={8}>
-                      <AppstoreOutlined style={{ fontSize: '18px', color: '#722ed1' }} />
-                      <Text strong style={{ fontSize: '15px' }}>App Control Menu</Text>
+                      <AppstoreOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+                      <Text strong style={{ fontSize: '14px' }}>Shipment Settings Menu</Text>
                     </Space>
                     <div>
                       <Text type="secondary" style={{ fontSize: '12px' }}>
-                        Controls `/admin/app-control` menu visibility
+                        Controls `/admin/shipment-settings` menu visibility
                       </Text>
                     </div>
                   </div>
@@ -268,8 +268,68 @@ const SuperAdminManagement = () => {
                   <Switch
                     checkedChildren={<CheckCircleOutlined />}
                     unCheckedChildren={<StopOutlined />}
-                    checked={controls.isAppControlMenuEnabled}
-                    onChange={(checked) => setControls({ ...controls, isAppControlMenuEnabled: checked })}
+                    checked={controls.isShipmentSettingsMenuEnabled}
+                    onChange={(checked) => setControls({ ...controls, isShipmentSettingsMenuEnabled: checked, isAppControlMenuEnabled: checked })}
+                  />
+                </div>
+
+                {/* Invoice Settings Menu Toggle */}
+                <div style={{
+                  padding: '14px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #f0f0f0',
+                  background: controls.isInvoiceSettingsMenuEnabled ? '#f6ffed' : '#fff1f0',
+                  display: 'flex',
+                  justify: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <Space align="center" size={8}>
+                      <SettingOutlined style={{ fontSize: '18px', color: '#fa8c16' }} />
+                      <Text strong style={{ fontSize: '14px' }}>Invoice Settings Menu</Text>
+                    </Space>
+                    <div>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        Controls `/admin/invoice-settings` menu visibility
+                      </Text>
+                    </div>
+                  </div>
+
+                  <Switch
+                    checkedChildren={<CheckCircleOutlined />}
+                    unCheckedChildren={<StopOutlined />}
+                    checked={controls.isInvoiceSettingsMenuEnabled}
+                    onChange={(checked) => setControls({ ...controls, isInvoiceSettingsMenuEnabled: checked })}
+                  />
+                </div>
+
+                {/* Tax Settings Menu Toggle */}
+                <div style={{
+                  padding: '14px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #f0f0f0',
+                  background: controls.isTaxSettingsMenuEnabled ? '#f6ffed' : '#fff1f0',
+                  display: 'flex',
+                  justify: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <Space align="center" size={8}>
+                      <SettingOutlined style={{ fontSize: '18px', color: '#52c41a' }} />
+                      <Text strong style={{ fontSize: '14px' }}>Tax Settings Menu</Text>
+                    </Space>
+                    <div>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        Controls `/admin/tax-settings` menu visibility
+                      </Text>
+                    </div>
+                  </div>
+
+                  <Switch
+                    checkedChildren={<CheckCircleOutlined />}
+                    unCheckedChildren={<StopOutlined />}
+                    checked={controls.isTaxSettingsMenuEnabled}
+                    onChange={(checked) => setControls({ ...controls, isTaxSettingsMenuEnabled: checked })}
                   />
                 </div>
               </Space>

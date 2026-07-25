@@ -150,6 +150,9 @@ using (var scope = app.Services.CreateScope())
               CREATE TABLE IF NOT EXISTS ""SuperAdminControls"" (
                   ""Id"" SERIAL PRIMARY KEY,
                   ""IsShopSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE,
+                  ""IsShipmentSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE,
+                  ""IsInvoiceSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE,
+                  ""IsTaxSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE,
                   ""IsAppControlMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE,
                   ""IsWhatsAppFloatingWidgetEnabled"" BOOLEAN NOT NULL DEFAULT TRUE,
                   ""CreatedDate"" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -161,8 +164,12 @@ using (var scope = app.Services.CreateScope())
                   ""IsDeleted"" BOOLEAN NOT NULL DEFAULT FALSE
               );
 
-              INSERT INTO ""SuperAdminControls"" (""Id"", ""IsShopSettingsMenuEnabled"", ""IsAppControlMenuEnabled"", ""IsWhatsAppFloatingWidgetEnabled"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
-              SELECT 1, TRUE, TRUE, TRUE, NOW(), 'System', FALSE
+              ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsShipmentSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
+              ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsInvoiceSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
+              ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsTaxSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
+
+              INSERT INTO ""SuperAdminControls"" (""Id"", ""IsShopSettingsMenuEnabled"", ""IsShipmentSettingsMenuEnabled"", ""IsInvoiceSettingsMenuEnabled"", ""IsTaxSettingsMenuEnabled"", ""IsAppControlMenuEnabled"", ""IsWhatsAppFloatingWidgetEnabled"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
+              SELECT 1, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, NOW(), 'System', FALSE
               WHERE NOT EXISTS (SELECT 1 FROM ""SuperAdminControls"" WHERE ""Id"" = 1);
 
               SELECT setval('""Categories_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Categories""), 1));

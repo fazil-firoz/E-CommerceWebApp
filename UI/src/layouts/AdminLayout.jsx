@@ -15,7 +15,10 @@ import {
   KeyOutlined,
   LockOutlined,
   DownOutlined,
-  CrownOutlined
+  CrownOutlined,
+  TruckOutlined,
+  FileTextOutlined,
+  PercentageOutlined
 } from '@ant-design/icons';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import { shopApi } from '../api/shopApi';
@@ -136,12 +139,22 @@ const AdminLayout = () => {
       icon: <BarChartOutlined />,
       label: <Link to="/admin/reports">Reports</Link>,
     },
-    ...(superAdminControl.isAppControlMenuEnabled ? [{
-      key: '/admin/app-control',
-      icon: <ControlOutlined />,
-      label: <Link to="/admin/app-control">App Control</Link>,
+    ...(superAdminControl.isShipmentSettingsMenuEnabled !== false && superAdminControl.isAppControlMenuEnabled !== false ? [{
+      key: '/admin/shipment-settings',
+      icon: <TruckOutlined style={{ color: '#1890ff' }} />,
+      label: <Link to="/admin/shipment-settings">Shipment Settings</Link>,
     }] : []),
-    ...(superAdminControl.isShopSettingsMenuEnabled ? [{
+    ...(superAdminControl.isInvoiceSettingsMenuEnabled !== false ? [{
+      key: '/admin/invoice-settings',
+      icon: <FileTextOutlined style={{ color: '#fa8c16' }} />,
+      label: <Link to="/admin/invoice-settings">Invoice Settings</Link>,
+    }] : []),
+    ...(superAdminControl.isTaxSettingsMenuEnabled !== false ? [{
+      key: '/admin/tax-settings',
+      icon: <PercentageOutlined style={{ color: '#52c41a' }} />,
+      label: <Link to="/admin/tax-settings">Tax Settings</Link>,
+    }] : []),
+    ...(superAdminControl.isShopSettingsMenuEnabled !== false ? [{
       key: '/admin/shop-settings',
       icon: <ShopOutlined />,
       label: <Link to="/admin/shop-settings">Shop Settings</Link>,

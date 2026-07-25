@@ -13,6 +13,9 @@ namespace ToyShop.Application.Features.SuperAdmin
     public class SuperAdminControlDto
     {
         public bool IsShopSettingsMenuEnabled { get; set; } = true;
+        public bool IsShipmentSettingsMenuEnabled { get; set; } = true;
+        public bool IsInvoiceSettingsMenuEnabled { get; set; } = true;
+        public bool IsTaxSettingsMenuEnabled { get; set; } = true;
         public bool IsAppControlMenuEnabled { get; set; } = true;
         public bool IsWhatsAppFloatingWidgetEnabled { get; set; } = true;
     }
@@ -20,6 +23,9 @@ namespace ToyShop.Application.Features.SuperAdmin
     public class UpdateSuperAdminControlRequest
     {
         public bool IsShopSettingsMenuEnabled { get; set; }
+        public bool IsShipmentSettingsMenuEnabled { get; set; }
+        public bool IsInvoiceSettingsMenuEnabled { get; set; }
+        public bool IsTaxSettingsMenuEnabled { get; set; }
         public bool IsAppControlMenuEnabled { get; set; }
         public bool IsWhatsAppFloatingWidgetEnabled { get; set; }
     }
@@ -65,6 +71,9 @@ namespace ToyShop.Application.Features.SuperAdmin
                 control = new SuperAdminControl
                 {
                     IsShopSettingsMenuEnabled = true,
+                    IsShipmentSettingsMenuEnabled = true,
+                    IsInvoiceSettingsMenuEnabled = true,
+                    IsTaxSettingsMenuEnabled = true,
                     IsAppControlMenuEnabled = true,
                     IsWhatsAppFloatingWidgetEnabled = true
                 };
@@ -101,7 +110,10 @@ namespace ToyShop.Application.Features.SuperAdmin
             }
 
             control.IsShopSettingsMenuEnabled = request.Request.IsShopSettingsMenuEnabled;
-            control.IsAppControlMenuEnabled = request.Request.IsAppControlMenuEnabled;
+            control.IsShipmentSettingsMenuEnabled = request.Request.IsShipmentSettingsMenuEnabled;
+            control.IsInvoiceSettingsMenuEnabled = request.Request.IsInvoiceSettingsMenuEnabled;
+            control.IsTaxSettingsMenuEnabled = request.Request.IsTaxSettingsMenuEnabled;
+            control.IsAppControlMenuEnabled = request.Request.IsShipmentSettingsMenuEnabled;
             control.IsWhatsAppFloatingWidgetEnabled = request.Request.IsWhatsAppFloatingWidgetEnabled;
             control.UpdatedDate = System.DateTimeOffset.UtcNow;
 
@@ -114,7 +126,10 @@ namespace ToyShop.Application.Features.SuperAdmin
         private static SuperAdminControlDto MapToDto(SuperAdminControl c) => new SuperAdminControlDto
         {
             IsShopSettingsMenuEnabled = c.IsShopSettingsMenuEnabled,
-            IsAppControlMenuEnabled = c.IsAppControlMenuEnabled,
+            IsShipmentSettingsMenuEnabled = c.IsShipmentSettingsMenuEnabled,
+            IsInvoiceSettingsMenuEnabled = c.IsInvoiceSettingsMenuEnabled,
+            IsTaxSettingsMenuEnabled = c.IsTaxSettingsMenuEnabled,
+            IsAppControlMenuEnabled = c.IsShipmentSettingsMenuEnabled,
             IsWhatsAppFloatingWidgetEnabled = c.IsWhatsAppFloatingWidgetEnabled
         };
     }
