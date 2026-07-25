@@ -1,35 +1,55 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Card, Col, Row, Button, Typography, Space, Spin, message } from 'antd';
-import { RightOutlined, FireOutlined, AppstoreOutlined } from '@ant-design/icons';
+import { RightOutlined, FireOutlined, AppstoreOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
+import { superAdminApi } from '../../api/superAdminApi';
+import { WishlistContext } from '../../context/WishlistContext';
 import ProductBadge from '../../components/common/ProductBadge';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Paragraph, Text } = Typography;
 
 const Home = () => {
+  const { toggleWishlist, isInWishlist } = React.useContext(WishlistContext);
   const [categories, setCategories] = useState([]);
   const [latestProducts, setLatestProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isWishlistEnabled, setIsWishlistEnabled] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
+    const fetchControls = async () => {
+      try {
+        const res = await superAdminApi.getControlFlags();
+        if (res.success && res.data) {
+          setIsWishlistEnabled(res.data.isWishlistEnabled !== false);
+        }
+      } catch (err) {}
+    };
+
     const fetchData = async () => {
       try {
-        const catRes = await categoryApi.getAll();
-        const prodRes = await productApi.getAll({ limit: 4 });
-        
+        const [catRes, prodRes] = await Promise.all([
+          categoryApi.getAll(),
+          productApi.getAll({ pageSize: 8 })
+        ]);
+
         if (catRes.success) setCategories(catRes.data || []);
-        if (prodRes.success) setLatestProducts((prodRes.data || []).slice(0, 4));
+        if (prodRes.success) setLatestProducts(prodRes.data || []);
       } catch (err) {
-        message.error('Failed to load store content');
+        message.error('Failed to load homepage content');
       } finally {
         setLoading(false);
       }
     };
+
+    fetchControls();
     fetchData();
+
+    window.addEventListener('superAdminControlUpdated', fetchControls);
+    return () => window.removeEventListener('superAdminControlUpdated', fetchControls);
   }, []);
 
   if (loading) {
@@ -174,6 +194,28 @@ const Home = () => {
                       onClick={() => navigate(`/products/${prod.id}`)}
                     >
                       <ProductBadge label={prod.badgeLabel} />
+                      {isWishlistEnabled && (
+                        <Button
+                          type="text"
+                          shape="circle"
+                          icon={isInWishlist(prod.id) ? <HeartFilled className="wishlist-heart-active" style={{ color: '#ff4d4f', fontSize: '18px' }} /> : <HeartOutlined style={{ color: '#ff4d4f', fontSize: '18px' }} />}
+                          onClick={(e) => toggleWishlist(prod, e)}
+                          className="wishlist-heart-btn"
+                          style={{
+                            position: 'absolute',
+                            top: 10,
+                            right: 10,
+                            zIndex: 12,
+                            background: 'rgba(255, 255, 255, 0.9)',
+                            backdropFilter: 'blur(4px)',
+                            border: '1px solid rgba(0,0,0,0.06)',
+                            boxShadow: '0 4px 10px rgba(0,0,0,0.12)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
+                          }}
+                        />
+                      )}
                       <img
                         alt={prod.name}
                         src={resolveProductImageUrl(mainImageUrl, 'thumb')}

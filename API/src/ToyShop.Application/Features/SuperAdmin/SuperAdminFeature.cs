@@ -22,6 +22,7 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsWhatsAppFloatingWidgetEnabled { get; set; } = true;
         public bool IsPrintInvoiceEnabled { get; set; } = true;
         public bool IsProductBadgeEnabled { get; set; } = true;
+        public bool IsWishlistEnabled { get; set; } = true;
     }
 
     public class UpdateSuperAdminControlRequest
@@ -36,6 +37,7 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsWhatsAppFloatingWidgetEnabled { get; set; }
         public bool IsPrintInvoiceEnabled { get; set; }
         public bool IsProductBadgeEnabled { get; set; }
+        public bool IsWishlistEnabled { get; set; }
     }
 
     public class SuperAdminLoginRequest
@@ -128,6 +130,7 @@ namespace ToyShop.Application.Features.SuperAdmin
             control.IsWhatsAppFloatingWidgetEnabled = request.Request.IsWhatsAppFloatingWidgetEnabled;
             control.IsPrintInvoiceEnabled = request.Request.IsPrintInvoiceEnabled;
             control.IsProductBadgeEnabled = request.Request.IsProductBadgeEnabled;
+            control.IsWishlistEnabled = request.Request.IsWishlistEnabled;
             control.UpdatedDate = System.DateTimeOffset.UtcNow;
 
             _controlRepo.Update(control);
@@ -147,7 +150,8 @@ namespace ToyShop.Application.Features.SuperAdmin
             IsAppControlMenuEnabled = c.IsShipmentSettingsMenuEnabled,
             IsWhatsAppFloatingWidgetEnabled = c.IsWhatsAppFloatingWidgetEnabled,
             IsPrintInvoiceEnabled = c.IsPrintInvoiceEnabled,
-            IsProductBadgeEnabled = c.IsProductBadgeEnabled
+            IsProductBadgeEnabled = c.IsProductBadgeEnabled,
+            IsWishlistEnabled = c.IsWishlistEnabled
         };
     }
 }

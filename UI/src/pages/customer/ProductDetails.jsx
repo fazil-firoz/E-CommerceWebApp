@@ -12,11 +12,15 @@ import {
   TwitterOutlined,
   FacebookOutlined,
   SendOutlined,
-  CheckOutlined
+  CheckOutlined,
+  HeartOutlined,
+  HeartFilled
 } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { shopApi } from '../../api/shopApi';
+import { superAdminApi } from '../../api/superAdminApi';
 import { CartContext } from '../../context/CartContext';
+import { WishlistContext } from '../../context/WishlistContext';
 import ProductBadge from '../../components/common/ProductBadge';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
@@ -26,6 +30,7 @@ const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
+  const { toggleWishlist, isInWishlist } = useContext(WishlistContext);
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -35,6 +40,7 @@ const ProductDetails = () => {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [copied, setCopied] = useState(false);
   const [shopSettings, setShopSettings] = useState(null);
+  const [isWishlistEnabled, setIsWishlistEnabled] = useState(true);
   const carouselRef = useRef(null);
 
   useEffect(() => {
@@ -64,8 +70,21 @@ const ProductDetails = () => {
       } catch (err) {}
     };
 
+    const fetchControls = async () => {
+      try {
+        const res = await superAdminApi.getControlFlags();
+        if (res.success && res.data) {
+          setIsWishlistEnabled(res.data.isWishlistEnabled !== false);
+        }
+      } catch (err) {}
+    };
+
     fetchProduct();
     fetchShopInfo();
+    fetchControls();
+
+    window.addEventListener('superAdminControlUpdated', fetchControls);
+    return () => window.removeEventListener('superAdminControlUpdated', fetchControls);
   }, [id, navigate]);
 
   const handleAddToCart = () => {
@@ -152,6 +171,30 @@ const ProductDetails = () => {
               position: 'relative'
             }}>
               <ProductBadge label={product.badgeLabel} />
+              {isWishlistEnabled && (
+                <Button
+                  type="text"
+                  shape="circle"
+                  icon={isInWishlist(product.id) ? <HeartFilled className="wishlist-heart-active" style={{ color: '#ff4d4f', fontSize: '20px' }} /> : <HeartOutlined style={{ color: '#ff4d4f', fontSize: '20px' }} />}
+                  onClick={(e) => toggleWishlist(product, e)}
+                  className="wishlist-heart-btn"
+                  style={{
+                    position: 'absolute',
+                    top: 14,
+                    right: 14,
+                    zIndex: 12,
+                    background: 'rgba(255, 255, 255, 0.9)',
+                    backdropFilter: 'blur(4px)',
+                    border: '1px solid rgba(0,0,0,0.06)',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+                    width: '42px',
+                    height: '42px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}
+                />
+              )}
               <Carousel
                 ref={carouselRef}
                 dots={true}

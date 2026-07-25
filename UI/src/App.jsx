@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
+import { WishlistProvider } from './context/WishlistContext';
 import { AdminAuthProvider as AuthProvider } from './context/AdminAuthContext';
 import { CustomerAuthProvider } from './context/CustomerAuthContext';
 
@@ -13,6 +14,7 @@ import Home from './pages/customer/Home';
 import ProductListing from './pages/customer/ProductListing';
 import ProductDetails from './pages/customer/ProductDetails';
 import Cart from './pages/customer/Cart';
+import Wishlist from './pages/customer/Wishlist';
 import Checkout from './pages/customer/Checkout';
 import OrderSuccess from './pages/customer/OrderSuccess';
 import AboutUs from './pages/customer/AboutUs';
@@ -43,6 +45,7 @@ function App() {
       <AuthProvider>
         <CustomerAuthProvider>
         <CartProvider>
+        <WishlistProvider>
           <Routes>
             {/* Customer Routes */}
             <Route path="/" element={<CustomerLayout />}>
@@ -50,6 +53,7 @@ function App() {
               <Route path="products" element={<ProductListing />} />
               <Route path="products/:id" element={<ProductDetails />} />
               <Route path="cart" element={<Cart />} />
+              <Route path="wishlist" element={<Wishlist />} />
               <Route path="checkout" element={<Checkout />} />
               <Route path="order-success" element={<OrderSuccess />} />
               <Route path="about" element={<AboutUs />} />
@@ -80,6 +84,7 @@ function App() {
               <Route path="super-admin" element={<SuperAdminManagement />} />
             </Route>
           </Routes>
+        </WishlistProvider>
         </CartProvider>
         </CustomerAuthProvider>
       </AuthProvider>

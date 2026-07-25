@@ -6,9 +6,11 @@ import {
   DashboardOutlined, UserOutlined, PhoneOutlined, MailOutlined,
   EnvironmentOutlined, WhatsAppOutlined, ClockCircleOutlined,
   FacebookOutlined, InstagramOutlined, TwitterOutlined, YoutubeOutlined,
-  SafetyCertificateOutlined, LockOutlined, RocketOutlined, InfoCircleOutlined
+  SafetyCertificateOutlined, LockOutlined, RocketOutlined, InfoCircleOutlined,
+  HeartFilled
 } from '@ant-design/icons';
 import { CartContext } from '../context/CartContext';
+import { WishlistContext } from '../context/WishlistContext';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import LoginDrawer from '../components/LoginDrawer';
@@ -21,6 +23,7 @@ const { Title, Text, Paragraph } = Typography;
 
 const CustomerLayout = () => {
   const { cartCount } = useContext(CartContext);
+  const { wishlistCount } = useContext(WishlistContext);
   const { isAuthenticated } = useContext(AdminAuthContext);
   const { customer, isLoggedIn } = useCustomerAuth();
   const navigate = useNavigate();
@@ -203,6 +206,21 @@ const CustomerLayout = () => {
               )}
             </Button>
           </Tooltip>
+
+          {/* Wishlist Header Icon */}
+          {superAdminControl.isWishlistEnabled !== false && (
+            <Link to="/wishlist">
+              <Badge count={wishlistCount} offset={[2, 0]} color="#ff4d4f">
+                <Button
+                  type="text"
+                  icon={<HeartFilled style={{ fontSize: '20px', color: '#ff4d4f' }} />}
+                  style={{ height: '40px', display: 'flex', alignItems: 'center', borderRadius: '8px', padding: '0 10px' }}
+                >
+                  <span style={{ marginLeft: '4px', fontWeight: 600, color: '#ff4d4f' }}>Wishlist</span>
+                </Button>
+              </Badge>
+            </Link>
+          )}
 
           {/* Cart */}
           <Link to="/cart">

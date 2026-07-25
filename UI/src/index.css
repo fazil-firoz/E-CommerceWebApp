@@ -162,3 +162,24 @@ code {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
 }
+
+/* Heart Love Pop Animation for Wishlist Button */
+@keyframes heartPopScale {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.45) rotate(-10deg); }
+  80% { transform: scale(0.9) rotate(5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.wishlist-heart-btn {
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.wishlist-heart-btn:active {
+  animation: heartPopScale 0.4s ease-in-out;
+}
+
+.wishlist-heart-active {
+  color: #ff4d4f !important;
+  animation: heartPopScale 0.45s ease-in-out;
+}

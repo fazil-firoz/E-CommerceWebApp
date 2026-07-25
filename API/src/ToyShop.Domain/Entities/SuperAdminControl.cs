@@ -14,5 +14,6 @@ namespace ToyShop.Domain.Entities
         public bool IsWhatsAppFloatingWidgetEnabled { get; set; } = true;
         public bool IsPrintInvoiceEnabled { get; set; } = true;
         public bool IsProductBadgeEnabled { get; set; } = true;
+        public bool IsWishlistEnabled { get; set; } = true;
     }
 }

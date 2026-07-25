@@ -3,7 +3,7 @@ import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Switch
 import {
   CrownOutlined, LockOutlined, UnlockOutlined, SaveOutlined,
   AppstoreOutlined, SettingOutlined, WhatsAppOutlined, SafetyCertificateOutlined,
-  CheckCircleOutlined, StopOutlined, ReloadOutlined, TagOutlined, PrinterOutlined
+  CheckCircleOutlined, StopOutlined, ReloadOutlined, TagOutlined, PrinterOutlined, HeartOutlined
 } from '@ant-design/icons';
 import { superAdminApi } from '../../api/superAdminApi';
 
@@ -501,6 +501,36 @@ const SuperAdminManagement = () => {
                     unCheckedChildren={<StopOutlined />}
                     checked={controls.isProductBadgeEnabled !== false}
                     onChange={(checked) => setControls({ ...controls, isProductBadgeEnabled: checked })}
+                  />
+                </div>
+
+                {/* Wishlist Feature Toggle */}
+                <div style={{
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid #f0f0f0',
+                  background: controls.isWishlistEnabled !== false ? '#f6ffed' : '#fff1f0',
+                  display: 'flex',
+                  justify: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <Space align="center" size={8}>
+                      <HeartOutlined style={{ fontSize: '20px', color: '#ff4d4f' }} />
+                      <Text strong style={{ fontSize: '15px' }}>Wishlist Feature</Text>
+                    </Space>
+                    <div>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        Enables or disables customer wishlist heart icons on product cards and header wishlist counter
+                      </Text>
+                    </div>
+                  </div>
+
+                  <Switch
+                    checkedChildren={<CheckCircleOutlined />}
+                    unCheckedChildren={<StopOutlined />}
+                    checked={controls.isWishlistEnabled !== false}
+                    onChange={(checked) => setControls({ ...controls, isWishlistEnabled: checked })}
                   />
                 </div>
 
