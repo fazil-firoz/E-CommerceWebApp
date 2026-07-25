@@ -1,10 +1,10 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Form, Input, Button, Typography, Divider, Modal, message, Spin, Tag } from 'antd';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Form, Input, Button, Typography, Divider, Modal, message, Spin, Tag, Alert } from 'antd';
 import {
   LockOutlined, ShoppingOutlined, RightOutlined,
   SafetyCertificateOutlined, PhoneOutlined, MailOutlined,
-  EnvironmentOutlined, CheckCircleFilled, UserOutlined
+  EnvironmentOutlined, CheckCircleFilled, UserOutlined, ThunderboltOutlined
 } from '@ant-design/icons';
 import { CartContext } from '../../context/CartContext';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
@@ -22,6 +22,12 @@ const Checkout = () => {
   const { cartItems, cartTotal, clearCart } = useContext(CartContext);
   const { customer, isLoggedIn } = useCustomerAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+
+  // Buy Now single item override (if user clicked "Buy Now" instead of adding to cart)
+  const buyNowItem = location.state?.buyNowItem;
+  const checkoutItems = buyNowItem ? [buyNowItem] : cartItems;
+  const checkoutTotal = buyNowItem ? (buyNowItem.price * buyNowItem.quantity) : cartTotal;
 
   const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
@@ -70,11 +76,11 @@ const Checkout = () => {
     fetchShipping();
   }, []);
 
-  if (cartItems.length === 0) {
+  if (checkoutItems.length === 0) {
     return (
       <div className="checkout-empty">
         <ShoppingOutlined style={{ fontSize: '48px', color: '#f9a8d4' }} />
-        <Title level={4} style={{ color: '#8c8c8c', marginTop: '16px' }}>Your cart is empty</Title>
+        <Title level={4} style={{ color: '#8c8c8c', marginTop: '16px' }}>Your checkout items are empty</Title>
         <Button type="primary" onClick={() => navigate('/products')} style={{ marginTop: '8px', background: '#ec4899', borderColor: '#ec4899', borderRadius: '20px' }}>
           Back to Shop
         </Button>
@@ -99,34 +105,41 @@ const Checkout = () => {
 
       const payload = {
         customerName: values.fullName,
-        customerEmail: values.email || null,   // optional
+        customerEmail: values.email || null,
         customerPhone: values.phone,
         addressLine1: values.addressLine1,
         addressLine2: values.addressLine2 || null,
         city: values.city,
         state: values.state,
         pincode: values.pincode,
-        items: cartItems.map(item => ({ productId: item.id, quantity: item.quantity }))
+        items: checkoutItems.map(item => ({ productId: item.id, quantity: item.quantity }))
       };
 
-      const result = await orderApi.create(payload);
-
-      if (result.success && result.data) {
-        const data = result.data;
-        setOrderResponse(data);
-
-        if (data.razorpayOrderId.startsWith('order_mock_')) {
-          setShowMockModal(true);
-        } else {
-          const loaded = await loadRazorpayScript();
-          if (!loaded) { message.error('Could not load Razorpay. Check internet.'); return; }
-          openRazorpayCheckout(data, values);
-        }
-      } else {
-        message.error(result.message || 'Failed to place order');
+      const res = await orderApi.create(payload);
+      if (!res.success) {
+        message.error(res.message || 'Failed to create order');
+        setLoading(false);
+        return;
       }
+
+      const orderData = res.data;
+      setOrderResponse(orderData);
+
+      if (!orderData.isRazorpayConfigured || orderData.isTestMode) {
+        setLoading(false);
+        setShowMockModal(true);
+        return;
+      }
+
+      const isScriptLoaded = await loadRazorpayScript();
+      if (!isScriptLoaded) {
+        message.error('Razorpay SDK failed to load. Check internet connection.');
+        setLoading(false);
+        return;
+      }
+
+      openRazorpayCheckout(orderData, values);
     } catch (err) {
-      if (err?.errorFields) return; // form validation error
       message.error(err?.message || 'Error processing order');
     } finally {
       setLoading(false);
@@ -150,7 +163,11 @@ const Checkout = () => {
             razorpayPaymentId: response.razorpay_payment_id,
             razorpaySignature: response.razorpay_signature
           });
-          clearCart();
+          
+          if (!buyNowItem) {
+            clearCart();
+          }
+
           navigate(verifyResult.success
             ? `/order-success?orderNumber=${orderData.orderNumber}&status=Success`
             : `/order-success?orderNumber=${orderData.orderNumber}&status=Failed&error=Signature verification failed`
@@ -166,7 +183,7 @@ const Checkout = () => {
         email: customerValues.email || '',
         contact: customerValues.phone
       },
-      theme: { color: '#ec4899' },
+      theme: { color: '#1890ff' },
       modal: { ondismiss: () => message.warning('Payment cancelled.') }
     };
     new window.Razorpay(options).open();
@@ -186,7 +203,11 @@ const Checkout = () => {
         razorpayPaymentId: `pay_mock_${Math.random().toString(36).substr(2, 9)}`,
         razorpaySignature: 'mock_sig_successful_payment'
       });
-      clearCart();
+      
+      if (!buyNowItem) {
+        clearCart();
+      }
+
       navigate(verifyResult.success
         ? `/order-success?orderNumber=${orderResponse.orderNumber}&status=Success`
         : `/order-success?orderNumber=${orderResponse.orderNumber}&status=Failed&error=Signature verification failed`
@@ -200,14 +221,14 @@ const Checkout = () => {
 
   const calculateShippingFee = () => {
     if (!shippingMethod) return 0;
-    if (shippingMethod.freeShippingThreshold > 0 && cartTotal >= shippingMethod.freeShippingThreshold) {
+    if (shippingMethod.freeShippingThreshold > 0 && checkoutTotal >= shippingMethod.freeShippingThreshold) {
       return 0;
     }
     return shippingMethod.fee;
   };
 
   const shippingCharge = calculateShippingFee();
-  const grandTotal = cartTotal + shippingCharge;
+  const grandTotal = checkoutTotal + shippingCharge;
 
   return (
     <div className="checkout-wrapper">
@@ -226,6 +247,19 @@ const Checkout = () => {
           </Title>
         </div>
 
+        {/* Buy Now Express Banner */}
+        {buyNowItem && (
+          <div style={{ background: '#e6f7ff', border: '1px solid #91d5ff', borderRadius: '10px', padding: '10px 16px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <ThunderboltOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+            <div>
+              <Text strong style={{ color: '#003a8c', fontSize: '14px' }}>Express Buy Now Checkout</Text>
+              <Text type="secondary" style={{ display: 'block', fontSize: '12px' }}>
+                Purchasing <strong>{buyNowItem.name}</strong> (Qty: {buyNowItem.quantity}). Items in your main cart are kept safe for later.
+              </Text>
+            </div>
+          </div>
+        )}
+
         {/* Mobile Order Summary Toggle */}
         <div className="checkout-mobile-summary" onClick={() => setOrderSummaryExpanded(!orderSummaryExpanded)}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -240,7 +274,7 @@ const Checkout = () => {
 
         {orderSummaryExpanded && (
           <div className="checkout-mobile-items">
-            {cartItems.map(item => (
+            {checkoutItems.map(item => (
               <div key={item.id} className="checkout-item-row">
                 <div className="checkout-item-img-wrap">
                   <img src={resolveProductImageUrl(item.imageUrl || item.imageUrls?.[0], 'thumb')} alt={item.name} />
@@ -253,7 +287,7 @@ const Checkout = () => {
             <Divider style={{ margin: '12px 0' }} />
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
               <Text type="secondary">Subtotal</Text>
-              <Text>₹{cartTotal.toLocaleString('en-IN')}</Text>
+              <Text>₹{checkoutTotal.toLocaleString('en-IN')}</Text>
             </div>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
               <Text type="secondary">Shipping ({shippingMethod?.name || 'Standard'})</Text>
@@ -298,105 +332,102 @@ const Checkout = () => {
             <Form.Item
               name="email"
               style={{ marginBottom: '12px' }}
+              rules={[{ type: 'email', message: 'Enter a valid email' }]}
             >
               <Input
                 prefix={<MailOutlined style={{ color: '#bfbfbf' }} />}
-                placeholder="Email address (optional)"
+                placeholder="Email address (optional, for order updates)"
                 size="large"
-                className="checkout-input"
+                style={{ borderRadius: '8px' }}
               />
             </Form.Item>
-            <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginBottom: '16px', marginTop: '-8px' }}>
-              Enter your email to receive shipment tracking updates and order receipt.
-            </Text>
+          </div>
+
+          {/* ── SHIPPING ADDRESS ───────────────────────────── */}
+          <div className="checkout-section">
+            <Title level={5} style={{ marginBottom: '14px', fontWeight: 700 }}>Shipping Address</Title>
+
+            <Form.Item
+              name="fullName"
+              rules={[{ required: true, message: 'Please enter your full name' }]}
+              style={{ marginBottom: '12px' }}
+            >
+              <Input
+                prefix={<UserOutlined style={{ color: '#bfbfbf' }} />}
+                placeholder="Full Name"
+                size="large"
+                style={{ borderRadius: '8px' }}
+              />
+            </Form.Item>
 
             <Form.Item
               name="phone"
               rules={[
-                { required: true, message: 'Phone number is required' },
-                { pattern: /^[0-9]{10}$/, message: 'Enter a valid 10-digit phone number' }
+                { required: true, message: 'Mobile number is required' },
+                { pattern: /^[0-9]{10}$/, message: 'Enter a valid 10-digit mobile number' }
               ]}
-              style={{ marginBottom: 0 }}
+              style={{ marginBottom: '12px' }}
             >
               <Input
                 prefix={<PhoneOutlined style={{ color: '#bfbfbf' }} />}
-                placeholder="Phone number"
+                placeholder="10-digit Mobile Number"
                 size="large"
-                className="checkout-input"
                 maxLength={10}
+                style={{ borderRadius: '8px' }}
               />
             </Form.Item>
-          </div>
 
-          {/* ── DELIVERY ─────────────────────────────── */}
-          <div className="checkout-section">
-            <Title level={5} style={{ margin: '0 0 16px', fontWeight: 700 }}>Delivery Address</Title>
-
-            <Form.Item name="fullName" rules={[{ required: true, message: 'Full name is required' }]} style={{ marginBottom: '12px' }}>
-              <Input placeholder="Full name" size="large" className="checkout-input" />
-            </Form.Item>
-
-            <Form.Item name="addressLine1" rules={[{ required: true, message: 'Address is required' }]} style={{ marginBottom: '12px' }}>
+            <Form.Item
+              name="addressLine1"
+              rules={[{ required: true, message: 'Address line 1 is required' }]}
+              style={{ marginBottom: '12px' }}
+            >
               <Input
                 prefix={<EnvironmentOutlined style={{ color: '#bfbfbf' }} />}
-                placeholder="Address line 1"
+                placeholder="House No., Building, Street Name"
                 size="large"
-                className="checkout-input"
+                style={{ borderRadius: '8px' }}
               />
             </Form.Item>
 
             <Form.Item name="addressLine2" style={{ marginBottom: '12px' }}>
-              <Input placeholder="Apartment, suite, landmark, etc. (optional)" size="large" className="checkout-input" />
+              <Input
+                placeholder="Apartment, Suite, Unit, Landmark (optional)"
+                size="large"
+                style={{ borderRadius: '8px' }}
+              />
             </Form.Item>
 
-            <div className="checkout-row-3">
-              <Form.Item name="city" rules={[{ required: true, message: 'City required' }]} style={{ marginBottom: '12px', flex: 2 }}>
-                <Input placeholder="City" size="large" className="checkout-input" />
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+              <Form.Item
+                name="city"
+                rules={[{ required: true, message: 'City is required' }]}
+                style={{ margin: 0 }}
+              >
+                <Input placeholder="City" size="large" style={{ borderRadius: '8px' }} />
               </Form.Item>
-              <Form.Item name="state" rules={[{ required: true, message: 'State required' }]} style={{ marginBottom: '12px', flex: 2 }}>
-                <Input placeholder="State" size="large" className="checkout-input" />
+
+              <Form.Item
+                name="state"
+                rules={[{ required: true, message: 'State is required' }]}
+                style={{ margin: 0 }}
+              >
+                <Input placeholder="State" size="large" style={{ borderRadius: '8px' }} />
               </Form.Item>
+
               <Form.Item
                 name="pincode"
                 rules={[
-                  { required: true, message: 'Pincode required' },
-                  { pattern: /^[0-9]{6}$/, message: '6 digits' }
+                  { required: true, message: 'Pincode is required' },
+                  { pattern: /^[0-9]{6}$/, message: 'Valid 6-digit Pincode' }
                 ]}
-                style={{ marginBottom: '12px', flex: 1 }}
+                style={{ margin: 0 }}
               >
-                <Input placeholder="Pincode" size="large" className="checkout-input" maxLength={6} />
+                <Input placeholder="Pincode" size="large" maxLength={6} style={{ borderRadius: '8px' }} />
               </Form.Item>
             </div>
           </div>
 
-          {/* ── PAYMENT ─────────────────────────────── */}
-          <div className="checkout-section">
-            <Title level={5} style={{ margin: '0 0 4px', fontWeight: 700 }}>Payment Method</Title>
-            <Text type="secondary" style={{ fontSize: '13px', display: 'block', marginBottom: '16px' }}>
-              All transactions are 100% secure and encrypted.
-            </Text>
-
-            <div className="checkout-payment-box">
-              <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <img src="https://razorpay.com/favicon.ico" alt="razorpay" style={{ width: '20px', height: '20px', borderRadius: '4px' }} />
-                <Text strong>Razorpay — UPI, GPay, Credit/Debit Cards & Net Banking</Text>
-              </div>
-              <Text type="secondary" style={{ fontSize: '13px', display: 'block', marginTop: '8px' }}>
-                You'll be redirected to Razorpay to safely complete your payment.
-              </Text>
-            </div>
-          </div>
-
-          {/* ── BILLING ADDRESS ─────────────────────── */}
-          <div className="checkout-section">
-            <Title level={5} style={{ margin: '0 0 12px', fontWeight: 700 }}>Billing address</Title>
-            <div className="checkout-billing-option checkout-billing-selected">
-              <div className="checkout-radio-dot" />
-              <Text>Same as shipping address</Text>
-            </div>
-          </div>
-
-          {/* Pay Now */}
           <Button
             type="primary"
             size="large"
@@ -405,12 +436,13 @@ const Checkout = () => {
             loading={loading}
             className="checkout-pay-btn"
             icon={<LockOutlined />}
+            style={{ borderRadius: '10px', height: '50px', fontSize: '16px', fontWeight: 700 }}
           >
             Pay now — ₹{grandTotal.toLocaleString('en-IN')}
           </Button>
 
           <div className="checkout-footer-links">
-            <SafetyCertificateOutlined style={{ color: '#ec4899' }} />
+            <SafetyCertificateOutlined style={{ color: '#1890ff' }} />
             <Text type="secondary" style={{ fontSize: '12px' }}>
               Secured by 256-bit SSL encryption
             </Text>
@@ -421,7 +453,7 @@ const Checkout = () => {
       {/* Right: Order Summary (desktop) */}
       <div className="checkout-right">
         <div className="checkout-summary-panel">
-          {cartItems.map(item => (
+          {checkoutItems.map(item => (
             <div key={item.id} className="checkout-item-row">
               <div className="checkout-item-img-wrap">
                 <img src={resolveProductImageUrl(item.imageUrl || item.imageUrls?.[0], 'thumb')} alt={item.name} />
@@ -439,7 +471,7 @@ const Checkout = () => {
 
           <div className="checkout-summary-row">
             <Text type="secondary">Subtotal</Text>
-            <Text>₹{cartTotal.toLocaleString('en-IN')}</Text>
+            <Text>₹{checkoutTotal.toLocaleString('en-IN')}</Text>
           </div>
           <div className="checkout-summary-row" style={{ alignItems: 'flex-start' }}>
             <div>

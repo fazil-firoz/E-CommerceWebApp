@@ -87,8 +87,20 @@ const ProductListing = () => {
   const handleBuyNow = (e, prod) => {
     e.stopPropagation();
     if (prod.stockQuantity === 0) return;
-    addToCart({ ...prod, imageUrls: prod.imageUrls }, 1, false);
-    navigate('/checkout');
+    const mainImageObj = prod.images?.find(i => i.isMain) || prod.images?.[0];
+    const mainImageUrl = mainImageObj?.imageUrl || prod.imageUrl || prod.imageUrls?.[0] || 'https://via.placeholder.com/200?text=Toy';
+
+    const buyNowItem = {
+      id: prod.id,
+      name: prod.name,
+      price: prod.price,
+      imageUrl: mainImageUrl,
+      imageUrls: prod.imageUrls && prod.imageUrls.length > 0 ? prod.imageUrls : [mainImageUrl],
+      quantity: 1,
+      stockQuantity: prod.stockQuantity,
+    };
+
+    navigate('/checkout', { state: { buyNowItem } });
   };
 
   return (

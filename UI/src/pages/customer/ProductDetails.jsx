@@ -50,10 +50,20 @@ const ProductDetails = () => {
 
   const handleBuyNow = () => {
     if (product) {
-      addToCart(product, quantity, false);
-      setTimeout(() => {
-        navigate('/checkout');
-      }, 50);
+      const mainImageObj = product.images?.find(i => i.isMain) || product.images?.[0];
+      const mainImageUrl = mainImageObj?.imageUrl || product.imageUrl || product.imageUrls?.[0] || 'https://via.placeholder.com/200?text=Toy';
+
+      const buyNowItem = {
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        imageUrl: mainImageUrl,
+        imageUrls: product.imageUrls && product.imageUrls.length > 0 ? product.imageUrls : [mainImageUrl],
+        quantity,
+        stockQuantity: product.stockQuantity,
+      };
+
+      navigate('/checkout', { state: { buyNowItem } });
     }
   };
 
