@@ -15,6 +15,7 @@ import {
 import { adminApi } from '../../api/adminApi';
 import { orderApi } from '../../api/orderApi';
 import { reportApi } from '../../api/reportApi';
+import { categoryApi } from '../../api/categoryApi';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
@@ -152,10 +153,7 @@ const MonthlyTrendBarChart = ({ data }) => {
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
-  const [salesReportData, setSalesReportData] = useState(null);
-  const [showGraphicalView, setShowGraphicalView] = useState(false);
-  const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const [categoriesList, setCategoriesList] = useState([]);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -163,10 +161,12 @@ const Dashboard = () => {
         const statsRes = await adminApi.getDashboardStats();
         const ordersRes = await orderApi.getAll();
         const salesRes = await reportApi.getSalesReport();
+        const catRes = await categoryApi.getAll();
 
         if (statsRes.success) setStats(statsRes.data);
         if (ordersRes.success) setRecentOrders((ordersRes.data || []).slice(0, 5));
         if (salesRes.success) setSalesReportData(salesRes.data);
+        if (catRes.success) setCategoriesList(catRes.data || []);
       } catch (err) {
         message.error('Failed to load dashboard metrics');
       } finally {
@@ -191,7 +191,7 @@ const Dashboard = () => {
   };
 
   // Compute Order Status Donut Chart Data (100% accurate database counts)
-  const allOrdersList = salesReportData?.items || [];
+  const allOrdersList = salesReportData?.items || recentOrders || [];
   const statusCounts = { Delivered: 0, Shipped: 0, Processing: 0, Pending: 0, Cancelled: 0 };
   allOrdersList.forEach(o => {
     const st = o.orderStatus || 'Pending';
@@ -207,16 +207,19 @@ const Dashboard = () => {
     { label: 'Cancelled', count: statusCounts.Cancelled, color: '#ff4d4f' }
   ].filter(d => d.count > 0 || allOrdersList.length === 0);
 
-  // Compute Category Sales Bar Chart Data (100% accurate category sum)
+  // Compute Category Sales Bar Chart Data (100% accurate category sum across all store categories)
   const categoryMap = {};
+  categoriesList.forEach(c => {
+    if (c.name) categoryMap[c.name] = 0;
+  });
+
   if (salesReportData?.items) {
     salesReportData.items.forEach(order => {
-      if (order.items && order.items.length > 0) {
-        order.items.forEach(item => {
-          const catName = item.categoryName || 'General Toys';
-          categoryMap[catName] = (categoryMap[catName] || 0) + (item.subtotal || item.unitPrice * item.quantity);
-        });
-      }
+      const orderItems = order.orderItems || order.items || [];
+      orderItems.forEach(item => {
+        const catName = item.categoryName || 'General Toys';
+        categoryMap[catName] = (categoryMap[catName] || 0) + (item.subtotal || item.unitPrice * item.quantity);
+      });
     });
   }
 

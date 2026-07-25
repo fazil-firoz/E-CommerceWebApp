@@ -130,6 +130,9 @@ namespace ToyShop.Application.Features.Reports
             var query = _orderRepo.Query()
                 .Include(o => o.OrderItems)
                     .ThenInclude(i => i.Product)
+                        .ThenInclude(p => p.Category)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(i => i.Product)
                         .ThenInclude(p => p.Images)
                 .Include(o => o.Customer)
                 .AsQueryable();
@@ -241,6 +244,7 @@ namespace ToyShop.Application.Features.Reports
                 {
                     ProductId = i.ProductId,
                     ProductName = i.Product != null ? i.Product.Name : "Product #" + i.ProductId,
+                    CategoryName = i.Product?.Category != null ? i.Product.Category.Name : "General Toys",
                     UnitPrice = i.UnitPrice,
                     Quantity = i.Quantity,
                     Subtotal = i.TotalPrice > 0 ? i.TotalPrice : i.UnitPrice * i.Quantity,
