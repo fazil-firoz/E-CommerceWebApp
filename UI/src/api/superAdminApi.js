@@ -7,6 +7,11 @@ export const superAdminApi = {
     return response;
   },
 
+  getControlFlags: async () => {
+    const response = await apiClient.get(URLS.SUPER_ADMIN.GET_CONTROL);
+    return response;
+  },
+
   verify: async (username, password) => {
     const response = await apiClient.post(URLS.SUPER_ADMIN.VERIFY, { username, password });
     return response;

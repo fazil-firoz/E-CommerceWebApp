@@ -63,6 +63,9 @@ const ProductManagement = () => {
       } catch (err) {}
     };
     fetchControls();
+
+    window.addEventListener('superAdminControlUpdated', fetchControls);
+    return () => window.removeEventListener('superAdminControlUpdated', fetchControls);
   }, []);
 
   const handleOpenAdd = () => {

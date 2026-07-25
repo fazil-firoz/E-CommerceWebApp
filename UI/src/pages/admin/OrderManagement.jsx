@@ -67,6 +67,9 @@ const OrderManagement = () => {
 
     fetchShopInfo();
     fetchControlFlags();
+
+    window.addEventListener('superAdminControlUpdated', fetchControlFlags);
+    return () => window.removeEventListener('superAdminControlUpdated', fetchControlFlags);
   }, []);
 
   const fetchOrders = async (status = statusFilter, dates = dateRange, search = searchText) => {
