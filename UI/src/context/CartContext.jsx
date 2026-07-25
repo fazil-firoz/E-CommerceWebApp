@@ -13,7 +13,7 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('toy_shop_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product, quantity = 1, showToast = true) => {
+  const addToCart = (product, quantity = 1, showToast = false) => {
     let messageType = null;
     let messageText = '';
 
@@ -27,8 +27,6 @@ export const CartProvider = ({ children }) => {
           messageText = `Cannot add more. Only ${product.stockQuantity} items available in stock.`;
           return prevItems;
         }
-        messageType = 'success';
-        messageText = `Updated ${product.name} quantity in cart.`;
         return prevItems.map((item) =>
           item.id === product.id ? { ...item, quantity: newQty } : item
         );
@@ -40,8 +38,6 @@ export const CartProvider = ({ children }) => {
         return prevItems;
       }
 
-      messageType = 'success';
-      messageText = `${product.name} added to cart.`;
       const mainImageObj = product.images?.find(i => i.isMain) || product.images?.[0];
       const mainImageUrl = mainImageObj?.imageUrl || product.imageUrl || product.imageUrls?.[0] || 'https://via.placeholder.com/200?text=Toy';
 
@@ -59,9 +55,8 @@ export const CartProvider = ({ children }) => {
       ];
     });
 
-    if (showToast && messageText) {
-      if (messageType === 'warning') message.warning(messageText);
-      else if (messageType === 'success') message.success(messageText);
+    if (showToast && messageType === 'warning' && messageText) {
+      message.warning(messageText);
     }
   };
 
@@ -86,13 +81,7 @@ export const CartProvider = ({ children }) => {
   };
 
   const removeFromCart = (productId) => {
-    setCartItems((prevItems) => {
-      const item = prevItems.find((i) => i.id === productId);
-      if (item) {
-        message.info(`${item.name} removed from cart.`);
-      }
-      return prevItems.filter((item) => item.id !== productId);
-    });
+    setCartItems((prevItems) => prevItems.filter((item) => item.id !== productId));
   };
 
   const clearCart = () => {

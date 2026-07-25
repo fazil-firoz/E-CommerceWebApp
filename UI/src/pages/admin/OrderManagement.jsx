@@ -4,6 +4,7 @@ import { EyeOutlined, SendOutlined, TruckOutlined, SearchOutlined, ReloadOutline
 import dayjs from 'dayjs';
 import { orderApi } from '../../api/orderApi';
 import { shopApi } from '../../api/shopApi';
+import { superAdminApi } from '../../api/superAdminApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,8 +39,9 @@ const OrderManagement = () => {
   const [pendingStatusChange, setPendingStatusChange] = useState(null); // { orderId, newStatus }
   const [shippingForm] = Form.useForm();
   const [shippingLoading, setShippingLoading] = useState(false);
+  const [isPrintInvoiceEnabled, setIsPrintInvoiceEnabled] = useState(true);
 
-  // Fetch shop settings for invoice header/footer details
+  // Fetch shop settings for invoice header/footer details & Super Admin control flags
   useEffect(() => {
     const fetchShopInfo = async () => {
       try {
@@ -51,7 +53,23 @@ const OrderManagement = () => {
         console.error('Failed to fetch shop settings for invoice', err);
       }
     };
+
+    const fetchControlFlags = async () => {
+      try {
+        const res = await superAdminApi.getControlFlags();
+        if (res.success && res.data) {
+          setIsPrintInvoiceEnabled(res.data.isPrintInvoiceEnabled !== false);
+        }
+      } catch (err) {
+        console.error('Failed to fetch Super Admin control flags', err);
+      }
+    };
+
     fetchShopInfo();
+    fetchControlFlags();
+
+    window.addEventListener('superAdminControlUpdated', fetchControlFlags);
+    return () => window.removeEventListener('superAdminControlUpdated', fetchControlFlags);
   }, []);
 
   const fetchOrders = async (status = statusFilter, dates = dateRange, search = searchText) => {
@@ -224,7 +242,9 @@ const OrderManagement = () => {
       `;
     });
 
-    const shippingCharge = order.totalAmount > itemsSubtotal ? (order.totalAmount - itemsSubtotal) : 0;
+    const couponDiscount = order.discountAmount || 0;
+    const couponCode = order.couponCode || '';
+    const shippingCharge = Math.max(0, (order.totalAmount + couponDiscount) - itemsSubtotal);
 
     const htmlContent = `
       <!DOCTYPE html>
@@ -528,8 +548,14 @@ const OrderManagement = () => {
                   ${shippingCharge === 0 ? 'FREE Shipping' : `₹${shippingCharge.toLocaleString('en-IN')}`}
                 </td>
               </tr>
+              ${couponDiscount > 0 ? `
+              <tr style="color: #15803d;">
+                <td style="text-align: right;"><strong>Less: Coupon Discount (${couponCode || 'COUPON'}):</strong></td>
+                <td style="text-align: right; font-weight: 700; color: #15803d;">- ₹${couponDiscount.toLocaleString('en-IN')}</td>
+              </tr>
+              ` : ''}
               <tr class="summary-total-row">
-                <td style="text-align: right;">GRAND TOTAL:</td>
+                <td style="text-align: right;">GRAND TOTAL / NET PAYABLE:</td>
                 <td style="text-align: right;">₹${order.totalAmount.toLocaleString('en-IN')}</td>
               </tr>
             </table>
@@ -885,19 +911,56 @@ const OrderManagement = () => {
               />
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-              <Button
-                type="default"
-                icon={<PrinterOutlined />}
-                onClick={() => handlePrintInvoice(selectedOrder)}
-                style={{ borderRadius: '6px' }}
-              >
-                Print Purchase Invoice
-              </Button>
-              <Title level={4} style={{ margin: 0 }}>
-                Total: <span style={{ color: '#ff4d4f' }}>₹{selectedOrder.totalAmount.toLocaleString('en-IN')}</span>
-              </Title>
-            </div>
+            {/* Financial Summary Breakdown */}
+            {(() => {
+              const modalSubtotal = (selectedOrder.items || []).reduce((sum, i) => sum + (i.totalPrice || (i.unitPrice * i.quantity)), 0);
+              const modalDiscount = selectedOrder.discountAmount || 0;
+              return (
+                <div style={{ padding: '12px 16px', background: '#fafafa', borderRadius: '10px', border: '1px solid #f0f0f0', marginTop: '12px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '280px' }}>
+                      <Text type="secondary">Items Subtotal:</Text>
+                      <Text strong>₹{modalSubtotal.toLocaleString('en-IN')}</Text>
+                    </div>
+                    {modalDiscount > 0 && (
+                      <div style={{ display: 'flex', justifyContent: 'space-between', width: '280px' }}>
+                        <Text style={{ color: '#52c41a', fontWeight: 600 }}>
+                          Less: Coupon Discount ({selectedOrder.couponCode || 'COUPON'}):
+                        </Text>
+                        <Text strong style={{ color: '#52c41a' }}>
+                          - ₹{modalDiscount.toLocaleString('en-IN')}
+                        </Text>
+                      </div>
+                    )}
+                    <div style={{ display: 'flex', justifyContent: 'space-between', width: '280px', borderTop: '1px solid #e8e8e8', paddingTop: '6px' }}>
+                      <Text strong style={{ fontSize: '15px' }}>Net Total Payable:</Text>
+                      <Text strong style={{ fontSize: '18px', color: '#ff4d4f' }}>
+                        ₹{selectedOrder.totalAmount.toLocaleString('en-IN')}
+                      </Text>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
+
+            {isPrintInvoiceEnabled && (
+              <div style={{ display: 'flex', justifyContent: 'flex-start', alignItems: 'center', marginTop: '16px' }}>
+                <Button
+                  type="primary"
+                  icon={<PrinterOutlined />}
+                  onClick={() => handlePrintInvoice(selectedOrder)}
+                  style={{
+                    borderRadius: '6px',
+                    background: '#001529',
+                    borderColor: '#001529',
+                    fontWeight: 600,
+                    fontSize: '13px'
+                  }}
+                >
+                  Print Invoice
+                </Button>
+              </div>
+            )}
 
           </Space>
         )}

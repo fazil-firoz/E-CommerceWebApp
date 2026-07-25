@@ -30,10 +30,22 @@ namespace ToyShop.Infrastructure.Persistence
         public DbSet<Admin> Admins => Set<Admin>();
         public DbSet<Shop> Shops => Set<Shop>();
         public DbSet<ShipmentMethod> ShipmentMethods => Set<ShipmentMethod>();
+        public DbSet<SuperAdminControl> SuperAdminControls => Set<SuperAdminControl>();
+        public DbSet<CouponCode> CouponCodes => Set<CouponCode>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            // Seed SuperAdminControl initial default settings
+            modelBuilder.Entity<SuperAdminControl>().HasData(new SuperAdminControl
+            {
+                Id = 1,
+                IsShopSettingsMenuEnabled = true,
+                IsAppControlMenuEnabled = true,
+                IsWhatsAppFloatingWidgetEnabled = true,
+                CreatedDate = DateTimeOffset.UtcNow
+            });
 
             // Configure global query filters for soft delete
             modelBuilder.Entity<Category>().HasQueryFilter(e => !e.IsDeleted);

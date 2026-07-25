@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using ToyShop.Application.Common.Interfaces;
 using ToyShop.Application.DTOs;
 using ToyShop.Domain.Entities;
+using ToyShop.Domain.Enums;
 using ToyShop.Shared.Models;
 
 namespace ToyShop.Application.Features.Reports
@@ -130,8 +131,12 @@ namespace ToyShop.Application.Features.Reports
             var query = _orderRepo.Query()
                 .Include(o => o.OrderItems)
                     .ThenInclude(i => i.Product)
+                        .ThenInclude(p => p.Category)
+                .Include(o => o.OrderItems)
+                    .ThenInclude(i => i.Product)
                         .ThenInclude(p => p.Images)
                 .Include(o => o.Customer)
+                .Where(o => o.PaymentStatus == PaymentStatus.Success)
                 .AsQueryable();
 
             // Date filtering
@@ -241,6 +246,7 @@ namespace ToyShop.Application.Features.Reports
                 {
                     ProductId = i.ProductId,
                     ProductName = i.Product != null ? i.Product.Name : "Product #" + i.ProductId,
+                    CategoryName = i.Product?.Category != null ? i.Product.Category.Name : "General Toys",
                     UnitPrice = i.UnitPrice,
                     Quantity = i.Quantity,
                     Subtotal = i.TotalPrice > 0 ? i.TotalPrice : i.UnitPrice * i.Quantity,
@@ -256,6 +262,8 @@ namespace ToyShop.Application.Features.Reports
                     CustomerPhone = o.CustomerPhone ?? o.Customer?.PhoneNumber ?? "N/A",
                     TotalItems = itemsCount,
                     TotalAmount = o.TotalAmount,
+                    CouponCode = o.CouponCode,
+                    DiscountAmount = o.DiscountAmount,
                     OrderStatus = oStatus,
                     PaymentStatus = pStatus,
                     OrderItems = orderItemDtos

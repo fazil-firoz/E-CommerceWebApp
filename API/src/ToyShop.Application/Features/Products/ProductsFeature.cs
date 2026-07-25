@@ -27,7 +27,8 @@ namespace ToyShop.Application.Features.Products
         decimal Mrp,
         int StockQuantity, 
         int CategoryId, 
-        List<ProductImageInput> Images
+        List<ProductImageInput> Images,
+        string? BadgeLabel = null
     ) : IRequest<BaseResponse<int>>;
 
     public record UpdateProductCommand(
@@ -39,7 +40,8 @@ namespace ToyShop.Application.Features.Products
         int StockQuantity,
         int CategoryId,
         List<ProductImageInput> Images,
-        bool IsActive
+        bool IsActive,
+        string? BadgeLabel = null
     ) : IRequest<BaseResponse<bool>>;
 
     public record DeleteProductCommand(int Id) : IRequest<BaseResponse<bool>>;
@@ -93,6 +95,7 @@ namespace ToyShop.Application.Features.Products
                     CategoryId = p.CategoryId,
                     CategoryName = p.Category != null ? p.Category.Name : string.Empty,
                     IsActive = p.IsActive,
+                    BadgeLabel = p.BadgeLabel,
                     ImageUrls = p.Images.Where(i => !i.IsDeleted)
                                          .OrderByDescending(i => i.IsMain)
                                          .ThenBy(i => i.Id)
@@ -135,6 +138,7 @@ namespace ToyShop.Application.Features.Products
                 CategoryId = product.CategoryId,
                 CategoryName = product.Category != null ? product.Category.Name : string.Empty,
                 IsActive = product.IsActive,
+                BadgeLabel = product.BadgeLabel,
                 ImageUrls = product.Images.Where(i => !i.IsDeleted)
                                            .OrderByDescending(i => i.IsMain)
                                            .ThenBy(i => i.Id)
@@ -190,7 +194,8 @@ namespace ToyShop.Application.Features.Products
                 Mrp = request.Mrp > 0 ? request.Mrp : request.Price,
                 StockQuantity = request.StockQuantity,
                 CategoryId = request.CategoryId,
-                IsActive = true
+                IsActive = true,
+                BadgeLabel = request.BadgeLabel
             };
 
             if (request.Images != null && request.Images.Count > 0)
@@ -235,6 +240,7 @@ namespace ToyShop.Application.Features.Products
             product.StockQuantity = request.StockQuantity;
             product.CategoryId = request.CategoryId;
             product.IsActive = request.IsActive;
+            product.BadgeLabel = request.BadgeLabel;
             product.UpdatedDate = DateTimeOffset.UtcNow;
 
             // Simple update images logic: Soft delete existing ones, then add new ones

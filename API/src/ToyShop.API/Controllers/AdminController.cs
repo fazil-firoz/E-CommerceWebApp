@@ -17,6 +17,15 @@ namespace ToyShop.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost("change-password")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<BaseResponse<bool>>> ChangePassword(AdminChangePasswordCommand command)
+        {
+            var result = await Mediator.Send(command);
+            if (!result.Success) return BadRequest(result);
+            return Ok(result);
+        }
+
         [HttpGet("dashboard-stats")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<BaseResponse<DashboardStatsDto>>> GetDashboardStats()

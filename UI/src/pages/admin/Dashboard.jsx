@@ -1,21 +1,161 @@
 import React, { useState, useEffect } from 'react';
-import { Card, Col, Row, Statistic, Spin, Typography, Space, Table, Tag, Button, message } from 'antd';
+import { Card, Col, Row, Statistic, Spin, Typography, Space, Table, Tag, Button, message, Tooltip } from 'antd';
 import { 
   ShoppingOutlined, 
   DollarOutlined, 
   FileTextOutlined, 
   FieldTimeOutlined,
-  ArrowRightOutlined
+  ArrowRightOutlined,
+  RightOutlined,
+  DownOutlined,
+  PieChartOutlined,
+  BarChartOutlined,
+  RiseOutlined
 } from '@ant-design/icons';
 import { adminApi } from '../../api/adminApi';
 import { orderApi } from '../../api/orderApi';
+import { reportApi } from '../../api/reportApi';
+import { categoryApi } from '../../api/categoryApi';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
 
+// 🥧 Donut / Pie Chart Component
+const OrderStatusDonutChart = ({ data }) => {
+  const total = data.reduce((sum, item) => sum + item.count, 0) || 1;
+  let cumulativeAngle = 0;
+
+  const radius = 55;
+  const strokeWidth = 22;
+  const center = 75;
+  const circumference = 2 * Math.PI * radius;
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-around', flexWrap: 'wrap', gap: '20px' }}>
+      <div style={{ position: 'relative', width: '150px', height: '150px' }}>
+        <svg width="150" height="150" viewBox="0 0 150 150">
+          {data.map((item, index) => {
+            const percentage = item.count / total;
+            const strokeDasharray = `${percentage * circumference} ${circumference}`;
+            const strokeDashoffset = -cumulativeAngle * circumference;
+            cumulativeAngle += percentage;
+
+            return (
+              <circle
+                key={index}
+                cx={center}
+                cy={center}
+                r={radius}
+                fill="transparent"
+                stroke={item.color}
+                strokeWidth={strokeWidth}
+                strokeDasharray={strokeDasharray}
+                strokeDashoffset={strokeDashoffset}
+                transform={`rotate(-90 ${center} ${center})`}
+                style={{ transition: 'all 0.5s ease' }}
+              />
+            );
+          })}
+        </svg>
+        <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+          <Text style={{ fontSize: '20px', fontWeight: 800, color: '#1a1a1a' }}>{total}</Text>
+          <Text type="secondary" style={{ fontSize: '11px' }}>Orders</Text>
+        </div>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        {data.map((item, index) => {
+          const pct = Math.round((item.count / total) * 100);
+          return (
+            <div key={index} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ width: '10px', height: '10px', borderRadius: '3px', background: item.color }} />
+              <Text style={{ fontSize: '12px', width: '80px' }}>{item.label}</Text>
+              <Tag color="default" style={{ margin: 0, fontWeight: 600, fontSize: '11px' }}>{item.count} ({pct}%)</Tag>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
+// 📊 Category Revenue Bar Chart
+const CategoryRevenueBarChart = ({ data }) => {
+  const maxRevenue = Math.max(...data.map(d => d.revenue), 1);
+
+  if (!data || data.length === 0) {
+    return <Text type="secondary" style={{ fontSize: '13px' }}>No sales breakdown data available yet.</Text>;
+  }
+
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+      {data.map((item, idx) => {
+        const pct = Math.round((item.revenue / maxRevenue) * 100);
+        return (
+          <div key={idx}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+              <Text strong style={{ fontSize: '13px' }}>{item.category}</Text>
+              <Text strong style={{ color: '#1890ff', fontSize: '13px' }}>₹{item.revenue.toLocaleString('en-IN')}</Text>
+            </div>
+            <div style={{ width: '100%', height: '12px', background: '#f5f5f5', borderRadius: '6px', overflow: 'hidden' }}>
+              <div
+                style={{
+                  width: `${Math.max(pct, 5)}%`,
+                  height: '100%',
+                  background: item.color || 'linear-gradient(90deg, #1890ff, #722ed1)',
+                  borderRadius: '6px',
+                  transition: 'width 0.8s ease'
+                }}
+              />
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+// 📈 Monthly Trend Bar Chart
+const MonthlyTrendBarChart = ({ data }) => {
+  const maxVal = Math.max(...data.map(d => d.revenue), 1);
+  const chartHeight = 130;
+
+  return (
+    <div style={{ display: 'flex', alignItems: 'flex-end', justifyContent: 'space-around', height: `${chartHeight + 35}px`, padding: '10px 0 0 0' }}>
+      {data.map((item, idx) => {
+        const barHeight = Math.max(Math.round((item.revenue / maxVal) * chartHeight), 8);
+        return (
+          <div key={idx} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', flex: 1, gap: '6px' }}>
+            <Text type="secondary" style={{ fontSize: '10px', fontWeight: 600 }}>
+              {item.revenue > 0 ? `₹${Math.round(item.revenue / 1000)}k` : '₹0'}
+            </Text>
+            <Tooltip title={`₹${item.revenue.toLocaleString('en-IN')} (${item.count} orders)`}>
+              <div
+                style={{
+                  width: '55%',
+                  maxWidth: '26px',
+                  height: `${barHeight}px`,
+                  background: 'linear-gradient(180deg, #1890ff 0%, #002140 100%)',
+                  borderRadius: '6px 6px 0 0',
+                  transition: 'height 0.6s ease',
+                  cursor: 'pointer'
+                }}
+              />
+            </Tooltip>
+            <Text strong style={{ fontSize: '11px', color: '#595959' }}>{item.month}</Text>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
 const Dashboard = () => {
   const [stats, setStats] = useState(null);
   const [recentOrders, setRecentOrders] = useState([]);
+  const [salesReportData, setSalesReportData] = useState(null);
+  const [categoriesList, setCategoriesList] = useState([]);
+  const [showGraphicalView, setShowGraphicalView] = useState(false);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
@@ -24,9 +164,13 @@ const Dashboard = () => {
       try {
         const statsRes = await adminApi.getDashboardStats();
         const ordersRes = await orderApi.getAll();
+        const salesRes = await reportApi.getSalesReport();
+        const catRes = await categoryApi.getAll();
 
         if (statsRes.success) setStats(statsRes.data);
         if (ordersRes.success) setRecentOrders((ordersRes.data || []).slice(0, 5));
+        if (salesRes.success) setSalesReportData(salesRes.data);
+        if (catRes.success) setCategoriesList(catRes.data || []);
       } catch (err) {
         message.error('Failed to load dashboard metrics');
       } finally {
@@ -50,20 +194,72 @@ const Dashboard = () => {
     border: '1px solid #f0f0f0'
   };
 
+  // Compute Order Status Donut Chart Data (100% accurate paid orders count)
+  const allOrdersList = (salesReportData?.items || recentOrders || []).filter(o => !o.paymentStatus || o.paymentStatus === 'Success');
+  const statusCounts = { Delivered: 0, Shipped: 0, Processing: 0, Pending: 0, Cancelled: 0 };
+  allOrdersList.forEach(o => {
+    const st = o.orderStatus || 'Pending';
+    if (statusCounts[st] !== undefined) statusCounts[st]++;
+    else statusCounts['Pending']++;
+  });
+
+  const orderStatusData = [
+    { label: 'Delivered', count: statusCounts.Delivered, color: '#52c41a' },
+    { label: 'Shipped', count: statusCounts.Shipped, color: '#13c2c2' },
+    { label: 'Processing', count: statusCounts.Processing, color: '#1890ff' },
+    { label: 'Pending', count: statusCounts.Pending, color: '#fa8c16' },
+    { label: 'Cancelled', count: statusCounts.Cancelled, color: '#ff4d4f' }
+  ].filter(d => d.count > 0 || allOrdersList.length === 0);
+
+  // Compute Category Sales Bar Chart Data (100% accurate category sum across all store categories)
+  const categoryMap = {};
+  categoriesList.forEach(c => {
+    if (c.name) categoryMap[c.name] = 0;
+  });
+
+  if (salesReportData?.items) {
+    salesReportData.items.forEach(order => {
+      const orderItems = order.orderItems || order.items || [];
+      orderItems.forEach(item => {
+        const catName = item.categoryName || 'General Toys';
+        categoryMap[catName] = (categoryMap[catName] || 0) + (item.subtotal || item.unitPrice * item.quantity);
+      });
+    });
+  }
+
+  const palette = ['#1890ff', '#722ed1', '#eb2f96', '#fa8c16', '#52c41a', '#13c2c2'];
+  const categoryChartData = Object.keys(categoryMap).map((cat, idx) => ({
+    category: cat,
+    revenue: categoryMap[cat],
+    color: palette[idx % palette.length]
+  }));
+
+  // Compute Monthly Sales Trend Data (100% accurate date-based revenue sum)
+  const monthMap = {};
+  if (salesReportData?.items) {
+    salesReportData.items.forEach(order => {
+      if (order.orderDate) {
+        const d = new Date(order.orderDate);
+        const monthKey = d.toLocaleString('en-US', { month: 'short' });
+        if (!monthMap[monthKey]) {
+          monthMap[monthKey] = { revenue: 0, count: 0 };
+        }
+        monthMap[monthKey].revenue += order.totalAmount;
+        monthMap[monthKey].count += 1;
+      }
+    });
+  }
+
+  const monthlyTrendData = Object.keys(monthMap).map(m => ({
+    month: m,
+    revenue: monthMap[m].revenue,
+    count: monthMap[m].count
+  }));
+
   const columns = [
     { title: 'Order #', dataIndex: 'orderNumber', key: 'orderNumber', render: (val) => <Text strong>{val}</Text> },
     { title: 'Customer', dataIndex: ['customer', 'name'], key: 'customerName' },
     { title: 'Date', dataIndex: 'orderDate', key: 'orderDate', render: (date) => new Date(date).toLocaleDateString() },
-    { 
-      title: 'Payment', 
-      dataIndex: 'paymentStatus', 
-      key: 'paymentStatus', 
-      render: (status) => (
-        <Tag color={status === 'Success' ? 'green' : status === 'Failed' ? 'red' : 'orange'}>
-          {status}
-        </Tag>
-      ) 
-    },
     { 
       title: 'Order Status', 
       dataIndex: 'orderStatus', 
@@ -89,11 +285,42 @@ const Dashboard = () => {
 
   return (
     <Space direction="vertical" size={24} style={{ width: '100%' }}>
-      <div>
-        <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Admin Dashboard</Title>
-        <Text type="secondary">Real-time metrics and store performance overview</Text>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+        <div>
+          <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Admin Dashboard</Title>
+          <Text type="secondary">Real-time metrics, store performance, and visual analytics</Text>
+        </div>
+
+        <Tooltip title={showGraphicalView ? "Hide Visual Analytics Charts" : "View Graphical Analytics (Bar & Pie Charts)"}>
+          <Button
+            type={showGraphicalView ? 'primary' : 'default'}
+            icon={<BarChartOutlined style={{ color: showGraphicalView ? '#fff' : '#1890ff', fontSize: '15px' }} />}
+            onClick={() => setShowGraphicalView(!showGraphicalView)}
+            style={{ 
+              borderRadius: '20px', 
+              fontWeight: 600, 
+              fontSize: '13px',
+              height: '36px',
+              padding: '0 16px',
+              display: 'flex', 
+              alignItems: 'center', 
+              gap: '6px',
+              border: showGraphicalView ? 'none' : '1px solid #d9d9d9',
+              background: showGraphicalView ? '#1890ff' : '#fff',
+              boxShadow: showGraphicalView ? '0 4px 12px rgba(24, 144, 255, 0.3)' : '0 2px 4px rgba(0,0,0,0.03)'
+            }}
+          >
+            <span></span>
+            {showGraphicalView ? (
+              <DownOutlined style={{ fontSize: '10px', marginLeft: '2px' }} />
+            ) : (
+              <RightOutlined style={{ fontSize: '10px', color: '#1890ff', marginLeft: '2px' }} />
+            )}
+          </Button>
+        </Tooltip>
       </div>
 
+      {/* KPI Statistics Cards */}
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} lg={4.8} style={{ width: '20%' }}>
           <Card style={cardStyle} bodyStyle={{ padding: '20px' }}>
@@ -152,6 +379,40 @@ const Dashboard = () => {
         </Col>
       </Row>
 
+      {/* 📊 Graphical Visual Analytics Section (Toggled by Right Arrow / Button) */}
+      {showGraphicalView && (
+        <Card
+          style={{ ...cardStyle, background: 'linear-gradient(180deg, #fafafa 0%, #ffffff 100%)' }}
+          title={
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <BarChartOutlined style={{ color: '#1890ff', fontSize: '18px' }} />
+              <span style={{ fontWeight: 700 }}>Graphical Visual Analytics & Store Trends</span>
+            </div>
+          }
+        >
+          <Row gutter={[24, 24]}>
+            <Col xs={24} md={8}>
+              <Card type="inner" title={<span style={{ fontSize: '14px', fontWeight: 600 }}>🥧 Order Status Distribution</span>} style={{ borderRadius: '12px', height: '100%' }}>
+                <OrderStatusDonutChart data={orderStatusData} />
+              </Card>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Card type="inner" title={<span style={{ fontSize: '14px', fontWeight: 600 }}>📊 Category Revenue Breakdown</span>} style={{ borderRadius: '12px', height: '100%' }}>
+                <CategoryRevenueBarChart data={categoryChartData} />
+              </Card>
+            </Col>
+
+            <Col xs={24} md={8}>
+              <Card type="inner" title={<span style={{ fontSize: '14px', fontWeight: 600 }}>📈 Revenue Growth & Sales Trend</span>} style={{ borderRadius: '12px', height: '100%' }}>
+                <MonthlyTrendBarChart data={monthlyTrendData} />
+              </Card>
+            </Col>
+          </Row>
+        </Card>
+      )}
+
+      {/* Recent Orders Table */}
       <Card 
         style={cardStyle} 
         title={<span style={{ fontWeight: 700 }}>Recent Orders</span>}

@@ -262,7 +262,7 @@ const ReportManagement = () => {
 
     let tableHeaders = isStock
       ? '<th>ID</th><th>Toy Name</th><th>Category</th><th>MRP</th><th>Price</th><th>Stock</th><th>Valuation</th><th>Status</th>'
-      : '<th>Order #</th><th>Date</th><th>Customer</th><th>Phone</th><th>Items</th><th>Status</th><th>Total Revenue</th>';
+      : '<th>Order #</th><th>Date</th><th>Customer</th><th>Phone</th><th>Items</th><th>Coupon Discount</th><th>Status</th><th>Net Revenue</th>';
 
     let tableRows = '';
     items.forEach((item) => {
@@ -281,6 +281,9 @@ const ReportManagement = () => {
         `;
       } else {
         const dateStr = dayjs(item.orderDate).format('DD MMM YYYY, hh:mm A');
+        const discountText = item.discountAmount > 0
+          ? `<span style="color: #2e7d32; font-weight: 700;">-${item.couponCode ? ` (${item.couponCode})` : ''} ₹${item.discountAmount.toLocaleString('en-IN')}</span>`
+          : '<span style="color: #8c8c8c;">None</span>';
         tableRows += `
           <tr>
             <td style="color: #0288d1; font-weight: 700;">${item.orderNumber}</td>
@@ -288,6 +291,7 @@ const ReportManagement = () => {
             <td><strong>${item.customerName}</strong></td>
             <td>${item.customerPhone}</td>
             <td style="text-align: center;">${item.totalItems}</td>
+            <td style="text-align: center;">${discountText}</td>
             <td><span class="badge ${item.orderStatus}">${item.orderStatus}</span></td>
             <td style="color: #d32f2f; font-weight: 700;">₹${item.totalAmount.toLocaleString('en-IN')}</td>
           </tr>
@@ -308,7 +312,7 @@ const ReportManagement = () => {
         <tr class="total-row">
           <td colspan="4"><strong>TOTAL SUMMARY (${items.length} Orders)</strong></td>
           <td style="text-align: center;"><strong>${totalItemsSum} Items</strong></td>
-          <td style="text-align: right;"><strong>SUM OF TOTAL REVENUE:</strong></td>
+          <td colspan="2" style="text-align: right;"><strong>SUM OF TOTAL REVENUE:</strong></td>
           <td style="color: #2e7d32; font-size: 16px; font-weight: 800;">₹${totalRevenueSum.toLocaleString('en-IN')}</td>
         </tr>
       `;
@@ -526,6 +530,24 @@ const ReportManagement = () => {
       }
     },
     {
+      title: 'Coupon Discount',
+      dataIndex: 'discountAmount',
+      key: 'discountAmount',
+      align: 'center',
+      render: (val, record) => val > 0 ? (
+        <Space direction="vertical" size={0}>
+          <Tag color="success" style={{ fontWeight: 700, margin: 0 }}>
+            🏷️ {record.couponCode || 'COUPON'}
+          </Tag>
+          <Text style={{ color: '#52c41a', fontWeight: 600, fontSize: '12px' }}>
+            - ₹{val.toLocaleString('en-IN')}
+          </Text>
+        </Space>
+      ) : (
+        <Text type="secondary" style={{ fontSize: '12px' }}>—</Text>
+      )
+    },
+    {
       title: 'Total Revenue (₹)',
       dataIndex: 'totalAmount',
       key: 'totalAmount',
@@ -536,6 +558,10 @@ const ReportManagement = () => {
 
   // Expanded Order Items Table
   const expandedOrderItemsRender = (record) => {
+    const itemsSubtotal = (record.orderItems || []).reduce((sum, item) => sum + (item.subtotal || (item.unitPrice * item.quantity)), 0);
+    const discountAmt = record.discountAmount || 0;
+    const couponCode = record.couponCode || '';
+
     const itemColumns = [
       {
         title: 'Item Thumbnail',
@@ -592,6 +618,39 @@ const ReportManagement = () => {
           pagination={false}
           size="small"
         />
+
+        <div style={{
+          marginTop: '12px',
+          padding: '12px 16px',
+          background: '#ffffff',
+          borderRadius: '10px',
+          border: '1px solid #e8e8e8',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'flex-end',
+          gap: '6px'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '300px' }}>
+            <Text type="secondary">Items Subtotal:</Text>
+            <Text strong>₹{itemsSubtotal.toLocaleString('en-IN')}</Text>
+          </div>
+          {discountAmt > 0 && (
+            <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '300px' }}>
+              <Text style={{ color: '#52c41a', fontWeight: 600 }}>
+                Less: Coupon Discount ({couponCode || 'COUPON'}):
+              </Text>
+              <Text strong style={{ color: '#52c41a' }}>
+                - ₹{discountAmt.toLocaleString('en-IN')}
+              </Text>
+            </div>
+          )}
+          <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '300px', borderTop: '1px solid #f0f0f0', paddingTop: '6px' }}>
+            <Text strong style={{ fontSize: '15px' }}>Net Total Revenue:</Text>
+            <Text strong style={{ fontSize: '16px', color: '#ff4d4f' }}>
+              ₹{record.totalAmount.toLocaleString('en-IN')}
+            </Text>
+          </div>
+        </div>
       </Card>
     );
   };

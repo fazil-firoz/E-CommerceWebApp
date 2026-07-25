@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
+import { WishlistProvider } from './context/WishlistContext';
 import { AdminAuthProvider as AuthProvider } from './context/AdminAuthContext';
 import { CustomerAuthProvider } from './context/CustomerAuthContext';
 
@@ -13,6 +14,7 @@ import Home from './pages/customer/Home';
 import ProductListing from './pages/customer/ProductListing';
 import ProductDetails from './pages/customer/ProductDetails';
 import Cart from './pages/customer/Cart';
+import Wishlist from './pages/customer/Wishlist';
 import Checkout from './pages/customer/Checkout';
 import OrderSuccess from './pages/customer/OrderSuccess';
 import AboutUs from './pages/customer/AboutUs';
@@ -30,8 +32,12 @@ import CategoryManagement from './pages/admin/CategoryManagement';
 import ProductManagement from './pages/admin/ProductManagement';
 import OrderManagement from './pages/admin/OrderManagement';
 import ShopManagement from './pages/admin/ShopManagement';
-import AppControl from './pages/admin/AppControl';
+import ShipmentManagement from './pages/admin/ShipmentManagement';
+import InvoiceManagement from './pages/admin/InvoiceManagement';
+import TaxManagement from './pages/admin/TaxManagement';
 import ReportManagement from './pages/admin/ReportManagement';
+import CouponManagement from './pages/admin/CouponManagement';
+import SuperAdminManagement from './pages/admin/SuperAdminManagement';
 
 function App() {
   return (
@@ -39,6 +45,7 @@ function App() {
       <AuthProvider>
         <CustomerAuthProvider>
         <CartProvider>
+        <WishlistProvider>
           <Routes>
             {/* Customer Routes */}
             <Route path="/" element={<CustomerLayout />}>
@@ -46,6 +53,7 @@ function App() {
               <Route path="products" element={<ProductListing />} />
               <Route path="products/:id" element={<ProductDetails />} />
               <Route path="cart" element={<Cart />} />
+              <Route path="wishlist" element={<Wishlist />} />
               <Route path="checkout" element={<Checkout />} />
               <Route path="order-success" element={<OrderSuccess />} />
               <Route path="about" element={<AboutUs />} />
@@ -67,10 +75,16 @@ function App() {
               <Route path="products" element={<ProductManagement />} />
               <Route path="orders" element={<OrderManagement />} />
               <Route path="reports" element={<ReportManagement />} />
-              <Route path="app-control" element={<AppControl />} />
+              <Route path="coupons" element={<CouponManagement />} />
+              <Route path="shipment-settings" element={<ShipmentManagement />} />
+              <Route path="app-control" element={<ShipmentManagement />} />
+              <Route path="invoice-settings" element={<InvoiceManagement />} />
+              <Route path="tax-settings" element={<TaxManagement />} />
               <Route path="shop-settings" element={<ShopManagement />} />
+              <Route path="super-admin" element={<SuperAdminManagement />} />
             </Route>
           </Routes>
+        </WishlistProvider>
         </CartProvider>
         </CustomerAuthProvider>
       </AuthProvider>

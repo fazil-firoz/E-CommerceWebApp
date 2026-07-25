@@ -1,10 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { Card, Col, Row, Input, List, Space, Typography, Spin, message, Empty, Button, Tooltip } from 'antd';
-import { SearchOutlined, AppstoreOutlined, ShoppingCartOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { SearchOutlined, AppstoreOutlined, ShoppingCartOutlined, ThunderboltOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
+import { superAdminApi } from '../../api/superAdminApi';
 import { CartContext } from '../../context/CartContext';
+import { WishlistContext } from '../../context/WishlistContext';
+import ProductBadge from '../../components/common/ProductBadge';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Text } = Typography;
@@ -13,12 +16,14 @@ const ProductListing = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
+  const { toggleWishlist, isInWishlist } = useContext(WishlistContext);
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState(searchParams.get('search') || '');
   const [addingId, setAddingId] = useState(null);
+  const [isWishlistEnabled, setIsWishlistEnabled] = useState(true);
 
   const categoryId = searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')) : null;
 
@@ -31,7 +36,20 @@ const ProductListing = () => {
         message.error('Failed to load categories');
       }
     };
+    const fetchControls = async () => {
+      try {
+        const res = await superAdminApi.getControlFlags();
+        if (res.success && res.data) {
+          setIsWishlistEnabled(res.data.isWishlistEnabled !== false);
+        }
+      } catch (err) {}
+    };
+
     fetchCategories();
+    fetchControls();
+
+    window.addEventListener('superAdminControlUpdated', fetchControls);
+    return () => window.removeEventListener('superAdminControlUpdated', fetchControls);
   }, []);
 
   useEffect(() => {
@@ -87,8 +105,20 @@ const ProductListing = () => {
   const handleBuyNow = (e, prod) => {
     e.stopPropagation();
     if (prod.stockQuantity === 0) return;
-    addToCart({ ...prod, imageUrls: prod.imageUrls }, 1, false);
-    navigate('/checkout');
+    const mainImageObj = prod.images?.find(i => i.isMain) || prod.images?.[0];
+    const mainImageUrl = mainImageObj?.imageUrl || prod.imageUrl || prod.imageUrls?.[0] || 'https://via.placeholder.com/200?text=Toy';
+
+    const buyNowItem = {
+      id: prod.id,
+      name: prod.name,
+      price: prod.price,
+      imageUrl: mainImageUrl,
+      imageUrls: prod.imageUrls && prod.imageUrls.length > 0 ? prod.imageUrls : [mainImageUrl],
+      quantity: 1,
+      stockQuantity: prod.stockQuantity,
+    };
+
+    navigate('/checkout', { state: { buyNowItem } });
   };
 
   return (
@@ -200,6 +230,29 @@ const ProductListing = () => {
                         }}
                         onClick={() => navigate(`/products/${prod.id}`)}
                       >
+                        <ProductBadge label={prod.badgeLabel} />
+                        {isWishlistEnabled && (
+                          <Button
+                            type="text"
+                            shape="circle"
+                            icon={isInWishlist(prod.id) ? <HeartFilled className="wishlist-heart-active" style={{ color: '#ff4d4f', fontSize: '18px' }} /> : <HeartOutlined style={{ color: '#ff4d4f', fontSize: '18px' }} />}
+                            onClick={(e) => toggleWishlist(prod, e)}
+                            className="wishlist-heart-btn"
+                            style={{
+                              position: 'absolute',
+                              top: 10,
+                              right: 10,
+                              zIndex: 12,
+                              background: 'rgba(255, 255, 255, 0.9)',
+                              backdropFilter: 'blur(4px)',
+                              border: '1px solid rgba(0,0,0,0.06)',
+                              boxShadow: '0 4px 10px rgba(0,0,0,0.12)',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center'
+                            }}
+                          />
+                        )}
                         {(() => {
                           const mainImage = prod.images?.find(img => img.isMain) || { imageUrl: prod.imageUrls?.[0], zoomScale: 1.0 };
                           const zoom = mainImage?.zoomScale || 1.0;

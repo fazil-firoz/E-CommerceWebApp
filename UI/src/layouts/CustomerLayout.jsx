@@ -6,13 +6,16 @@ import {
   DashboardOutlined, UserOutlined, PhoneOutlined, MailOutlined,
   EnvironmentOutlined, WhatsAppOutlined, ClockCircleOutlined,
   FacebookOutlined, InstagramOutlined, TwitterOutlined, YoutubeOutlined,
-  SafetyCertificateOutlined, LockOutlined, RocketOutlined, InfoCircleOutlined
+  SafetyCertificateOutlined, LockOutlined, RocketOutlined, InfoCircleOutlined,
+  HeartFilled
 } from '@ant-design/icons';
 import { CartContext } from '../context/CartContext';
+import { WishlistContext } from '../context/WishlistContext';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import LoginDrawer from '../components/LoginDrawer';
 import { shopApi } from '../api/shopApi';
+import { superAdminApi } from '../api/superAdminApi';
 import { resolveProductImageUrl } from '../utils/imageHelper';
 
 const { Header, Content, Footer } = Layout;
@@ -20,6 +23,7 @@ const { Title, Text, Paragraph } = Typography;
 
 const CustomerLayout = () => {
   const { cartCount } = useContext(CartContext);
+  const { wishlistCount } = useContext(WishlistContext);
   const { isAuthenticated } = useContext(AdminAuthContext);
   const { customer, isLoggedIn } = useCustomerAuth();
   const navigate = useNavigate();
@@ -27,8 +31,11 @@ const CustomerLayout = () => {
 
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
   const [shopSettings, setShopSettings] = useState(null);
+  const [superAdminControl, setSuperAdminControl] = useState({
+    isWhatsAppFloatingWidgetEnabled: true
+  });
 
-  // Fetch shop settings for footer data
+  // Fetch shop settings for footer data and Super Admin control flags
   useEffect(() => {
     const fetchShopInfo = async () => {
       try {
@@ -40,7 +47,23 @@ const CustomerLayout = () => {
         console.error('Failed to fetch shop info for footer', err);
       }
     };
+
+    const fetchSuperAdminControls = async () => {
+      try {
+        const res = await superAdminApi.getControl();
+        if (res.success && res.data) {
+          setSuperAdminControl(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch Super Admin control flags', err);
+      }
+    };
+
     fetchShopInfo();
+    fetchSuperAdminControls();
+
+    window.addEventListener('superAdminControlUpdated', fetchSuperAdminControls);
+    return () => window.removeEventListener('superAdminControlUpdated', fetchSuperAdminControls);
   }, []);
 
   const menuItems = [
@@ -52,7 +75,7 @@ const CustomerLayout = () => {
     {
       key: '/products',
       icon: <ShopOutlined />,
-      label: <Link to="/products">Toys Catalog</Link>,
+      label: <Link to="/products">Products</Link>,
     },
     {
       key: '/about',
@@ -81,7 +104,10 @@ const CustomerLayout = () => {
   const fullAddress = addressParts.length > 0 ? addressParts.join(', ') : 'Store Main Branch, City Center, India';
 
   const phone1 = shopSettings?.phone1 || '+91 9876543210';
-  const whatsapp = shopSettings?.whatsAppNumber || phone1;
+  const whatsappNumberRaw = shopSettings?.whatsAppNumber || shopSettings?.phone1 || '9876543210';
+  const cleanWhatsappNumber = whatsappNumberRaw.replace(/[^0-9]/g, '');
+  const whatsappUrl = `https://wa.me/${cleanWhatsappNumber}?text=${encodeURIComponent(`Hello ${shopName}! I have an inquiry about products on your store.`)}`;
+
   const email1 = shopSettings?.email1 || 'support@store.com';
   const openingHours = shopSettings?.openingHours || 'Mon - Sat: 9:00 AM - 8:00 PM';
 
@@ -95,7 +121,7 @@ const CustomerLayout = () => {
       {/* Sticky Header */}
       <Header style={{
         display: 'flex',
-        justifyContent: 'space-between',
+        justify: 'space-between',
         alignItems: 'center',
         background: '#fff',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
@@ -180,6 +206,21 @@ const CustomerLayout = () => {
               )}
             </Button>
           </Tooltip>
+
+          {/* Wishlist Header Icon */}
+          {superAdminControl.isWishlistEnabled !== false && (
+            <Link to="/wishlist">
+              <Badge count={wishlistCount} offset={[2, 0]} color="#ff4d4f">
+                <Button
+                  type="text"
+                  icon={<HeartFilled style={{ fontSize: '20px', color: '#ff4d4f' }} />}
+                  style={{ height: '40px', display: 'flex', alignItems: 'center', borderRadius: '8px', padding: '0 10px' }}
+                >
+                  <span style={{ marginLeft: '4px', fontWeight: 600, color: '#ff4d4f' }}>Wishlist</span>
+                </Button>
+              </Badge>
+            </Link>
+          )}
 
           {/* Cart */}
           <Link to="/cart">
@@ -291,7 +332,7 @@ const CustomerLayout = () => {
                 </Space>
                 <Space align="center">
                   <WhatsAppOutlined style={{ color: '#25D366' }} />
-                  <span><strong>WhatsApp:</strong> <a href={`https://wa.me/${whatsapp.replace(/[^0-9]/g, '')}`} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', fontWeight: 600 }}>{whatsapp}</a></span>
+                  <span><strong>WhatsApp:</strong> <a href={whatsappUrl} target="_blank" rel="noopener noreferrer" style={{ color: '#25D366', fontWeight: 600 }}>{whatsappNumberRaw}</a></span>
                 </Space>
                 <Space align="center">
                   <MailOutlined style={{ color: '#ec4899' }} />
@@ -325,6 +366,50 @@ const CustomerLayout = () => {
           </Row>
         </div>
       </Footer>
+
+      {/* 💬 Floating WhatsApp Live Chatbot Button (Fixed Bottom-Right with Up & Down Bounce) */}
+      {superAdminControl.isWhatsAppFloatingWidgetEnabled && (
+        <Tooltip title="Chat with us on WhatsApp" placement="left">
+          <a
+            href={whatsappUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="whatsapp-float-widget"
+            style={{
+              position: 'fixed',
+              bottom: '28px',
+              right: '28px',
+              width: '58px',
+              height: '58px',
+              borderRadius: '50%',
+              backgroundColor: '#25D366',
+              color: '#ffffff',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 9999,
+              cursor: 'pointer',
+              transition: 'all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275)',
+              textDecoration: 'none'
+            }}
+          >
+            <WhatsAppOutlined style={{ fontSize: '32px' }} />
+            {/* Subtle active online badge indicator */}
+            <span
+              style={{
+                position: 'absolute',
+                top: '2px',
+                right: '2px',
+                width: '13px',
+                height: '13px',
+                backgroundColor: '#52c41a',
+                border: '2px solid #ffffff',
+                borderRadius: '50%'
+              }}
+            />
+          </a>
+        </Tooltip>
+      )}
 
       {/* Customer Login Drawer */}
       <LoginDrawer open={loginDrawerOpen} onClose={() => setLoginDrawerOpen(false)} />

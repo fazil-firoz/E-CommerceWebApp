@@ -12,6 +12,7 @@ namespace ToyShop.Domain.Entities
         public int StockQuantity { get; set; }
         public int CategoryId { get; set; }
         public bool IsActive { get; set; } = true;
+        public string? BadgeLabel { get; set; }
 
         public Category? Category { get; set; }
         public ICollection<ProductImage> Images { get; set; } = new List<ProductImage>();

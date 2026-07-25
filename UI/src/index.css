@@ -60,3 +60,126 @@ code {
 .ant-menu-horizontal {
   line-height: 64px;
 }
+
+/* Floating WhatsApp Up & Down Attention Bouncing Animation */
+@keyframes whatsappFloatBounce {
+  0%, 100% {
+    transform: translateY(0);
+    box-shadow: 0 6px 20px rgba(37, 211, 102, 0.45);
+  }
+  50% {
+    transform: translateY(-10px);
+    box-shadow: 0 14px 28px rgba(37, 211, 102, 0.6);
+  }
+}
+
+.whatsapp-float-widget {
+  animation: whatsappFloatBounce 2.4s ease-in-out infinite;
+}
+
+.whatsapp-float-widget:hover {
+  animation-play-state: paused;
+  transform: scale(1.12) translateY(-4px) !important;
+  box-shadow: 0 16px 32px rgba(37, 211, 102, 0.7) !important;
+}
+
+/* Card-Hugging Corner Ribbon Badge Shining Effect */
+@keyframes productRibbonShine {
+  0% {
+    left: -120%;
+  }
+  25% {
+    left: 180%;
+  }
+  100% {
+    left: 180%;
+  }
+}
+
+.corner-ribbon-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 90px;
+  height: 90px;
+  overflow: hidden;
+  z-index: 10;
+  pointer-events: none;
+}
+
+.corner-ribbon {
+  position: absolute;
+  top: 18px;
+  left: -35px;
+  width: 140px;
+  padding: 5px 0;
+  text-align: center;
+  font-size: 10px;
+  font-weight: 800;
+  color: #ffffff;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  transform: rotate(-45deg);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  line-height: 1.2;
+}
+
+.corner-ribbon::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -120%;
+  width: 50%;
+  height: 200%;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.75) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  transform: rotate(25deg);
+  animation: productRibbonShine 3.2s infinite ease-in-out;
+}
+
+/* Ribbon Color themes */
+.badge-theme-new {
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.badge-theme-bestseller {
+  background: linear-gradient(135deg, #ff7a00 0%, #ff4d00 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.badge-theme-popular {
+  background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.badge-theme-limitedstock {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Heart Love Pop Animation for Wishlist Button */
+@keyframes heartPopScale {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.45) rotate(-10deg); }
+  80% { transform: scale(0.9) rotate(5deg); }
+  100% { transform: scale(1) rotate(0deg); }
+}
+
+.wishlist-heart-btn {
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.wishlist-heart-btn:active {
+  animation: heartPopScale 0.4s ease-in-out;
+}
+
+.wishlist-heart-active {
+  color: #ff4d4f !important;
+  animation: heartPopScale 0.45s ease-in-out;
+}

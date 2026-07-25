@@ -1,20 +1,30 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Button, Typography } from 'antd';
-import { 
-  DashboardOutlined, 
-  FolderOutlined, 
-  ShoppingOutlined, 
-  SolutionOutlined, 
+import { Layout, Menu, Button, Typography, Modal, Form, Input, message, Dropdown, Avatar } from 'antd';
+import {
+  DashboardOutlined,
+  FolderOutlined,
+  ShoppingOutlined,
+  SolutionOutlined,
   LogoutOutlined,
   HomeOutlined,
   ShopOutlined,
   ControlOutlined,
   BarChartOutlined,
-  UserOutlined
+  UserOutlined,
+  KeyOutlined,
+  LockOutlined,
+  DownOutlined,
+  CrownOutlined,
+  TruckOutlined,
+  FileTextOutlined,
+  PercentageOutlined,
+  TagOutlined
 } from '@ant-design/icons';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import { shopApi } from '../api/shopApi';
+import { adminApi } from '../api/adminApi';
+import { superAdminApi } from '../api/superAdminApi';
 
 const { Header, Content, Sider } = Layout;
 
@@ -23,6 +33,16 @@ const AdminLayout = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [shopSettings, setShopSettings] = useState(null);
+  const [superAdminControl, setSuperAdminControl] = useState({
+    isShopSettingsMenuEnabled: true,
+    isAppControlMenuEnabled: true,
+    isWhatsAppFloatingWidgetEnabled: true
+  });
+
+  // Change Password Modal state
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [form] = Form.useForm();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -41,12 +61,58 @@ const AdminLayout = () => {
         console.error('Failed to fetch shop settings for admin layout', err);
       }
     };
+
+    const fetchSuperAdminControls = async () => {
+      try {
+        const res = await superAdminApi.getControl();
+        if (res.success && res.data) {
+          setSuperAdminControl(res.data);
+        }
+      } catch (err) {
+        console.error('Failed to fetch Super Admin controls', err);
+      }
+    };
+
     fetchShopInfo();
+    fetchSuperAdminControls();
+
+    window.addEventListener('superAdminControlUpdated', fetchSuperAdminControls);
+    return () => window.removeEventListener('superAdminControlUpdated', fetchSuperAdminControls);
   }, []);
 
   if (!isAuthenticated) {
     return null; // Don't render anything while redirecting
   }
+
+  const handleChangePassword = async (values) => {
+    if (values.newPassword !== values.confirmPassword) {
+      message.error('New password and confirm password do not match');
+      return;
+    }
+
+    setChangingPassword(true);
+    try {
+      const res = await adminApi.changePassword({
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
+        confirmPassword: values.confirmPassword
+      });
+
+      if (res.success) {
+        message.success(res.message || 'Password changed successfully!');
+        setPasswordModalOpen(false);
+        form.resetFields();
+      } else {
+        message.error(res.message || 'Failed to change password');
+      }
+    } catch (err) {
+      console.error('Change password error:', err);
+      const errMsg = err?.response?.data?.message || err?.message || 'Current password is incorrect or request failed';
+      message.error(errMsg);
+    } finally {
+      setChangingPassword(false);
+    }
+  };
 
   const menuItems = [
     {
@@ -69,20 +135,58 @@ const AdminLayout = () => {
       icon: <SolutionOutlined />,
       label: <Link to="/admin/orders">Orders</Link>,
     },
-    {
+    ...(superAdminControl.isReportsMenuEnabled !== false ? [{
       key: '/admin/reports',
       icon: <BarChartOutlined />,
       label: <Link to="/admin/reports">Reports</Link>,
-    },
-    {
-      key: '/admin/app-control',
-      icon: <ControlOutlined />,
-      label: <Link to="/admin/app-control">App Control</Link>,
-    },
-    {
+    }] : []),
+    ...(superAdminControl.isCouponMenuEnabled !== false ? [{
+      key: '/admin/coupons',
+      icon: <TagOutlined />,
+      label: <Link to="/admin/coupons">Coupons</Link>,
+    }] : []),
+    ...(superAdminControl.isShipmentSettingsMenuEnabled !== false && superAdminControl.isAppControlMenuEnabled !== false ? [{
+      key: '/admin/shipment-settings',
+      icon: <TruckOutlined />,
+      label: <Link to="/admin/shipment-settings">Shipment Settings</Link>,
+    }] : []),
+    ...(superAdminControl.isInvoiceSettingsMenuEnabled !== false ? [{
+      key: '/admin/invoice-settings',
+      icon: <FileTextOutlined />,
+      label: <Link to="/admin/invoice-settings">Invoice Settings</Link>,
+    }] : []),
+    ...(superAdminControl.isTaxSettingsMenuEnabled !== false ? [{
+      key: '/admin/tax-settings',
+      icon: <PercentageOutlined />,
+      label: <Link to="/admin/tax-settings">Tax Settings</Link>,
+    }] : []),
+    ...(superAdminControl.isShopSettingsMenuEnabled !== false ? [{
       key: '/admin/shop-settings',
       icon: <ShopOutlined />,
       label: <Link to="/admin/shop-settings">Shop Settings</Link>,
+    }] : []),
+    {
+      key: '/admin/super-admin',
+      icon: <CrownOutlined style={{ color: '#722ed1' }} />,
+      label: <Link to="/admin/super-admin">Super Admin</Link>,
+    },
+  ];
+
+  const adminProfileDropdownItems = [
+    {
+      key: 'change-password',
+      icon: <KeyOutlined style={{ color: '#fa8c16' }} />,
+      label: <span style={{ fontWeight: 500 }}>Change Password</span>,
+      onClick: () => setPasswordModalOpen(true),
+    },
+    {
+      type: 'divider',
+    },
+    {
+      key: 'logout',
+      icon: <LogoutOutlined style={{ color: '#ff4d4f' }} />,
+      label: <span style={{ fontWeight: 500, color: '#ff4d4f' }}>Logout</span>,
+      onClick: logout,
     },
   ];
 
@@ -90,7 +194,7 @@ const AdminLayout = () => {
 
   return (
     <Layout style={{ minHeight: '100vh' }}>
-      <Sider 
+      <Sider
         breakpoint="lg"
         collapsedWidth="0"
         style={{
@@ -98,10 +202,10 @@ const AdminLayout = () => {
           background: '#001529'
         }}
       >
-        <div style={{ 
-          height: '64px', 
-          display: 'flex', 
-          alignItems: 'center', 
+        <div style={{
+          height: '64px',
+          display: 'flex',
+          alignItems: 'center',
           padding: '0 24px',
           background: '#002140'
         }}>
@@ -109,22 +213,22 @@ const AdminLayout = () => {
             {shopName} Admin
           </Typography.Title>
         </div>
-        <Menu 
+        <Menu
           theme="dark"
-          mode="inline" 
-          selectedKeys={[location.pathname]} 
-          items={menuItems} 
+          mode="inline"
+          selectedKeys={[location.pathname]}
+          items={menuItems}
           style={{ padding: '16px 0' }}
         />
       </Sider>
 
       <Layout>
-        <Header style={{ 
-          background: '#fff', 
-          padding: '0 24px', 
+        <Header style={{
+          background: '#fff',
+          padding: '0 24px',
           height: '64px',
-          display: 'flex', 
-          justify: 'space-between', 
+          display: 'flex',
+          justify: 'space-between',
           alignItems: 'center',
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
           zIndex: 10
@@ -136,36 +240,43 @@ const AdminLayout = () => {
           </div>
 
           <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
-            <Button 
-              icon={<HomeOutlined />} 
+            <Button
+              icon={<HomeOutlined />}
               onClick={() => navigate('/')}
               style={{ borderRadius: '6px', display: 'flex', alignItems: 'center' }}
             >
               View Storefront
             </Button>
-            
-            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                <UserOutlined style={{ color: '#1890ff' }} />
-                <Typography.Text strong>{admin?.username || 'Admin'}</Typography.Text>
-              </div>
-              <Button 
-                type="text" 
-                danger 
-                icon={<LogoutOutlined />} 
-                onClick={logout}
-                style={{ borderRadius: '6px', display: 'flex', alignItems: 'center' }}
+
+            <Dropdown menu={{ items: adminProfileDropdownItems }} trigger={['click']} placement="bottomRight">
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  background: '#f5f5f5',
+                  padding: '6px 14px',
+                  borderRadius: '20px',
+                  cursor: 'pointer',
+                  border: '1px solid #e8e8e8',
+                  transition: 'all 0.2s ease',
+                  userSelect: 'none'
+                }}
               >
-                Logout
-              </Button>
-            </div>
+                <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
+                <Typography.Text strong style={{ fontSize: '13px', color: '#141414' }}>
+                  {admin?.username || 'Admin'}
+                </Typography.Text>
+                <DownOutlined style={{ fontSize: '10px', color: '#8c8c8c' }} />
+              </div>
+            </Dropdown>
           </div>
         </Header>
 
-        <Content style={{ 
-          margin: '24px', 
-          padding: '24px', 
-          background: '#fff', 
+        <Content style={{
+          margin: '24px',
+          padding: '24px',
+          background: '#fff',
           borderRadius: '8px',
           minHeight: '280px',
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
@@ -173,6 +284,102 @@ const AdminLayout = () => {
           <Outlet />
         </Content>
       </Layout>
+
+      {/* Change Password Modal */}
+      <Modal
+        title={
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <KeyOutlined style={{ color: '#fa8c16', fontSize: '18px' }} />
+            <span>Change Admin Password</span>
+          </div>
+        }
+        open={passwordModalOpen}
+        onCancel={() => { setPasswordModalOpen(false); form.resetFields(); }}
+        footer={null}
+        destroyOnClose
+        style={{ borderRadius: '12px' }}
+      >
+        <Typography.Paragraph type="secondary" style={{ fontSize: '13px', marginBottom: '20px' }}>
+          Enter your current password and set your new password below.
+        </Typography.Paragraph>
+
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={handleChangePassword}
+          requiredMark={false}
+        >
+          <Form.Item
+            label="Current Password"
+            name="currentPassword"
+            rules={[{ required: true, message: 'Please enter your current password' }]}
+          >
+            <Input.Password
+              prefix={<LockOutlined style={{ color: '#bfbfbf' }} />}
+              placeholder="Enter current password"
+              size="large"
+              style={{ borderRadius: '8px' }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="New Password"
+            name="newPassword"
+            rules={[
+              { required: true, message: 'Please enter a new password' },
+              { min: 6, message: 'Password must be at least 6 characters' }
+            ]}
+          >
+            <Input.Password
+              prefix={<KeyOutlined style={{ color: '#bfbfbf' }} />}
+              placeholder="Enter new password (min 6 characters)"
+              size="large"
+              style={{ borderRadius: '8px' }}
+            />
+          </Form.Item>
+
+          <Form.Item
+            label="Confirm New Password"
+            name="confirmPassword"
+            dependencies={['newPassword']}
+            rules={[
+              { required: true, message: 'Please confirm your new password' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('newPassword') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('The two passwords do not match!'));
+                },
+              }),
+            ]}
+          >
+            <Input.Password
+              prefix={<KeyOutlined style={{ color: '#bfbfbf' }} />}
+              placeholder="Re-enter new password"
+              size="large"
+              style={{ borderRadius: '8px' }}
+            />
+          </Form.Item>
+
+          <div style={{ display: 'flex', justify: 'flex-end', gap: '8px', marginTop: '24px' }}>
+            <Button
+              onClick={() => { setPasswordModalOpen(false); form.resetFields(); }}
+              style={{ borderRadius: '6px' }}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="primary"
+              htmlType="submit"
+              loading={changingPassword}
+              style={{ borderRadius: '6px', background: '#001529', borderColor: '#001529' }}
+            >
+              Update Password
+            </Button>
+          </div>
+        </Form>
+      </Modal>
     </Layout>
   );
 };

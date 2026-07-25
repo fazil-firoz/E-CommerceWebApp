@@ -47,7 +47,9 @@ namespace ToyShop.Application.Features.Orders
         string City,
         string State,
         string Pincode,
-        List<CreateOrderItemInput> Items
+        List<CreateOrderItemInput> Items,
+        string? CouponCode = null,
+        decimal DiscountAmount = 0
     ) : IRequest<BaseResponse<RazorpayOrderResponseDto>>;
 
     /// <summary>
@@ -80,6 +82,7 @@ namespace ToyShop.Application.Features.Orders
                 .Include(o => o.Address)
                 .Include(o => o.OrderItems)
                     .ThenInclude(oi => oi.Product)
+                .Where(o => o.PaymentStatus == PaymentStatus.Success)
                 .AsQueryable();
 
             if (request.OrderStatus.HasValue)
@@ -141,6 +144,8 @@ namespace ToyShop.Application.Features.Orders
             Id = o.Id,
             OrderNumber = o.OrderNumber,
             TotalAmount = o.TotalAmount,
+            CouponCode = o.CouponCode,
+            DiscountAmount = o.DiscountAmount,
             OrderStatus = o.OrderStatus.ToString(),
             PaymentStatus = o.PaymentStatus.ToString(),
             OrderDate = o.OrderDate,
@@ -289,13 +294,18 @@ namespace ToyShop.Application.Features.Orders
             // Generate unique Order Number
             var orderNumber = "ORD-" + DateTime.UtcNow.ToString("yyyyMMdd") + "-" + new Random().Next(1000, 9999);
 
+            // Apply discount if provided
+            var finalTotalAmount = request.DiscountAmount > 0 ? Math.Max(0, totalAmount - request.DiscountAmount) : totalAmount;
+
             // Create Order - store contact directly on order for guest tracking
             var order = new Order
             {
                 OrderNumber = orderNumber,
                 CustomerId = customer.Id,
                 AddressId = address.Id,
-                TotalAmount = totalAmount,
+                TotalAmount = finalTotalAmount,
+                CouponCode = request.CouponCode,
+                DiscountAmount = request.DiscountAmount,
                 OrderStatus = OrderStatus.Pending,
                 PaymentStatus = PaymentStatus.Pending,
                 CustomerEmail = request.CustomerEmail,
@@ -310,7 +320,7 @@ namespace ToyShop.Application.Features.Orders
             string razorpayOrderId;
             try
             {
-                razorpayOrderId = await _razorpayService.CreateOrderAsync(totalAmount, orderNumber, cancellationToken);
+                razorpayOrderId = await _razorpayService.CreateOrderAsync(finalTotalAmount, orderNumber, cancellationToken);
             }
             catch (Exception ex)
             {
