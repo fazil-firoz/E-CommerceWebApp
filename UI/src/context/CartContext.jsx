@@ -13,9 +13,9 @@ export const CartProvider = ({ children }) => {
     localStorage.setItem('toy_shop_cart', JSON.stringify(cartItems));
   }, [cartItems]);
 
-  const addToCart = (product, quantity = 1, showToast = true) => {
-    let messageType = 'success';
-    let messageText = `Added "${product.name}" to cart!`;
+  const addToCart = (product, quantity = 1, showToast = false) => {
+    let messageType = null;
+    let messageText = '';
 
     setCartItems((prevItems) => {
       const existingItem = prevItems.find((item) => item.id === product.id);
@@ -55,12 +55,8 @@ export const CartProvider = ({ children }) => {
       ];
     });
 
-    if (showToast) {
-      if (messageType === 'warning') {
-        message.warning(messageText);
-      } else {
-        message.success(messageText);
-      }
+    if (showToast && messageType === 'warning' && messageText) {
+      message.warning(messageText);
     }
   };
 

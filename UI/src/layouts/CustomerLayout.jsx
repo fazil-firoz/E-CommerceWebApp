@@ -70,23 +70,23 @@ const CustomerLayout = () => {
   const menuItems = [
     {
       key: '/',
-      icon: <HomeOutlined style={{ fontSize: '16px', color: '#1890ff' }} />,
-      label: <Link to="/" style={{ fontWeight: 600 }}>Home</Link>,
+      icon: <HomeOutlined />,
+      label: <Link to="/">Home</Link>,
     },
     {
       key: '/products',
-      icon: <ShopOutlined style={{ fontSize: '16px', color: '#722ed1' }} />,
-      label: <Link to="/products" style={{ fontWeight: 600 }}>Products</Link>,
+      icon: <ShopOutlined />,
+      label: <Link to="/products">Products</Link>,
     },
     {
       key: '/about',
-      icon: <InfoCircleOutlined style={{ fontSize: '16px', color: '#fa8c16' }} />,
-      label: <Link to="/about" style={{ fontWeight: 600 }}>About Us</Link>,
+      icon: <InfoCircleOutlined />,
+      label: <Link to="/about">About Us</Link>,
     },
     {
       key: '/contact',
-      icon: <PhoneOutlined style={{ fontSize: '16px', color: '#52c41a' }} />,
-      label: <Link to="/contact" style={{ fontWeight: 600 }}>Contact</Link>,
+      icon: <PhoneOutlined />,
+      label: <Link to="/contact">Contact</Link>,
     },
   ];
 
@@ -183,29 +183,27 @@ const CustomerLayout = () => {
         </div>
 
         {/* Right actions */}
-        <Space size={10} align="center">
+        <Space size={8} align="center">
           {/* Customer Login / Avatar */}
           <Tooltip title={isLoggedIn ? `Signed in as ${customer?.email}` : 'Sign in'} placement="bottom">
             <Button
               type="text"
               onClick={() => setLoginDrawerOpen(true)}
               style={{
-                height: '42px',
+                height: '40px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '6px',
-                borderRadius: '12px',
-                padding: '0 12px',
-                background: '#f8fafc',
-                border: '1px solid #e2e8f0'
+                borderRadius: '8px',
+                padding: '0 10px'
               }}
             >
               {isLoggedIn ? (
                 <Avatar
-                  size={28}
+                  size={32}
                   style={{
                     background: 'linear-gradient(135deg, #1677ff, #4096ff)',
-                    fontSize: '13px',
+                    fontSize: '14px',
                     fontWeight: 700,
                     cursor: 'pointer'
                   }}
@@ -214,12 +212,13 @@ const CustomerLayout = () => {
                 </Avatar>
               ) : (
                 <div style={{
-                  width: '28px', height: '28px',
+                  width: '32px', height: '32px',
+                  border: '2px solid #e0e0e0',
                   borderRadius: '50%',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  color: '#475569'
+                  color: '#595959'
                 }}>
-                  <UserOutlined style={{ fontSize: '16px', color: '#1890ff' }} />
+                  <UserOutlined style={{ fontSize: '15px' }} />
                 </div>
               )}
             </Button>
@@ -231,18 +230,10 @@ const CustomerLayout = () => {
               <Badge count={wishlistCount} offset={[2, 0]} color="#ff4d4f">
                 <Button
                   type="text"
-                  icon={<HeartFilled style={{ fontSize: '18px', color: '#ff4d4f' }} />}
-                  style={{
-                    height: '42px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    borderRadius: '12px',
-                    padding: '0 14px',
-                    background: '#fff1f0',
-                    border: '1px solid #ffccc7'
-                  }}
+                  icon={<HeartFilled style={{ fontSize: '20px', color: '#ff4d4f' }} />}
+                  style={{ height: '40px', display: 'flex', alignItems: 'center', borderRadius: '8px', padding: '0 10px' }}
                 >
-                  <span style={{ marginLeft: '4px', fontWeight: 700, color: '#ff4d4f', fontSize: '13px' }}>Wishlist</span>
+                  <span style={{ marginLeft: '4px', fontWeight: 600, color: '#ff4d4f' }}>Wishlist</span>
                 </Button>
               </Badge>
             </Link>
@@ -253,18 +244,10 @@ const CustomerLayout = () => {
             <Badge count={cartCount} offset={[2, 0]} color="#52c41a">
               <Button
                 type="text"
-                icon={<ShoppingCartOutlined style={{ fontSize: '20px', color: '#1890ff' }} />}
-                style={{
-                  height: '42px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  borderRadius: '12px',
-                  padding: '0 14px',
-                  background: '#e6f7ff',
-                  border: '1px solid #bae7ff'
-                }}
+                icon={<ShoppingCartOutlined style={{ fontSize: '22px', color: '#1890ff' }} />}
+                style={{ height: '40px', display: 'flex', alignItems: 'center', borderRadius: '8px', padding: '0 10px' }}
               >
-                <span style={{ marginLeft: '4px', fontWeight: 700, color: '#1890ff', fontSize: '13px' }}>Cart</span>
+                <span style={{ marginLeft: '4px', fontWeight: 600, color: '#1890ff' }}>Cart</span>
               </Button>
             </Badge>
           </Link>
@@ -273,15 +256,10 @@ const CustomerLayout = () => {
           {isAuthenticated && (
             <Button
               type="primary"
+              ghost
               icon={<DashboardOutlined />}
               onClick={() => navigate('/admin')}
-              style={{
-                borderRadius: '12px',
-                height: '42px',
-                fontWeight: 700,
-                background: '#001529',
-                borderColor: '#001529'
-              }}
+              style={{ borderRadius: '8px' }}
             >
               Dashboard
             </Button>
