@@ -21,6 +21,7 @@ import { shopApi } from '../../api/shopApi';
 import { superAdminApi } from '../../api/superAdminApi';
 import { CartContext } from '../../context/CartContext';
 import { WishlistContext } from '../../context/WishlistContext';
+import { ThemeContext } from '../../context/ThemeContext';
 import ProductBadge from '../../components/common/ProductBadge';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
@@ -31,6 +32,7 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
   const { toggleWishlist, isInWishlist } = useContext(WishlistContext);
+  const { activeTheme } = useContext(ThemeContext);
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -157,8 +159,16 @@ const ProductDetails = () => {
 
   const isOutOfStock = product.stockQuantity <= 0;
 
+  // Theme colors
+  const primaryColor = activeTheme?.primaryColor || '#ff6584';
+  const secondaryColor = activeTheme?.secondaryColor || '#ff85c0';
+  const accentColor = activeTheme?.accentColor || '#ff2a6d';
+  const cardBgColor = activeTheme?.cardBgColor || '#ffffff';
+  const textColor = activeTheme?.textColor || '#0f172a';
+
+
   return (
-    <Card style={{ borderRadius: '24px', boxShadow: '0 8px 24px rgba(0,0,0,0.02)', padding: '20px', border: '1px solid #f0f0f0' }}>
+    <Card style={{ borderRadius: '24px', boxShadow: `0 8px 24px ${primaryColor}10`, padding: '20px', border: `1px solid ${primaryColor}22`, background: cardBgColor, transition: 'all 0.3s ease' }}>
       <Row gutter={[40, 32]}>
         {/* Images Column */}
         <Col xs={24} md={10}>
@@ -175,23 +185,20 @@ const ProductDetails = () => {
                 <Button
                   type="text"
                   shape="circle"
-                  icon={isInWishlist(product.id) ? <HeartFilled className="wishlist-heart-active" style={{ color: '#ff4d4f', fontSize: '20px' }} /> : <HeartOutlined style={{ color: '#ff4d4f', fontSize: '20px' }} />}
+                  icon={isInWishlist(product.id)
+                    ? <HeartFilled className="wishlist-heart-active" style={{ color: accentColor, fontSize: '20px' }} />
+                    : <HeartOutlined style={{ color: accentColor, fontSize: '20px' }} />}
                   onClick={(e) => toggleWishlist(product, e)}
                   className="wishlist-heart-btn"
                   style={{
                     position: 'absolute',
-                    top: 14,
-                    right: 14,
-                    zIndex: 12,
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    top: 14, right: 14, zIndex: 12,
+                    background: 'rgba(255, 255, 255, 0.92)',
                     backdropFilter: 'blur(4px)',
                     border: '1px solid rgba(0,0,0,0.06)',
                     boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
-                    width: '42px',
-                    height: '42px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center'
+                    width: '42px', height: '42px',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center'
                   }}
                 />
               )}
@@ -247,16 +254,13 @@ const ProductDetails = () => {
                       carouselRef.current?.goTo(index);
                     }}
                     style={{
-                      width: '70px',
-                      height: '70px',
+                      width: '70px', height: '70px',
                       borderRadius: '10px',
                       overflow: 'hidden',
-                      border: currentSlide === index ? '2px solid #1890ff' : '1px solid #d9d9d9',
+                      border: currentSlide === index ? `2px solid ${primaryColor}` : '1px solid #d9d9d9',
                       cursor: 'pointer',
                       background: '#fff',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
                       padding: '4px',
                       transition: 'border-color 0.2s'
                     }}
@@ -279,25 +283,25 @@ const ProductDetails = () => {
           <Space direction="vertical" size={20} style={{ width: '100%' }}>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Tag color="#1890ff" style={{ borderRadius: '4px', fontSize: '13px', padding: '2px 10px' }}>
+                <Tag style={{ borderRadius: '4px', fontSize: '13px', padding: '2px 10px', background: `${primaryColor}18`, color: primaryColor, border: `1px solid ${primaryColor}40` }}>
                   {product.categoryName}
                 </Tag>
                 <Button
                   type="text"
-                  icon={<ShareAltOutlined style={{ fontSize: '18px', color: '#1890ff' }} />}
+                  icon={<ShareAltOutlined style={{ fontSize: '18px', color: primaryColor }} />}
                   onClick={handleShareProduct}
-                  style={{ borderRadius: '8px', color: '#1890ff', fontWeight: 600 }}
+                  style={{ borderRadius: '8px', color: primaryColor, fontWeight: 600 }}
                 >
                   Share
                 </Button>
               </div>
 
-              <Title level={2} style={{ margin: '12px 0 8px', fontWeight: 800 }}>
+              <Title level={2} style={{ margin: '12px 0 8px', fontWeight: 800, color: textColor }}>
                 {product.name}
               </Title>
 
               <Space align="baseline" style={{ display: 'flex', flexWrap: 'wrap' }}>
-                <Text strong style={{ fontSize: '32px', color: '#ff4d4f' }}>
+                <Text strong style={{ fontSize: '32px', color: primaryColor }}>
                   ₹{product.price.toLocaleString('en-IN')}
                 </Text>
                 {product.mrp > product.price && (
@@ -316,7 +320,7 @@ const ProductDetails = () => {
               </Text>
             </div>
 
-            <Card style={{ background: '#fcfcfc', borderRadius: '12px', border: '1px dashed #d9d9d9' }} bodyStyle={{ padding: '16px' }}>
+            <Card style={{ background: `${primaryColor}08`, borderRadius: '12px', border: `1px dashed ${primaryColor}40` }} styles={{ body: { padding: '16px' } }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <Text strong style={{ color: '#595959' }}>Availability Status:</Text>
                 <Tag color={isOutOfStock ? 'red' : product.stockQuantity < 5 ? 'orange' : 'green'} style={{ fontWeight: 'bold' }}>
@@ -362,7 +366,10 @@ const ProductDetails = () => {
                 icon={<ShoppingCartOutlined />}
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                style={{ height: '48px', minWidth: '150px', borderRadius: '12px', fontWeight: 600 }}
+                style={{
+                  height: '48px', minWidth: '150px', borderRadius: '12px', fontWeight: 600,
+                  borderColor: primaryColor, color: primaryColor
+                }}
               >
                 Add To Cart
               </Button>
@@ -373,32 +380,14 @@ const ProductDetails = () => {
                 onClick={handleBuyNow}
                 disabled={isOutOfStock}
                 style={{
-                  height: '48px',
-                  minWidth: '150px',
-                  borderRadius: '12px',
-                  fontWeight: 600,
-                  background: 'linear-gradient(135deg, #fa8c16 0%, #fc5531 100%)',
+                  height: '48px', minWidth: '150px', borderRadius: '12px', fontWeight: 600,
+                  background: isOutOfStock ? undefined : `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
                   border: 'none',
-                  boxShadow: isOutOfStock ? 'none' : '0 4px 15px rgba(250, 140, 22, 0.3)'
+                  boxShadow: isOutOfStock ? 'none' : `0 4px 15px ${primaryColor}40`
                 }}
               >
                 Buy Now
               </Button>
-              {/* <Button
-                size="large"
-                icon={<ShareAltOutlined />}
-                onClick={handleShareProduct}
-                style={{
-                  height: '48px',
-                  borderRadius: '12px',
-                  fontWeight: 600,
-                  borderColor: '#722ed1',
-                  color: '#722ed1',
-                  background: '#f9f0ff'
-                }}
-              >
-                Share
-              </Button> */}
             </div>
 
             <div style={{ marginTop: '24px', borderTop: '1px solid #f0f0f0', paddingTop: '20px' }}>
@@ -444,9 +433,9 @@ const ProductDetails = () => {
             alt={product.name}
             style={{ width: '60px', height: '60px', objectFit: 'contain', borderRadius: '8px', background: '#fff', border: '1px solid #eee' }}
           />
-          <div>
+          <div style={{ marginBottom: '16px' }}>
             <Text strong style={{ fontSize: '15px', display: 'block' }}>{product.name}</Text>
-            <Text strong style={{ color: '#ff4d4f', fontSize: '16px' }}>₹{product.price.toLocaleString('en-IN')}</Text>
+            <Text strong style={{ color: primaryColor, fontSize: '16px' }}>₹{product.price.toLocaleString('en-IN')}</Text>
           </div>
         </div>
 

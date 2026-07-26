@@ -87,8 +87,8 @@
 
 .checkout-input:focus,
 .checkout-input:hover {
-  border-color: #0066cc !important;
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.08) !important;
+  border-color: var(--checkout-primary, #0066cc) !important;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--checkout-primary, #0066cc) 12%, transparent) !important;
 }
 
 .checkout-input .ant-input {
@@ -102,10 +102,10 @@
 
 /* Payment box */
 .checkout-payment-box {
-  border: 2px solid #0066cc;
+  border: 2px solid var(--checkout-primary, #0066cc);
   border-radius: 10px;
   padding: 16px;
-  background: #f0f7ff;
+  background: color-mix(in srgb, var(--checkout-primary, #0066cc) 8%, white);
 }
 
 /* Billing */
@@ -120,16 +120,16 @@
 }
 
 .checkout-billing-selected {
-  border-color: #0066cc;
-  background: #f0f7ff;
+  border-color: var(--checkout-primary, #0066cc);
+  background: color-mix(in srgb, var(--checkout-primary, #0066cc) 8%, white);
 }
 
 .checkout-radio-dot {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  border: 2px solid #0066cc;
-  background: #0066cc;
+  border: 2px solid var(--checkout-primary, #0066cc);
+  background: var(--checkout-primary, #0066cc);
   position: relative;
   flex-shrink: 0;
 }
@@ -146,21 +146,19 @@
   transform: translate(-50%, -50%);
 }
 
-/* Pay button */
+/* Pay button — color now driven by inline style from ThemeContext */
 .checkout-pay-btn {
   height: 52px !important;
   border-radius: 10px !important;
   font-size: 16px !important;
   font-weight: 700 !important;
-  background: #0066cc !important;
   border: none !important;
-  box-shadow: 0 4px 14px rgba(0, 102, 204, 0.35) !important;
   transition: transform 0.15s, box-shadow 0.15s !important;
 }
 
 .checkout-pay-btn:hover {
   transform: translateY(-1px) !important;
-  box-shadow: 0 6px 20px rgba(0, 102, 204, 0.45) !important;
+  filter: brightness(1.06) !important;
 }
 
 .checkout-pay-btn:active {
