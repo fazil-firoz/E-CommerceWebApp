@@ -14,6 +14,7 @@ import { WishlistContext } from '../context/WishlistContext';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import LoginDrawer from '../components/LoginDrawer';
+import RecentSearchInput from '../components/common/RecentSearchInput';
 import { shopApi } from '../api/shopApi';
 import { superAdminApi } from '../api/superAdminApi';
 import { resolveProductImageUrl } from '../utils/imageHelper';
@@ -164,6 +165,22 @@ const CustomerLayout = () => {
           items={menuItems}
           style={{ flex: 1, marginLeft: '24px', borderBottom: 'none' }}
         />
+
+        {/* Header Quick Search with Recently Searched dropdown */}
+        <div style={{ margin: '0 16px', flex: '0 1 280px' }}>
+          <RecentSearchInput
+            placeholder="Search products..."
+            size="middle"
+            onSearch={(term) => {
+              if (term) {
+                navigate(`/products?search=${encodeURIComponent(term)}`);
+              } else {
+                navigate('/products');
+              }
+            }}
+            maxWidth="280px"
+          />
+        </div>
 
         {/* Right actions */}
         <Space size={8} align="center">

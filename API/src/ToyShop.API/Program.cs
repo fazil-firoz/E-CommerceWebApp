@@ -169,6 +169,7 @@ using (var scope = app.Services.CreateScope())
               ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""DiscountAmount"" NUMERIC NOT NULL DEFAULT 0.0;
 
               ALTER TABLE ""Products"" ADD COLUMN IF NOT EXISTS ""BadgeLabel"" VARCHAR(100) NULL;
+              ALTER TABLE ""Orders"" ADD COLUMN IF NOT EXISTS ""ShippingCharge"" NUMERIC(18,2) NOT NULL DEFAULT 0;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsShipmentSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsInvoiceSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsTaxSettingsMenuEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;

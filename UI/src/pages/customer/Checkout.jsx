@@ -176,7 +176,8 @@ const Checkout = () => {
         pincode: values.pincode,
         items: checkoutItems.map(item => ({ productId: item.id, quantity: item.quantity })),
         couponCode: appliedCoupon ? appliedCoupon.code : null,
-        discountAmount: couponDiscountAmount || 0
+        discountAmount: couponDiscountAmount || 0,
+        shippingCharge: shippingCharge || 0
       };
 
       const res = await orderApi.create(payload);

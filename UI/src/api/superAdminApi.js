@@ -20,5 +20,10 @@ export const superAdminApi = {
   updateControl: async (controlData) => {
     const response = await apiClient.put(URLS.SUPER_ADMIN.UPDATE_CONTROL, controlData);
     return response;
+  },
+
+  resetDatabase: async (confirmationWord) => {
+    const response = await apiClient.post(URLS.SUPER_ADMIN.RESET_DATABASE, { confirmationWord });
+    return response;
   }
 };

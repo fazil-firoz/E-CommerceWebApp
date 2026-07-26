@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Switch, Divider, Spin, Alert, Tooltip } from 'antd';
+import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Switch, Divider, Spin, Alert, Tooltip, Modal } from 'antd';
 import {
   CrownOutlined, LockOutlined, UnlockOutlined, SaveOutlined,
   AppstoreOutlined, SettingOutlined, WhatsAppOutlined, SafetyCertificateOutlined,
-  CheckCircleOutlined, StopOutlined, ReloadOutlined, TagOutlined, PrinterOutlined, HeartOutlined
+  CheckCircleOutlined, StopOutlined, ReloadOutlined, TagOutlined, PrinterOutlined, HeartOutlined,
+  DeleteOutlined, WarningOutlined, ExclamationCircleOutlined
 } from '@ant-design/icons';
 import { superAdminApi } from '../../api/superAdminApi';
 
@@ -15,6 +16,11 @@ const SuperAdminManagement = () => {
   const [verifying, setVerifying] = useState(false);
   const [loadingControls, setLoadingControls] = useState(false);
   const [savingControls, setSavingControls] = useState(false);
+
+  // Reset Database State
+  const [isResetModalVisible, setIsResetModalVisible] = useState(false);
+  const [resetConfirmationInput, setResetConfirmationInput] = useState('');
+  const [resetting, setResetting] = useState(false);
 
   // Control state
   const [controls, setControls] = useState({
@@ -91,6 +97,36 @@ const SuperAdminManagement = () => {
       message.error('Error saving control settings');
     } finally {
       setSavingControls(false);
+    }
+  };
+
+  const handleResetDatabase = async () => {
+    if (resetConfirmationInput.trim().toUpperCase() !== 'RESET DATABASE') {
+      message.error('Please type RESET DATABASE exactly to confirm.');
+      return;
+    }
+
+    setResetting(true);
+    try {
+      const res = await superAdminApi.resetDatabase(resetConfirmationInput.trim());
+      if (res.success) {
+        setIsResetModalVisible(false);
+        setResetConfirmationInput('');
+        Modal.success({
+          title: '🎉 Factory Reset Complete',
+          content: 'All Products, Categories, Orders, Customers, Coupons, and Financial Records have been permanently purged. The system database is fresh and ready for a new client/company setup.',
+          onOk: () => {
+            fetchControls();
+            window.dispatchEvent(new Event('superAdminControlUpdated'));
+          }
+        });
+      } else {
+        message.error(res.message || 'Database reset failed');
+      }
+    } catch (err) {
+      message.error(err.response?.data?.message || 'Failed to execute database reset');
+    } finally {
+      setResetting(false);
     }
   };
 
@@ -200,7 +236,8 @@ const SuperAdminManagement = () => {
           <Spin size="large" tip="Loading Super Admin controls..." />
         </div>
       ) : (
-        <Row gutter={[24, 24]}>
+        <>
+          <Row gutter={[24, 24]}>
           {/* Section 1: Menu Controller */}
           <Col xs={24} lg={12}>
             <Card
@@ -544,6 +581,143 @@ const SuperAdminManagement = () => {
             </Card>
           </Col>
         </Row>
+
+        {/* Section 3: Danger Zone & System Factory Reset */}
+        <Row style={{ marginTop: '24px' }}>
+          <Col span={24}>
+            <Card
+              style={{
+                borderRadius: '16px',
+                border: '1px solid #ffccc7',
+                background: '#fff2f0',
+                boxShadow: '0 4px 12px rgba(255, 77, 79, 0.08)'
+              }}
+              title={
+                <Space>
+                  <WarningOutlined style={{ color: '#ff4d4f', fontSize: '20px' }} />
+                  <Text strong style={{ color: '#ff4d4f', fontSize: '18px' }}>
+                    Danger Zone — Factory Database Reset
+                  </Text>
+                </Space>
+              }
+            >
+              <Row align="middle" justify="space-between" gutter={[16, 16]}>
+                <Col xs={24} md={16}>
+                  <Space direction="vertical" size={4}>
+                    <Text strong style={{ fontSize: '15px', color: '#cf1322' }}>
+                      Clear All Database Tables for New Company / Client Handover
+                    </Text>
+                    <Text type="secondary" style={{ fontSize: '13px', color: '#595959' }}>
+                      This action will permanently purge all <strong>Products, Categories, Orders, Order Items, Customers, Saved Addresses, Payments, Coupons, Financial Reports,</strong> and <strong>Shop Settings</strong>. 
+                      Super Admin login credentials and system menu control flags remain preserved.
+                    </Text>
+                  </Space>
+                </Col>
+                <Col xs={24} md={8} style={{ textAlign: 'right' }}>
+                  <Button
+                    type="primary"
+                    danger
+                    size="large"
+                    icon={<DeleteOutlined />}
+                    onClick={() => {
+                      setResetConfirmationInput('');
+                      setIsResetModalVisible(true);
+                    }}
+                    style={{
+                      borderRadius: '8px',
+                      fontWeight: 700,
+                      boxShadow: '0 4px 10px rgba(255, 77, 79, 0.3)'
+                    }}
+                  >
+                    Reset All Tables
+                  </Button>
+                </Col>
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Factory Reset Modal */}
+        <Modal
+          title={
+            <Space align="center">
+              <ExclamationCircleOutlined style={{ color: '#ff4d4f', fontSize: '22px' }} />
+              <Text strong style={{ color: '#ff4d4f', fontSize: '18px' }}>
+                Confirm Factory Database Reset
+              </Text>
+            </Space>
+          }
+          open={isResetModalVisible}
+          onCancel={() => {
+            if (!resetting) {
+              setIsResetModalVisible(false);
+              setResetConfirmationInput('');
+            }
+          }}
+          footer={[
+            <Button
+              key="cancel"
+              disabled={resetting}
+              onClick={() => {
+                setIsResetModalVisible(false);
+                setResetConfirmationInput('');
+              }}
+            >
+              Cancel
+            </Button>,
+            <Button
+              key="submit"
+              type="primary"
+              danger
+              loading={resetting}
+              disabled={resetConfirmationInput.trim().toUpperCase() !== 'RESET DATABASE'}
+              icon={<DeleteOutlined />}
+              onClick={handleResetDatabase}
+              style={{ fontWeight: 700 }}
+            >
+              Confirm & Purge Database
+            </Button>
+          ]}
+        >
+          <Space direction="vertical" size={16} style={{ width: '100%', marginTop: '12px' }}>
+            <Alert
+              type="error"
+              showIcon
+              message="CRITICAL WARNING: Irreversible Action"
+              description="You are about to wipe all business data from the database. Once confirmed, this data CANNOT be recovered!"
+            />
+
+            <div style={{ background: '#fafafa', padding: '12px 16px', borderRadius: '8px', border: '1px solid #f0f0f0' }}>
+              <Text strong style={{ display: 'block', marginBottom: '6px' }}>Tables to be purged:</Text>
+              <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '12px', color: '#595959', lineHeight: '1.6' }}>
+                <li>Products & Product Images</li>
+                <li>Categories & Sub-collections</li>
+                <li>Orders & Order Items Breakdown</li>
+                <li>Customer Records & Saved Addresses</li>
+                <li>Coupons & Discount History</li>
+                <li>Payment Transactions & Sales Reports</li>
+                <li>Shop Settings & Store Profile Details</li>
+              </ul>
+            </div>
+
+            <div>
+              <Text strong style={{ fontSize: '13px', display: 'block', marginBottom: '8px' }}>
+                To prevent accidental deletion, type <Text code style={{ color: '#ff4d4f', fontWeight: 700 }}>RESET DATABASE</Text> below:
+              </Text>
+              <Input
+                placeholder="Type RESET DATABASE here..."
+                value={resetConfirmationInput}
+                onChange={(e) => setResetConfirmationInput(e.target.value)}
+                size="large"
+                style={{
+                  borderRadius: '8px',
+                  borderColor: resetConfirmationInput.trim().toUpperCase() === 'RESET DATABASE' ? '#52c41a' : undefined
+                }}
+              />
+            </div>
+          </Space>
+        </Modal>
+        </>
       )}
     </Space>
   );

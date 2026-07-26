@@ -8,6 +8,7 @@ namespace ToyShop.Application.DTOs
         public int Id { get; set; }
         public string OrderNumber { get; set; } = string.Empty;
         public decimal TotalAmount { get; set; }
+        public decimal ShippingCharge { get; set; }
         public string? CouponCode { get; set; }
         public decimal DiscountAmount { get; set; }
         public string OrderStatus { get; set; } = string.Empty;

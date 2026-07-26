@@ -53,11 +53,14 @@ namespace ToyShop.Application.Features.SuperAdmin
 
     public record UpdateSuperAdminControlCommand(UpdateSuperAdminControlRequest Request) : IRequest<BaseResponse<SuperAdminControlDto>>;
 
+    public record ResetDatabaseCommand(string ConfirmationWord) : IRequest<BaseResponse<bool>>;
+
     // Handlers
     public class SuperAdminCommandHandler :
         IRequestHandler<GetSuperAdminControlQuery, BaseResponse<SuperAdminControlDto>>,
         IRequestHandler<VerifySuperAdminCredentialsQuery, BaseResponse<bool>>,
-        IRequestHandler<UpdateSuperAdminControlCommand, BaseResponse<SuperAdminControlDto>>
+        IRequestHandler<UpdateSuperAdminControlCommand, BaseResponse<SuperAdminControlDto>>,
+        IRequestHandler<ResetDatabaseCommand, BaseResponse<bool>>
     {
         private readonly IRepository<SuperAdminControl> _controlRepo;
         private readonly IUnitOfWork _unitOfWork;
@@ -137,6 +140,28 @@ namespace ToyShop.Application.Features.SuperAdmin
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return BaseResponse<SuperAdminControlDto>.Ok(MapToDto(control), "Super Admin controls updated successfully");
+        }
+
+        public async Task<BaseResponse<bool>> Handle(ResetDatabaseCommand request, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(request.ConfirmationWord) || !request.ConfirmationWord.Trim().Equals("RESET DATABASE", System.StringComparison.OrdinalIgnoreCase))
+            {
+                return BaseResponse<bool>.Fail("Invalid confirmation word. You must type 'RESET DATABASE' to confirm clearing system tables.");
+            }
+
+            try
+            {
+                // Truncate transactional & master data tables safely (including Shops)
+                await _unitOfWork.ExecuteRawSqlAsync(@"
+                    TRUNCATE TABLE ""OrderItems"", ""Orders"", ""Payments"", ""ProductImages"", ""Products"", ""Categories"", ""CouponCodes"", ""Addresses"", ""Customers"", ""Shops"" RESTART IDENTITY CASCADE;
+                ", cancellationToken);
+
+                return BaseResponse<bool>.Ok(true, "All database tables cleared successfully. System has been reset to factory defaults.");
+            }
+            catch (System.Exception ex)
+            {
+                return BaseResponse<bool>.Fail("Database reset failed: " + ex.Message);
+            }
         }
 
         private static SuperAdminControlDto MapToDto(SuperAdminControl c) => new SuperAdminControlDto
