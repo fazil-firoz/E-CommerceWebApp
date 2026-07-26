@@ -240,29 +240,41 @@ const Home = () => {
       {/* 1. HERO BANNER */}
       {superAdminControl.isHeroBannerEnabled !== false && (
         <div style={{
-          background: 'linear-gradient(135deg, #001529 0%, #1890ff 50%, #722ed1 100%)',
+          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 45%, #eff6ff 100%)',
           borderRadius: '28px',
           padding: '64px 48px',
-          color: '#fff',
-          boxShadow: '0 12px 36px rgba(24, 144, 255, 0.25)',
+          color: '#0f172a',
+          boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.05)',
+          border: '1px solid #e2e8f0',
           position: 'relative',
           overflow: 'hidden'
         }}>
-          {/* Subtle background glow graphics */}
-          <div style={{ position: 'absolute', top: '-20%', right: '-10%', width: '350px', height: '350px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', filter: 'blur(30px)' }} />
-          <div style={{ position: 'absolute', bottom: '-20%', left: '35%', width: '250px', height: '250px', borderRadius: '50%', background: 'rgba(255,77,79,0.12)', filter: 'blur(40px)' }} />
+          {/* Subtle pastel ambient background glow graphics */}
+          <div style={{ position: 'absolute', top: '-15%', right: '-5%', width: '380px', height: '380px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(255, 255, 255, 0) 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: '-15%', left: '30%', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, rgba(255, 255, 255, 0) 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
 
           <Row align="middle" gutter={[32, 32]}>
             <Col xs={24} md={14}>
-              <Tag color="volcano" style={{ borderRadius: '20px', padding: '4px 14px', fontWeight: 700, fontSize: '12px', marginBottom: '16px' }}>
+              <span style={{
+                display: 'inline-block',
+                background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
+                color: '#1d4ed8',
+                border: '1px solid #bfdbfe',
+                borderRadius: '20px',
+                padding: '6px 16px',
+                fontWeight: 700,
+                fontSize: '12px',
+                marginBottom: '16px',
+                letterSpacing: '0.5px'
+              }}>
                 ✨ DISCOVER MAGICAL PLAYTIME
-              </Tag>
+              </span>
 
-              <Title level={1} style={{ color: '#fff', fontSize: '42px', fontWeight: 900, marginBottom: '16px', lineHeight: '1.2' }}>
+              <Title level={1} style={{ color: '#0f172a', fontSize: '44px', fontWeight: 900, marginBottom: '16px', lineHeight: '1.2' }}>
                 {heroTitle}
               </Title>
 
-              <Paragraph style={{ color: 'rgba(255, 255, 255, 0.88)', fontSize: '17px', marginBottom: '32px', lineHeight: '1.6', maxWidth: '540px' }}>
+              <Paragraph style={{ color: '#475569', fontSize: '17px', marginBottom: '32px', lineHeight: '1.6', maxWidth: '540px' }}>
                 {heroDescription}
               </Paragraph>
 
@@ -272,32 +284,33 @@ const Home = () => {
                   size="large"
                   onClick={() => navigate('/products')}
                   style={{
-                    background: '#ffffff',
-                    color: '#001529',
+                    background: 'linear-gradient(135deg, #1890ff 0%, #0050b3 100%)',
+                    color: '#ffffff',
                     border: 'none',
                     height: '52px',
                     padding: '0 32px',
                     borderRadius: '14px',
                     fontWeight: 800,
                     fontSize: '16px',
-                    boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
+                    boxShadow: '0 8px 24px rgba(24, 144, 255, 0.3)'
                   }}
                 >
                   Explore All Products <RightOutlined />
                 </Button>
 
                 <Button
-                  ghost
                   size="large"
                   onClick={() => navigate('/products')}
                   style={{
-                    color: '#ffffff',
-                    borderColor: 'rgba(255,255,255,0.4)',
+                    color: '#334155',
+                    borderColor: '#cbd5e1',
+                    background: '#ffffff',
                     height: '52px',
                     padding: '0 28px',
                     borderRadius: '14px',
                     fontWeight: 700,
-                    fontSize: '16px'
+                    fontSize: '16px',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.04)'
                   }}
                 >
                   Browse Categories
@@ -305,25 +318,34 @@ const Home = () => {
               </Space>
 
               {/* Stats Counters */}
-              <Row gutter={[24, 16]} style={{ marginTop: '40px', paddingTop: '24px', borderTop: '1px solid rgba(255,255,255,0.15)' }}>
+              <Row gutter={[24, 16]} style={{ marginTop: '40px', paddingTop: '24px', borderTop: '1px solid #e2e8f0' }}>
                 <Col span={8}>
-                  <Text strong style={{ display: 'block', color: '#fff', fontSize: '22px', fontWeight: 800 }}>500+</Text>
-                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px' }}>Unique Products</Text>
+                  <Text strong style={{ display: 'block', color: '#0f172a', fontSize: '22px', fontWeight: 800 }}>500+</Text>
+                  <Text style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>Unique Products</Text>
                 </Col>
                 <Col span={8}>
-                  <Text strong style={{ display: 'block', color: '#fff', fontSize: '22px', fontWeight: 800 }}>1,000+</Text>
-                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px' }}>Happy Customers</Text>
+                  <Text strong style={{ display: 'block', color: '#0f172a', fontSize: '22px', fontWeight: 800 }}>1,000+</Text>
+                  <Text style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>Happy Customers</Text>
                 </Col>
                 <Col span={8}>
-                  <Text strong style={{ display: 'block', color: '#fff', fontSize: '22px', fontWeight: 800 }}>4.9 ★</Text>
-                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px' }}>Verified Rating</Text>
+                  <Text strong style={{ display: 'block', color: '#0f172a', fontSize: '22px', fontWeight: 800 }}>4.9 ★</Text>
+                  <Text style={{ color: '#64748b', fontSize: '12px', fontWeight: 500 }}>Verified Rating</Text>
                 </Col>
               </Row>
             </Col>
 
             {/* Auto-sliding 4 Hero Images Carousel */}
             <Col xs={24} md={10} style={{ textAlign: 'center' }}>
-              <div style={{ borderRadius: '24px', overflow: 'hidden', boxShadow: '0 16px 40px rgba(0,0,0,0.3)', maxWidth: '400px', margin: '0 auto' }}>
+              <div style={{
+                borderRadius: '28px',
+                overflow: 'hidden',
+                boxShadow: '0 20px 40px -10px rgba(15, 23, 42, 0.12)',
+                maxWidth: '400px',
+                margin: '0 auto',
+                background: '#ffffff',
+                border: '4px solid #ffffff',
+                padding: '4px'
+              }}>
                 <Carousel autoplay autoplaySpeed={3500} fadeDots>
                   {heroImagesToDisplay.map((imgUrl, idx) => (
                     <div key={idx} style={{ height: '320px', borderRadius: '24px', overflow: 'hidden' }}>
@@ -334,7 +356,8 @@ const Home = () => {
                           width: '100%',
                           height: '320px',
                           objectFit: 'cover',
-                          display: 'block'
+                          display: 'block',
+                          borderRadius: '20px'
                         }}
                       />
                     </div>
