@@ -15,7 +15,6 @@ import { AdminAuthContext } from '../context/AdminAuthContext';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import { ThemeContext } from '../context/ThemeContext';
 import LoginDrawer from '../components/LoginDrawer';
-import RecentSearchInput from '../components/common/RecentSearchInput';
 import { shopApi } from '../api/shopApi';
 import { superAdminApi } from '../api/superAdminApi';
 import { resolveProductImageUrl } from '../utils/imageHelper';
@@ -124,6 +123,7 @@ const CustomerLayout = () => {
 
   // Dynamic CSS to override Ant Design Menu active/hover colors with theme
   const menuThemeStyle = `
+    /* Nav menu active/hover colors */
     .customer-nav.ant-menu-horizontal > .ant-menu-item-selected a,
     .customer-nav.ant-menu-horizontal > .ant-menu-item-selected span,
     .customer-nav.ant-menu-horizontal > .ant-menu-item-selected .ant-menu-title-content a,
@@ -141,21 +141,28 @@ const CustomerLayout = () => {
     .customer-nav.ant-menu-horizontal > .ant-menu-item:hover span {
       color: ${primaryColor} !important;
     }
-    /* Override Ant Input.Search button background */
-    .themed-search-input .ant-input-search-button {
+
+    /* Search button - Ant Design v4 & v5 */
+    .themed-search-input .ant-input-search-button,
+    .themed-search-input .ant-btn.ant-btn-primary,
+    .themed-search-input button[type=button].ant-btn-primary {
       background: ${primaryColor} !important;
+      background-color: ${primaryColor} !important;
       border-color: ${primaryColor} !important;
-      padding: 0 !important;
+      color: #fff !important;
     }
-    .themed-search-input .ant-input-search-button:hover {
-      background: ${primaryColor}dd !important;
-      border-color: ${primaryColor}dd !important;
+    .themed-search-input .ant-input-search-button:hover,
+    .themed-search-input .ant-btn.ant-btn-primary:hover {
+      background: ${primaryColor}cc !important;
+      background-color: ${primaryColor}cc !important;
+      border-color: ${primaryColor}cc !important;
     }
+    /* Input focus ring */
     .themed-search-input .ant-input:focus,
-    .themed-search-input .ant-input-affix-wrapper:focus,
+    .themed-search-input .ant-input-affix-wrapper:focus-within,
     .themed-search-input .ant-input-affix-wrapper-focused {
       border-color: ${primaryColor} !important;
-      box-shadow: 0 0 0 2px ${primaryColor}25 !important;
+      box-shadow: 0 0 0 2px ${primaryColor}28 !important;
     }
   `;
 
@@ -212,23 +219,6 @@ const CustomerLayout = () => {
           className="customer-nav"
           style={{ flex: 1, marginLeft: '24px', borderBottom: 'none', background: 'transparent', transition: 'all 0.3s ease' }}
         />
-
-        {/* Header Quick Search with Recently Searched dropdown */}
-        <div style={{ margin: '0 16px', flex: '0 1 280px' }}>
-          <RecentSearchInput
-            placeholder="Search products..."
-            size="middle"
-            primaryColor={primaryColor}
-            onSearch={(term) => {
-              if (term) {
-                navigate(`/products?search=${encodeURIComponent(term)}`);
-              } else {
-                navigate('/products');
-              }
-            }}
-            maxWidth="280px"
-          />
-        </div>
 
         {/* Right actions */}
         <Space size={8} align="center">
