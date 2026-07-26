@@ -293,8 +293,17 @@ namespace ToyShop.Application.Features.Orders
             await _addressRepository.AddAsync(address, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Generate unique Order Number
-            var orderNumber = "ORD-" + DateTime.UtcNow.ToString("yyyyMMdd") + "-" + new Random().Next(1000, 9999);
+            // Generate sequential Order Number (starting from 1000 and incrementing +1 for each order)
+            var totalOrdersCount = await _orderRepository.Query().CountAsync(cancellationToken);
+            var seq = 1000 + totalOrdersCount;
+            var datePrefix = DateTime.UtcNow.ToString("yyyyMMdd");
+            var orderNumber = $"ORD-{datePrefix}-{seq}";
+
+            while (await _orderRepository.Query().AnyAsync(o => o.OrderNumber == orderNumber, cancellationToken))
+            {
+                seq++;
+                orderNumber = $"ORD-{datePrefix}-{seq}";
+            }
 
             // Apply discount & shipping charge
             var grossOrderTotal = totalAmount + request.ShippingCharge;
