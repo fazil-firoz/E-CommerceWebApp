@@ -151,9 +151,9 @@ namespace ToyShop.Application.Features.SuperAdmin
 
             try
             {
-                // Truncate transactional & master data tables safely
+                // Truncate transactional & master data tables safely (including Shops)
                 await _unitOfWork.ExecuteRawSqlAsync(@"
-                    TRUNCATE TABLE ""OrderItems"", ""Orders"", ""Payments"", ""ProductImages"", ""Products"", ""Categories"", ""CouponCodes"", ""Addresses"", ""Customers"" RESTART IDENTITY CASCADE;
+                    TRUNCATE TABLE ""OrderItems"", ""Orders"", ""Payments"", ""ProductImages"", ""Products"", ""Categories"", ""CouponCodes"", ""Addresses"", ""Customers"", ""Shops"" RESTART IDENTITY CASCADE;
                 ", cancellationToken);
 
                 return BaseResponse<bool>.Ok(true, "All database tables cleared successfully. System has been reset to factory defaults.");

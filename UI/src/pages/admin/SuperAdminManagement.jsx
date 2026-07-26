@@ -696,6 +696,7 @@ const SuperAdminManagement = () => {
                 <li>Customer Records & Saved Addresses</li>
                 <li>Coupons & Discount History</li>
                 <li>Payment Transactions & Sales Reports</li>
+                <li>Shop Settings & Store Profile Details</li>
               </ul>
             </div>
 
