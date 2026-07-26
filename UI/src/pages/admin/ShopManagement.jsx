@@ -299,6 +299,77 @@ const ShopManagement = () => {
           </Col>
         </Row>
       )
+    },
+    {
+      key: 'banners',
+      label: <span>🎨 Homepage Hero & Promo Banners</span>,
+      children: (
+        <Space direction="vertical" size={20} style={{ width: '100%' }}>
+          {/* Hero Banner Controls */}
+          <Card title={<Text strong style={{ color: '#1890ff', fontSize: '15px' }}>🌟 Hero Banner Customization (Title, Subtitle & 4-Slide Auto Carousel)</Text>} size="small" style={{ background: '#fafafa', borderRadius: '10px' }}>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
+                <Form.Item name="heroTitle" label="Hero Main Title">
+                  <Input placeholder="Where Joy & Imagination Come Alive!" size="large" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={12}>
+                <Form.Item name="heroDescription" label="Hero Subtitle / Description">
+                  <Input.TextArea rows={2} placeholder="Explore our handpicked collection of certified safe STEM toys..." />
+                </Form.Item>
+              </Col>
+
+              <Col span={24}>
+                <Text strong style={{ fontSize: '13px', color: '#595959', display: 'block', marginBottom: '8px' }}>
+                  Auto-Sliding Hero Carousel Images (Set up to 4 Image URLs / Links):
+                </Text>
+              </Col>
+
+              <Col xs={24} sm={12} md={6}>
+                <Form.Item name="heroImageUrl1" label="Hero Slide Image #1 URL">
+                  <Input placeholder="https://images.unsplash.com/photo-..." />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Form.Item name="heroImageUrl2" label="Hero Slide Image #2 URL">
+                  <Input placeholder="https://images.unsplash.com/photo-..." />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Form.Item name="heroImageUrl3" label="Hero Slide Image #3 URL">
+                  <Input placeholder="https://images.unsplash.com/photo-..." />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={6}>
+                <Form.Item name="heroImageUrl4" label="Hero Slide Image #4 URL">
+                  <Input placeholder="https://images.unsplash.com/photo-..." />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+
+          {/* Promo Banner Controls */}
+          <Card title={<Text strong style={{ color: '#ff4d4f', fontSize: '15px' }}>🎉 Promo Banner Customization</Text>} size="small" style={{ background: '#fff2f0', borderRadius: '10px', border: '1px solid #ffccc7' }}>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={10}>
+                <Form.Item name="promoTitle" label="Promo Banner Heading">
+                  <Input placeholder="Summer Carnival Sale — Enjoy Up to 30% OFF!" size="large" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={10}>
+                <Form.Item name="promoDescription" label="Promo Banner Subtitle">
+                  <Input.TextArea rows={2} placeholder="Apply coupon codes at checkout to unlock instant extra savings..." />
+                </Form.Item>
+              </Col>
+              <Col xs={24} md={4}>
+                <Form.Item name="promoCouponCode" label="Coupon Code Display">
+                  <Input placeholder="TOY30" style={{ textTransform: 'uppercase', fontWeight: 700 }} />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+        </Space>
+      )
     }
   ];
 

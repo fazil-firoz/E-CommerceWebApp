@@ -186,6 +186,16 @@ using (var scope = app.Services.CreateScope())
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsPromoBannerEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsWhyChooseUsEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
 
+              ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""HeroTitle"" VARCHAR(255) NULL;
+              ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""HeroDescription"" TEXT NULL;
+              ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""HeroImageUrl1"" TEXT NULL;
+              ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""HeroImageUrl2"" TEXT NULL;
+              ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""HeroImageUrl3"" TEXT NULL;
+              ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""HeroImageUrl4"" TEXT NULL;
+              ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""PromoTitle"" VARCHAR(255) NULL;
+              ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""PromoDescription"" TEXT NULL;
+              ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""PromoCouponCode"" VARCHAR(100) NULL;
+
               INSERT INTO ""SuperAdminControls"" (""Id"", ""IsShopSettingsMenuEnabled"", ""IsShipmentSettingsMenuEnabled"", ""IsInvoiceSettingsMenuEnabled"", ""IsTaxSettingsMenuEnabled"", ""IsReportsMenuEnabled"", ""IsCouponMenuEnabled"", ""IsAppControlMenuEnabled"", ""IsWhatsAppFloatingWidgetEnabled"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
               SELECT 1, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, NOW(), 'System', FALSE
               WHERE NOT EXISTS (SELECT 1 FROM ""SuperAdminControls"" WHERE ""Id"" = 1);

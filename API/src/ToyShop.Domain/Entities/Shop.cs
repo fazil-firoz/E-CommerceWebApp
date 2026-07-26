@@ -36,5 +36,16 @@ namespace ToyShop.Domain.Entities
         public string? TwitterUrl { get; set; }
         public string? YouTubeUrl { get; set; }
         public string? OpeningHours { get; set; }
+
+        // Homepage Hero & Promo Banner Customization
+        public string? HeroTitle { get; set; }
+        public string? HeroDescription { get; set; }
+        public string? HeroImageUrl1 { get; set; }
+        public string? HeroImageUrl2 { get; set; }
+        public string? HeroImageUrl3 { get; set; }
+        public string? HeroImageUrl4 { get; set; }
+        public string? PromoTitle { get; set; }
+        public string? PromoDescription { get; set; }
+        public string? PromoCouponCode { get; set; }
     }
 }

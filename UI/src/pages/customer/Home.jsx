@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { Card, Col, Row, Button, Typography, Space, Spin, message, Tag } from 'antd';
+import { Card, Col, Row, Button, Typography, Space, Spin, message, Tag, Carousel } from 'antd';
 import {
   RightOutlined, FireOutlined, AppstoreOutlined, HeartOutlined, HeartFilled,
   StarOutlined, RocketOutlined, SafetyCertificateOutlined, SmileOutlined,
@@ -8,6 +8,7 @@ import {
 } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
+import { shopApi } from '../../api/shopApi';
 import { superAdminApi } from '../../api/superAdminApi';
 import { WishlistContext } from '../../context/WishlistContext';
 import { CartContext } from '../../context/CartContext';
@@ -23,6 +24,7 @@ const Home = () => {
 
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
+  const [shopSettings, setShopSettings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [superAdminControl, setSuperAdminControl] = useState({
     isWishlistEnabled: true,
@@ -47,13 +49,15 @@ const Home = () => {
 
     const fetchData = async () => {
       try {
-        const [catRes, prodRes] = await Promise.all([
+        const [catRes, prodRes, shopRes] = await Promise.all([
           categoryApi.getAll(),
-          productApi.getAll({ pageSize: 24 })
+          productApi.getAll({ pageSize: 24 }),
+          shopApi.getSettings()
         ]);
 
         if (catRes.success) setCategories(catRes.data || []);
         if (prodRes.success) setProducts(prodRes.data || []);
+        if (shopRes.success && shopRes.data) setShopSettings(shopRes.data);
       } catch (err) {
         message.error('Failed to load homepage content');
       } finally {
@@ -75,6 +79,30 @@ const Home = () => {
       </div>
     );
   }
+
+  // Dynamic Content with defaults
+  const heroTitle = shopSettings?.heroTitle || 'Where Joy & Imagination Come Alive!';
+  const heroDescription = shopSettings?.heroDescription || 'Explore our handpicked collection of certified safe STEM toys, educational building blocks, action collectibles, and wooden playsets designed for happy minds.';
+  
+  const configuredHeroImages = [
+    shopSettings?.heroImageUrl1,
+    shopSettings?.heroImageUrl2,
+    shopSettings?.heroImageUrl3,
+    shopSettings?.heroImageUrl4
+  ].filter(url => url && url.trim() !== '');
+
+  const defaultHeroImages = [
+    'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=480&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?q=80&w=480&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1558060370-d644479cb6f7?q=80&w=480&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=480&auto=format&fit=crop'
+  ];
+
+  const heroImagesToDisplay = configuredHeroImages.length > 0 ? configuredHeroImages : defaultHeroImages;
+
+  const promoTitle = shopSettings?.promoTitle || 'Summer Carnival Sale — Enjoy Up to 30% OFF!';
+  const promoDescription = shopSettings?.promoDescription || 'Apply coupon codes at checkout to unlock instant extra savings on all wooden playsets and STEM toys.';
+  const promoCouponCode = shopSettings?.promoCouponCode || 'TOY30';
 
   // Filtered product collections
   const featuredProducts = products.slice(0, 8);
@@ -225,12 +253,12 @@ const Home = () => {
                 ✨ DISCOVER MAGICAL PLAYTIME
               </Tag>
 
-              <Title level={1} style={{ color: '#fff', fontSize: '44px', fontWeight: 900, marginBottom: '16px', lineHeight: '1.2' }}>
-                Where Joy & Imagination Come Alive!
+              <Title level={1} style={{ color: '#fff', fontSize: '42px', fontWeight: 900, marginBottom: '16px', lineHeight: '1.2' }}>
+                {heroTitle}
               </Title>
 
-              <Paragraph style={{ color: 'rgba(255, 255, 255, 0.88)', fontSize: '18px', marginBottom: '32px', lineHeight: '1.6', maxWidth: '540px' }}>
-                Explore our handpicked collection of certified safe STEM toys, educational building blocks, action collectibles, and wooden playsets designed for happy minds.
+              <Paragraph style={{ color: 'rgba(255, 255, 255, 0.88)', fontSize: '17px', marginBottom: '32px', lineHeight: '1.6', maxWidth: '540px' }}>
+                {heroDescription}
               </Paragraph>
 
               <Space size={16} wrap>
@@ -288,19 +316,25 @@ const Home = () => {
               </Row>
             </Col>
 
+            {/* Auto-sliding 4 Hero Images Carousel */}
             <Col xs={24} md={10} style={{ textAlign: 'center' }}>
-              <div style={{ position: 'relative', display: 'inline-block' }}>
-                <img
-                  src="https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=480&auto=format&fit=crop"
-                  alt="Featured Toys Selection"
-                  style={{
-                    maxWidth: '100%',
-                    maxHeight: '320px',
-                    borderRadius: '24px',
-                    boxShadow: '0 16px 40px rgba(0,0,0,0.3)',
-                    transform: 'perspective(1000px) rotateY(-6deg) rotateX(2deg)'
-                  }}
-                />
+              <div style={{ borderRadius: '24px', overflow: 'hidden', boxShadow: '0 16px 40px rgba(0,0,0,0.3)', maxWidth: '400px', margin: '0 auto' }}>
+                <Carousel autoplay autoplaySpeed={3500} fadeDots>
+                  {heroImagesToDisplay.map((imgUrl, idx) => (
+                    <div key={idx} style={{ height: '320px', borderRadius: '24px', overflow: 'hidden' }}>
+                      <img
+                        src={resolveProductImageUrl(imgUrl)}
+                        alt={`Hero Slide ${idx + 1}`}
+                        style={{
+                          width: '100%',
+                          height: '320px',
+                          objectFit: 'cover',
+                          display: 'block'
+                        }}
+                      />
+                    </div>
+                  ))}
+                </Carousel>
               </div>
             </Col>
           </Row>
@@ -432,13 +466,13 @@ const Home = () => {
             <Col xs={24} md={16}>
               <Space direction="vertical" size={8}>
                 <Tag color="gold" style={{ borderRadius: '12px', padding: '4px 12px', fontWeight: 800 }}>
-                  🎉 SPECIAL OFFER
+                  🎉 SPECIAL OFFER: USE CODE {promoCouponCode}
                 </Tag>
                 <Title level={2} style={{ color: '#fff', margin: 0, fontWeight: 900, fontSize: '32px' }}>
-                  Summer Carnival Sale — Enjoy Up to 30% OFF!
+                  {promoTitle}
                 </Title>
                 <Paragraph style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '16px', margin: 0 }}>
-                  Apply coupon codes at checkout to unlock instant extra savings on all wooden playsets and STEM toys.
+                  {promoDescription}
                 </Paragraph>
               </Space>
             </Col>
