@@ -119,8 +119,50 @@ const CustomerLayout = () => {
   const twitter = shopSettings?.twitterUrl;
   const yt = shopSettings?.youTubeUrl;
 
+  const primaryColor = activeTheme?.primaryColor || '#ff6584';
+  const headerBg = activeTheme?.headerBgColor || '#ffffff';
+
+  // Dynamic CSS to override Ant Design Menu active/hover colors with theme
+  const menuThemeStyle = `
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-selected a,
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-selected span,
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-selected .ant-menu-title-content a,
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-active a,
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-active span {
+      color: ${primaryColor} !important;
+    }
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-selected::after {
+      border-bottom-color: ${primaryColor} !important;
+    }
+    .customer-nav.ant-menu-horizontal > .ant-menu-item:hover::after {
+      border-bottom-color: ${primaryColor} !important;
+    }
+    .customer-nav.ant-menu-horizontal > .ant-menu-item:hover a,
+    .customer-nav.ant-menu-horizontal > .ant-menu-item:hover span {
+      color: ${primaryColor} !important;
+    }
+    /* Override Ant Input.Search button background */
+    .themed-search-input .ant-input-search-button {
+      background: ${primaryColor} !important;
+      border-color: ${primaryColor} !important;
+      padding: 0 !important;
+    }
+    .themed-search-input .ant-input-search-button:hover {
+      background: ${primaryColor}dd !important;
+      border-color: ${primaryColor}dd !important;
+    }
+    .themed-search-input .ant-input:focus,
+    .themed-search-input .ant-input-affix-wrapper:focus,
+    .themed-search-input .ant-input-affix-wrapper-focused {
+      border-color: ${primaryColor} !important;
+      box-shadow: 0 0 0 2px ${primaryColor}25 !important;
+    }
+  `;
+
   return (
     <Layout className="layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Dynamic theme style injection */}
+      <style>{menuThemeStyle}</style>
       {/* Sticky Header */}
       <Header style={{
         display: 'flex',
@@ -167,7 +209,8 @@ const CustomerLayout = () => {
           mode="horizontal"
           selectedKeys={[location.pathname]}
           items={menuItems}
-          style={{ flex: 1, marginLeft: '24px', borderBottom: 'none' }}
+          className="customer-nav"
+          style={{ flex: 1, marginLeft: '24px', borderBottom: 'none', background: 'transparent', transition: 'all 0.3s ease' }}
         />
 
         {/* Header Quick Search with Recently Searched dropdown */}
@@ -175,6 +218,7 @@ const CustomerLayout = () => {
           <RecentSearchInput
             placeholder="Search products..."
             size="middle"
+            primaryColor={primaryColor}
             onSearch={(term) => {
               if (term) {
                 navigate(`/products?search=${encodeURIComponent(term)}`);

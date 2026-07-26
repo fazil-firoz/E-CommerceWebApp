@@ -199,6 +199,7 @@ const ProductListing = () => {
               placeholder="Search products..."
               value={search}
               onSearch={handleSearchSubmit}
+              primaryColor={primaryColor}
               maxWidth="340px"
             />
           </div>
