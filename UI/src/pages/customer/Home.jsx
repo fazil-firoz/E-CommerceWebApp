@@ -251,7 +251,7 @@ const Home = () => {
 
   return (
     <Space direction="vertical" size={48} style={{ width: '100%', paddingBottom: '32px' }}>
-      {/* Dynamic Shiny & Cute Keyframe Animations */}
+      {/* Dynamic Shiny & Floating Heart Keyframe Animations */}
       <style>{`
         @keyframes kawaii-text-shine {
           0% { background-position: 0% 50%; }
@@ -265,17 +265,54 @@ const Home = () => {
           -webkit-text-fill-color: transparent;
           animation: kawaii-text-shine 6s ease infinite;
         }
+        @keyframes float-heart-up {
+          0% { transform: translateY(0px) rotate(0deg) scale(0.8); opacity: 0.2; }
+          50% { transform: translateY(-20px) rotate(15deg) scale(1.1); opacity: 0.85; }
+          100% { transform: translateY(-40px) rotate(-10deg) scale(0.8); opacity: 0; }
+        }
+        .floating-heart-particle {
+          position: absolute;
+          pointer-events: none;
+          user-select: none;
+          z-index: 2;
+          animation: float-heart-up 4s ease-in-out infinite;
+        }
+        @keyframes pulse-aura {
+          0%, 100% { transform: scale(1); opacity: 0.3; }
+          50% { transform: scale(1.08); opacity: 0.5; }
+        }
+        .kawaii-aura-ring {
+          position: absolute;
+          top: -10px;
+          left: -10px;
+          right: -10px;
+          bottom: -10px;
+          border-radius: 36px;
+          background: linear-gradient(135deg, ${primaryColor}40, ${accentColor}40);
+          filter: blur(16px);
+          animation: pulse-aura 3.5s ease-in-out infinite;
+          z-index: 0;
+        }
       `}</style>
 
-      {/* 1. SEAMLESS BLENDED HERO BANNER */}
+      {/* 1. SEAMLESS BLENDED HERO BANNER WITH ANIMATED FLOATING HEARTS */}
       {superAdminControl.isHeroBannerEnabled !== false && (
         <div style={{
           background: 'transparent',
           borderRadius: '0px',
           padding: '24px 0 16px',
           color: textColor,
-          position: 'relative'
+          position: 'relative',
+          overflow: 'hidden'
         }}>
+          {/* Animated Floating Hearts / Love Sign Particles */}
+          <span className="floating-heart-particle" style={{ top: '15%', left: '8%', animationDelay: '0s', fontSize: '22px' }}>💖</span>
+          <span className="floating-heart-particle" style={{ top: '65%', left: '4%', animationDelay: '1.2s', fontSize: '18px' }}>💕</span>
+          <span className="floating-heart-particle" style={{ top: '25%', left: '42%', animationDelay: '2.5s', fontSize: '20px' }}>✨</span>
+          <span className="floating-heart-particle" style={{ top: '75%', right: '12%', animationDelay: '0.8s', fontSize: '24px' }}>💖</span>
+          <span className="floating-heart-particle" style={{ top: '18%', right: '6%', animationDelay: '1.9s', fontSize: '20px' }}>🌸</span>
+          <span className="floating-heart-particle" style={{ top: '50%', right: '45%', animationDelay: '3.1s', fontSize: '16px' }}>💕</span>
+
           {/* Ambient soft glow */}
           <div style={{ position: 'absolute', top: '-10%', right: '5%', width: '320px', height: '320px', borderRadius: '50%', background: `radial-gradient(circle, ${primaryColor}18 0%, rgba(255, 255, 255, 0) 70%)`, filter: 'blur(40px)', pointerEvents: 'none' }} />
 
@@ -371,32 +408,61 @@ const Home = () => {
               </div>
             </Col>
 
-            {/* Cute Frameless Image Carousel Showcase */}
-            <Col xs={24} md={10} style={{ textAlign: 'center' }}>
+            {/* Cute Frameless Image Carousel Showcase with Pulsing Aura Ring & Glassmorphism Badge */}
+            <Col xs={24} md={10} style={{ textAlign: 'center', position: 'relative' }}>
               <div style={{
-                borderRadius: '28px',
-                overflow: 'hidden',
-                boxShadow: `0 12px 32px ${primaryColor}20`,
+                position: 'relative',
                 maxWidth: '380px',
                 margin: '0 auto'
               }}>
-                <Carousel autoplay autoplaySpeed={3500} fadeDots>
-                  {heroImagesToDisplay.map((imgUrl, idx) => (
-                    <div key={idx} style={{ height: '320px', borderRadius: '28px', overflow: 'hidden' }}>
-                      <img
-                        src={resolveProductImageUrl(imgUrl)}
-                        alt={`Hero Slide ${idx + 1}`}
-                        style={{
-                          width: '100%',
-                          height: '320px',
-                          objectFit: 'cover',
-                          display: 'block',
-                          borderRadius: '28px'
-                        }}
-                      />
-                    </div>
-                  ))}
-                </Carousel>
+                {/* Glowing Aura Ring behind Carousel */}
+                <div className="kawaii-aura-ring" />
+
+                {/* Floating Heart Badge */}
+                <div style={{
+                  position: 'absolute',
+                  top: '-12px',
+                  right: '-10px',
+                  zIndex: 10,
+                  background: 'rgba(255, 255, 255, 0.92)',
+                  backdropFilter: 'blur(8px)',
+                  border: `1.5px solid ${primaryColor}40`,
+                  borderRadius: '20px',
+                  padding: '6px 14px',
+                  boxShadow: `0 8px 20px ${primaryColor}25`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px'
+                }}>
+                  <span style={{ fontSize: '14px' }}>💖</span>
+                  <Text strong style={{ fontSize: '11px', color: primaryColor }}>100% Cute Verified</Text>
+                </div>
+
+                <div style={{
+                  borderRadius: '28px',
+                  overflow: 'hidden',
+                  boxShadow: `0 16px 36px ${primaryColor}25`,
+                  position: 'relative',
+                  zIndex: 1
+                }}>
+                  <Carousel autoplay autoplaySpeed={3500} fadeDots>
+                    {heroImagesToDisplay.map((imgUrl, idx) => (
+                      <div key={idx} style={{ height: '320px', borderRadius: '28px', overflow: 'hidden' }}>
+                        <img
+                          src={resolveProductImageUrl(imgUrl)}
+                          alt={`Hero Slide ${idx + 1}`}
+                          style={{
+                            width: '100%',
+                            height: '320px',
+                            objectFit: 'cover',
+                            display: 'block',
+                            borderRadius: '28px'
+                          }}
+                        />
+                      </div>
+                    ))}
+                  </Carousel>
+                </div>
               </div>
             </Col>
           </Row>
