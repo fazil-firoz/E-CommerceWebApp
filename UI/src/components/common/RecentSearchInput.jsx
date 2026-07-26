@@ -127,18 +127,7 @@ const RecentSearchInput = ({
         onSearch={(val) => triggerSearch(val)}
         onFocus={() => setIsOpen(true)}
         allowClear
-        enterButton={
-          <span style={{
-            background: primaryColor,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            width: '100%',
-            height: '100%'
-          }}>
-            <SearchOutlined style={{ color: '#fff' }} />
-          </span>
-        }
+        enterButton={<SearchOutlined />}
         size={size}
         style={{ width: '100%' }}
         styles={{
