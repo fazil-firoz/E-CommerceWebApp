@@ -31,6 +31,7 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsBestSellersEnabled { get; set; } = true;
         public bool IsPromoBannerEnabled { get; set; } = true;
         public bool IsWhyChooseUsEnabled { get; set; } = true;
+        public bool IsMarqueeEnabled { get; set; } = true;
     }
 
     public class UpdateSuperAdminControlRequest
@@ -54,6 +55,7 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsBestSellersEnabled { get; set; } = true;
         public bool IsPromoBannerEnabled { get; set; } = true;
         public bool IsWhyChooseUsEnabled { get; set; } = true;
+        public bool IsMarqueeEnabled { get; set; } = true;
     }
 
     public class SuperAdminLoginRequest
@@ -158,6 +160,7 @@ namespace ToyShop.Application.Features.SuperAdmin
             control.IsBestSellersEnabled = request.Request.IsBestSellersEnabled;
             control.IsPromoBannerEnabled = request.Request.IsPromoBannerEnabled;
             control.IsWhyChooseUsEnabled = request.Request.IsWhyChooseUsEnabled;
+            control.IsMarqueeEnabled = request.Request.IsMarqueeEnabled;
 
             control.UpdatedDate = System.DateTimeOffset.UtcNow;
 
@@ -208,7 +211,8 @@ namespace ToyShop.Application.Features.SuperAdmin
             IsNewArrivalsEnabled = c.IsNewArrivalsEnabled,
             IsBestSellersEnabled = c.IsBestSellersEnabled,
             IsPromoBannerEnabled = c.IsPromoBannerEnabled,
-            IsWhyChooseUsEnabled = c.IsWhyChooseUsEnabled
+            IsWhyChooseUsEnabled = c.IsWhyChooseUsEnabled,
+            IsMarqueeEnabled = c.IsMarqueeEnabled
         };
     }
 }

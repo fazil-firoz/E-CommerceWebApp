@@ -696,6 +696,7 @@ const SuperAdminManagement = () => {
               <Row gutter={[16, 16]}>
                 {[
                   { key: 'isHeroBannerEnabled', label: 'Hero Banner Section', desc: 'Main interactive hero showcase with glowing call-to-action' },
+                  { key: 'isMarqueeEnabled', label: 'Infinite Marquee Ticker Ribbon', desc: 'Scrolling ticker ribbon below Hero Banner with promo text & emojis' },
                   { key: 'isCategoriesSectionEnabled', label: 'Categories Section', desc: 'Grid of toy categories with icon cards and item counts' },
                   { key: 'isFeaturedProductsEnabled', label: 'Featured Products Section', desc: 'Curated featured products with ribbon badges' },
                   { key: 'isNewArrivalsEnabled', label: 'New Arrivals Section', desc: 'Freshly added items grid' },

@@ -36,7 +36,8 @@ const Home = () => {
     isNewArrivalsEnabled: true,
     isBestSellersEnabled: true,
     isPromoBannerEnabled: true,
-    isWhyChooseUsEnabled: true
+    isWhyChooseUsEnabled: true,
+    isMarqueeEnabled: true
   });
 
   useEffect(() => {
@@ -105,6 +106,20 @@ const Home = () => {
   const promoTitle = shopSettings?.promoTitle || 'Summer Carnival Sale — Enjoy Up to 30% OFF!';
   const promoDescription = shopSettings?.promoDescription || 'Apply coupon codes at checkout to unlock instant extra savings on all wooden playsets and STEM toys.';
   const promoCouponCode = shopSettings?.promoCouponCode || 'TOY30';
+
+  const defaultMarqueeItems = [
+    { icon: '💖', text: 'Free Express Gift Wrapping' },
+    { icon: '✨', text: '100% Authentic Korean & Japanese Kawaii Merch' },
+    { icon: '🔥', text: 'Trending On TikTok & Instagram' },
+    { icon: '🏷️', text: 'Use Code KAWAII30 For Extra 30% OFF' },
+    { icon: '⭐', text: '50,000+ Happy Smiles Delivered' },
+    { icon: '🎀', text: 'Limited Edition Plushies & Cute Stationery' }
+  ];
+
+  const rawMarquee = shopSettings?.marqueeText;
+  const marqueeItemsToDisplay = (rawMarquee && rawMarquee.trim() !== '')
+    ? rawMarquee.split('•').map(t => t.trim()).filter(Boolean).map(t => ({ icon: '', text: t }))
+    : defaultMarqueeItems;
 
   // Filtered product collections
   const featuredProducts = products.slice(0, 8);
@@ -500,24 +515,19 @@ const Home = () => {
       )}
 
       {/* INFINITE KAWAII MARQUEE TICKER RIBBON */}
-      <div className="kawaii-marquee-wrapper">
-        <div className="kawaii-marquee-track">
-          {[...Array(3)].flatMap((_, arrayIdx) => [
-            { icon: '💖', text: 'Free Express Gift Wrapping' },
-            { icon: '✨', text: '100% Authentic Korean & Japanese Kawaii Merch' },
-            { icon: '🔥', text: 'Trending On TikTok & Instagram' },
-            { icon: '🏷️', text: 'Use Code KAWAII30 For Extra 30% OFF' },
-            { icon: '⭐', text: '50,000+ Happy Smiles Delivered' },
-            { icon: '🎀', text: 'Limited Edition Plushies & Cute Stationery' }
-          ]).map((item, idx) => (
-            <div key={idx} className="kawaii-marquee-item">
-              <span>{item.icon}</span>
-              <span>{item.text}</span>
-              <span style={{ opacity: 0.6, marginLeft: '12px' }}>•</span>
-            </div>
-          ))}
+      {superAdminControl.isMarqueeEnabled !== false && (
+        <div className="kawaii-marquee-wrapper">
+          <div className="kawaii-marquee-track">
+            {[...Array(4)].flatMap(() => marqueeItemsToDisplay).map((item, idx) => (
+              <div key={idx} className="kawaii-marquee-item">
+                {item.icon && <span>{item.icon}</span>}
+                <span>{item.text}</span>
+                <span style={{ opacity: 0.6, marginLeft: '12px' }}>•</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* 2. CATEGORIES SECTION */}
       {superAdminControl.isCategoriesSectionEnabled !== false && categories.length > 0 && (

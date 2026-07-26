@@ -47,5 +47,6 @@ namespace ToyShop.Domain.Entities
         public string? PromoTitle { get; set; }
         public string? PromoDescription { get; set; }
         public string? PromoCouponCode { get; set; }
+        public string? MarqueeText { get; set; }
     }
 }

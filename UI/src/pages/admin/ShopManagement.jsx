@@ -348,6 +348,17 @@ const ShopManagement = () => {
             </Row>
           </Card>
 
+          {/* Marquee Ticker Ribbon Controls */}
+          <Card title={<Text strong style={{ color: '#722ed1', fontSize: '15px' }}>🎀 Infinite Marquee Ticker Customization</Text>} size="small" style={{ background: '#f9f0ff', borderRadius: '10px', border: '1px solid #d3adf7' }}>
+            <Row gutter={[16, 16]}>
+              <Col span={24}>
+                <Form.Item name="marqueeText" label="Infinite Marquee Scrolling Text (Use bullet • or emojis to separate messages)">
+                  <Input.TextArea rows={2} placeholder="💖 FREE EXPRESS GIFT WRAPPING • ✨ 100% AUTHENTIC KAWAII MERCH • 🔥 TRENDING ON TIKTOK & INSTAGRAM • 🏷️ USE CODE KAWAII30 FOR EXTRA 30% OFF • ⭐ 50,000+ HAPPY SMILES" />
+                </Form.Item>
+              </Col>
+            </Row>
+          </Card>
+
           {/* Promo Banner Controls */}
           <Card title={<Text strong style={{ color: '#ff4d4f', fontSize: '15px' }}>🎉 Promo Banner Customization</Text>} size="small" style={{ background: '#fff2f0', borderRadius: '10px', border: '1px solid #ffccc7' }}>
             <Row gutter={[16, 16]}>
