@@ -68,25 +68,44 @@ const SuperAdminManagement = () => {
   const [resetConfirmationInput, setResetConfirmationInput] = useState('');
   const [resetting, setResetting] = useState(false);
 
-  // Control state
-  const [controls, setControls] = useState({
+  // Default controls fallback
+  const defaultControls = {
     isShopSettingsMenuEnabled: true,
     isShipmentSettingsMenuEnabled: true,
     isInvoiceSettingsMenuEnabled: true,
     isTaxSettingsMenuEnabled: true,
     isReportsMenuEnabled: true,
-    isWhatsAppFloatingWidgetEnabled: true
-  });
+    isCouponMenuEnabled: true,
+    isWhatsAppFloatingWidgetEnabled: true,
+    isPrintInvoiceEnabled: true,
+    isProductBadgeEnabled: true,
+    isWishlistEnabled: true,
+    isHeroBannerEnabled: true,
+    isCategoriesSectionEnabled: true,
+    isFeaturedProductsEnabled: true,
+    isNewArrivalsEnabled: true,
+    isBestSellersEnabled: true,
+    isPromoBannerEnabled: true,
+    isWhyChooseUsEnabled: true
+  };
+
+  // Control state
+  const [controls, setControls] = useState(defaultControls);
+
+  const getCtrl = (key) => {
+    if (!controls) return true;
+    return controls[key] !== false;
+  };
 
   const fetchControls = async () => {
     setLoadingControls(true);
     try {
       const res = await superAdminApi.getControl();
       if (res.success && res.data) {
-        setControls(res.data);
+        setControls({ ...defaultControls, ...res.data });
       }
     } catch (err) {
-      message.error('Failed to load Super Admin control flags');
+      console.error('Failed to load Super Admin control flags', err);
     } finally {
       setLoadingControls(false);
     }
@@ -689,7 +708,7 @@ const SuperAdminManagement = () => {
                       padding: '16px',
                       borderRadius: '12px',
                       border: '1px solid #f0f0f0',
-                      background: controls[sec.key] !== false ? '#f6ffed' : '#fff1f0',
+                      background: getCtrl(sec.key) ? '#f6ffed' : '#fff1f0',
                       display: 'flex',
                       justify: 'space-between',
                       alignItems: 'center',
@@ -702,8 +721,8 @@ const SuperAdminManagement = () => {
                       <Switch
                         checkedChildren={<CheckCircleOutlined />}
                         unCheckedChildren={<StopOutlined />}
-                        checked={controls[sec.key] !== false}
-                        onChange={(checked) => setControls({ ...controls, [sec.key]: checked })}
+                        checked={getCtrl(sec.key)}
+                        onChange={(checked) => setControls((prev) => ({ ...(prev || defaultControls), [sec.key]: checked }))}
                       />
                     </div>
                   </Col>
@@ -729,7 +748,7 @@ const SuperAdminManagement = () => {
               </Paragraph>
 
               <Row gutter={[20, 20]}>
-                {themes.map((t) => (
+                {(themes || []).map((t) => (
                   <Col xs={24} sm={12} lg={8} key={t.id}>
                     <Card
                       style={{
@@ -739,7 +758,7 @@ const SuperAdminManagement = () => {
                         boxShadow: t.isActive ? `0 8px 24px ${t.primaryColor}25` : '0 2px 8px rgba(0,0,0,0.03)',
                         transition: 'all 0.3s ease'
                       }}
-                      bodyStyle={{ padding: '20px' }}
+                      styles={{ body: { padding: '20px' } }}
                     >
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                         <div>
