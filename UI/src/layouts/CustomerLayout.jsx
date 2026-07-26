@@ -68,6 +68,23 @@ const CustomerLayout = () => {
     return () => window.removeEventListener('superAdminControlUpdated', fetchSuperAdminControls);
   }, []);
 
+  // 3-Second Rotating Tagline Ribbon
+  const rotatingPhrases = [
+    '✨ Surprisingly Affordable',
+    '💖 100% Genuine & Certified Products',
+    '🚀 Fast Express Doorstep Delivery',
+    '⭐ 50,000+ Happy Smiles Delivered',
+    '🎁 Free Gift Wrapping On All Orders'
+  ];
+  const [phraseIndex, setPhraseIndex] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setPhraseIndex((prev) => (prev + 1) % rotatingPhrases.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [rotatingPhrases.length]);
+
   const menuItems = [
     {
       key: '/',
@@ -169,6 +186,20 @@ const CustomerLayout = () => {
     .themed-search-input .ant-input-affix-wrapper-focused {
       border-color: ${primaryColor} !important;
       box-shadow: 0 0 0 2px ${primaryColor}28 !important;
+    }
+
+    /* 3-Second Word Ticker Keyframes */
+    @keyframes kawaii-word-slide {
+      0% { opacity: 0; transform: translateY(-6px); }
+      15% { opacity: 1; transform: translateY(0); }
+      85% { opacity: 1; transform: translateY(0); }
+      100% { opacity: 0; transform: translateY(6px); }
+    }
+    .kawaii-word-ticker {
+      animation: kawaii-word-slide 3s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
     }
   `;
 
@@ -322,6 +353,25 @@ const CustomerLayout = () => {
           )}
         </Space>
       </Header>
+
+      {/* 3-Second Auto-Rotating Words Ribbon Directly Below Navbar */}
+      <div style={{
+        background: activeTheme?.backgroundColor
+          ? `linear-gradient(90deg, ${activeTheme.backgroundColor} 0%, #ffffff 50%, ${activeTheme.backgroundColor} 100%)`
+          : 'linear-gradient(90deg, #fff0f5 0%, #ffffff 50%, #fff0f5 100%)',
+        borderBottom: '1px solid #f0f0f0',
+        padding: '7px 16px',
+        textAlign: 'center',
+        fontSize: '13px',
+        fontWeight: 700,
+        letterSpacing: '0.4px',
+        color: '#475569',
+        overflow: 'hidden'
+      }}>
+        <div key={phraseIndex} className="kawaii-word-ticker">
+          <span style={{ color: primaryColor, fontWeight: 800 }}>{rotatingPhrases[phraseIndex]}</span>
+        </div>
+      </div>
 
       {/* Main Content View */}
       <Content style={{ flex: 1, padding: '24px 50px', background: activeTheme?.backgroundColor || '#fff5f7', display: 'flex', flexDirection: 'column', transition: 'background 0.3s ease' }}>
