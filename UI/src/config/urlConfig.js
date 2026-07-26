@@ -40,6 +40,7 @@ export const URLS = {
     GET_CONTROL: `${API_BASE_URL}/superadmin/control`,
     VERIFY: `${API_BASE_URL}/superadmin/verify`,
     UPDATE_CONTROL: `${API_BASE_URL}/superadmin/control`,
+    RESET_DATABASE: `${API_BASE_URL}/superadmin/reset-database`,
   },
   COUPONS: {
     GET_ALL: `${API_BASE_URL}/coupons`,

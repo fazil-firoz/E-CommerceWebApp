@@ -41,5 +41,23 @@ namespace ToyShop.API.Controllers
             if (!result.Success) return BadRequest(result);
             return Ok(result);
         }
+
+        /// <summary>
+        /// Factory Reset all database tables (Products, Orders, Customers, Coupons, etc.)
+        /// Requires typing 'RESET DATABASE' confirmation phrase.
+        /// </summary>
+        [HttpPost("reset-database")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<BaseResponse<bool>>> ResetDatabase([FromBody] ResetDatabaseRequest request)
+        {
+            var result = await Mediator.Send(new ResetDatabaseCommand(request.ConfirmationWord));
+            if (!result.Success) return BadRequest(result);
+            return Ok(result);
+        }
+    }
+
+    public class ResetDatabaseRequest
+    {
+        public string ConfirmationWord { get; set; } = string.Empty;
     }
 }

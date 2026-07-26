@@ -6,5 +6,6 @@ namespace ToyShop.Application.Common.Interfaces
     public interface IUnitOfWork
     {
         Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+        Task<int> ExecuteRawSqlAsync(string sql, CancellationToken cancellationToken = default);
     }
 }

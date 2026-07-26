@@ -135,5 +135,10 @@ namespace ToyShop.Infrastructure.Persistence
 
             return await base.SaveChangesAsync(cancellationToken);
         }
+
+        public async Task<int> ExecuteRawSqlAsync(string sql, CancellationToken cancellationToken = default)
+        {
+            return await Database.ExecuteSqlRawAsync(sql, cancellationToken);
+        }
     }
 }
