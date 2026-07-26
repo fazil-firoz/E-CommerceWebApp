@@ -124,37 +124,39 @@ const CustomerLayout = () => {
       {/* Sticky Header */}
       <Header style={{
         display: 'flex',
-        justify: 'space-between',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        background: '#fff',
+        background: activeTheme?.headerBgColor || '#ffffff',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
         padding: '0 24px',
         position: 'sticky',
         top: 0,
-        zIndex: 1000
+        zIndex: 1000,
+        transition: 'background 0.3s ease'
       }}>
         {/* Brand Logo & Name */}
-        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/')}>
+        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '10px' }} onClick={() => navigate('/')}>
           {logoUrl ? (
-            <img src={logoUrl} alt={shopName} style={{ maxHeight: '40px', maxWidth: '120px', objectFit: 'contain', marginRight: '10px' }} />
+            <img src={logoUrl} alt={shopName} style={{ maxHeight: '40px', maxWidth: '120px', objectFit: 'contain' }} />
           ) : (
             <div style={{
-              background: 'linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%)',
+              background: `linear-gradient(135deg, ${activeTheme?.primaryColor || '#ff6584'} 0%, ${activeTheme?.secondaryColor || '#ff85c0'} 100%)`,
               width: '40px', height: '40px',
               borderRadius: '12px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginRight: '12px',
-              boxShadow: '0 4px 10px rgba(255, 77, 79, 0.3)'
+              boxShadow: `0 4px 10px ${activeTheme?.primaryColor || '#ff6584'}40`,
+              flexShrink: 0
             }}>
               <ShopOutlined style={{ color: '#fff', fontSize: '20px' }} />
             </div>
           )}
           <Typography.Title level={4} style={{
             margin: 0,
-            background: `linear-gradient(45deg, ${activeTheme?.primaryColor || '#ff6584'}, ${activeTheme?.secondaryColor || '#ff85c0'})`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            fontWeight: 800
+            color: activeTheme?.primaryColor || '#ff6584',
+            fontWeight: 800,
+            letterSpacing: '-0.3px',
+            whiteSpace: 'nowrap',
+            transition: 'color 0.3s ease'
           }}>
             {shopName}
           </Typography.Title>
