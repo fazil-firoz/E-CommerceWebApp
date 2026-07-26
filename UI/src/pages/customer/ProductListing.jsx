@@ -8,6 +8,7 @@ import { superAdminApi } from '../../api/superAdminApi';
 import { CartContext } from '../../context/CartContext';
 import { WishlistContext } from '../../context/WishlistContext';
 import ProductBadge from '../../components/common/ProductBadge';
+import RecentSearchInput from '../../components/common/RecentSearchInput';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
 const { Title, Text } = Typography;
@@ -182,14 +183,11 @@ const ProductListing = () => {
               {categoryId ? categories.find(c => c.id === categoryId)?.name : 'All Toys'}
             </Title>
 
-            <Input.Search
-              placeholder="Search toys..."
-              allowClear
-              enterButton={<SearchOutlined />}
-              size="large"
-              defaultValue={search}
+            <RecentSearchInput
+              placeholder="Search toys & products..."
+              value={search}
               onSearch={handleSearchSubmit}
-              style={{ maxWidth: '320px', width: '100%' }}
+              maxWidth="340px"
             />
           </div>
 
