@@ -72,7 +72,16 @@ namespace ToyShop.Application.Features.Shop
             InstagramUrl = s.InstagramUrl,
             TwitterUrl = s.TwitterUrl,
             YouTubeUrl = s.YouTubeUrl,
-            OpeningHours = s.OpeningHours
+            OpeningHours = s.OpeningHours,
+            HeroTitle = s.HeroTitle,
+            HeroDescription = s.HeroDescription,
+            HeroImageUrl1 = s.HeroImageUrl1,
+            HeroImageUrl2 = s.HeroImageUrl2,
+            HeroImageUrl3 = s.HeroImageUrl3,
+            HeroImageUrl4 = s.HeroImageUrl4,
+            PromoTitle = s.PromoTitle,
+            PromoDescription = s.PromoDescription,
+            PromoCouponCode = s.PromoCouponCode
         };
     }
 
@@ -122,6 +131,15 @@ namespace ToyShop.Application.Features.Shop
             shop.TwitterUrl = req.TwitterUrl;
             shop.YouTubeUrl = req.YouTubeUrl;
             shop.OpeningHours = req.OpeningHours;
+            shop.HeroTitle = req.HeroTitle;
+            shop.HeroDescription = req.HeroDescription;
+            shop.HeroImageUrl1 = req.HeroImageUrl1;
+            shop.HeroImageUrl2 = req.HeroImageUrl2;
+            shop.HeroImageUrl3 = req.HeroImageUrl3;
+            shop.HeroImageUrl4 = req.HeroImageUrl4;
+            shop.PromoTitle = req.PromoTitle;
+            shop.PromoDescription = req.PromoDescription;
+            shop.PromoCouponCode = req.PromoCouponCode;
             shop.UpdatedDate = DateTimeOffset.UtcNow;
 
             if (shop.Id > 0)

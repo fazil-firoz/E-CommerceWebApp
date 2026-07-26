@@ -23,6 +23,14 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsPrintInvoiceEnabled { get; set; } = true;
         public bool IsProductBadgeEnabled { get; set; } = true;
         public bool IsWishlistEnabled { get; set; } = true;
+
+        public bool IsHeroBannerEnabled { get; set; } = true;
+        public bool IsCategoriesSectionEnabled { get; set; } = true;
+        public bool IsFeaturedProductsEnabled { get; set; } = true;
+        public bool IsNewArrivalsEnabled { get; set; } = true;
+        public bool IsBestSellersEnabled { get; set; } = true;
+        public bool IsPromoBannerEnabled { get; set; } = true;
+        public bool IsWhyChooseUsEnabled { get; set; } = true;
     }
 
     public class UpdateSuperAdminControlRequest
@@ -38,6 +46,14 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsPrintInvoiceEnabled { get; set; }
         public bool IsProductBadgeEnabled { get; set; }
         public bool IsWishlistEnabled { get; set; }
+
+        public bool IsHeroBannerEnabled { get; set; } = true;
+        public bool IsCategoriesSectionEnabled { get; set; } = true;
+        public bool IsFeaturedProductsEnabled { get; set; } = true;
+        public bool IsNewArrivalsEnabled { get; set; } = true;
+        public bool IsBestSellersEnabled { get; set; } = true;
+        public bool IsPromoBannerEnabled { get; set; } = true;
+        public bool IsWhyChooseUsEnabled { get; set; } = true;
     }
 
     public class SuperAdminLoginRequest
@@ -134,6 +150,15 @@ namespace ToyShop.Application.Features.SuperAdmin
             control.IsPrintInvoiceEnabled = request.Request.IsPrintInvoiceEnabled;
             control.IsProductBadgeEnabled = request.Request.IsProductBadgeEnabled;
             control.IsWishlistEnabled = request.Request.IsWishlistEnabled;
+
+            control.IsHeroBannerEnabled = request.Request.IsHeroBannerEnabled;
+            control.IsCategoriesSectionEnabled = request.Request.IsCategoriesSectionEnabled;
+            control.IsFeaturedProductsEnabled = request.Request.IsFeaturedProductsEnabled;
+            control.IsNewArrivalsEnabled = request.Request.IsNewArrivalsEnabled;
+            control.IsBestSellersEnabled = request.Request.IsBestSellersEnabled;
+            control.IsPromoBannerEnabled = request.Request.IsPromoBannerEnabled;
+            control.IsWhyChooseUsEnabled = request.Request.IsWhyChooseUsEnabled;
+
             control.UpdatedDate = System.DateTimeOffset.UtcNow;
 
             _controlRepo.Update(control);
@@ -176,7 +201,14 @@ namespace ToyShop.Application.Features.SuperAdmin
             IsWhatsAppFloatingWidgetEnabled = c.IsWhatsAppFloatingWidgetEnabled,
             IsPrintInvoiceEnabled = c.IsPrintInvoiceEnabled,
             IsProductBadgeEnabled = c.IsProductBadgeEnabled,
-            IsWishlistEnabled = c.IsWishlistEnabled
+            IsWishlistEnabled = c.IsWishlistEnabled,
+            IsHeroBannerEnabled = c.IsHeroBannerEnabled,
+            IsCategoriesSectionEnabled = c.IsCategoriesSectionEnabled,
+            IsFeaturedProductsEnabled = c.IsFeaturedProductsEnabled,
+            IsNewArrivalsEnabled = c.IsNewArrivalsEnabled,
+            IsBestSellersEnabled = c.IsBestSellersEnabled,
+            IsPromoBannerEnabled = c.IsPromoBannerEnabled,
+            IsWhyChooseUsEnabled = c.IsWhyChooseUsEnabled
         };
     }
 }

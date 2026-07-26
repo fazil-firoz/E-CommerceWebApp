@@ -15,5 +15,14 @@ namespace ToyShop.Domain.Entities
         public bool IsPrintInvoiceEnabled { get; set; } = true;
         public bool IsProductBadgeEnabled { get; set; } = true;
         public bool IsWishlistEnabled { get; set; } = true;
+
+        // Homepage Section UI Controls
+        public bool IsHeroBannerEnabled { get; set; } = true;
+        public bool IsCategoriesSectionEnabled { get; set; } = true;
+        public bool IsFeaturedProductsEnabled { get; set; } = true;
+        public bool IsNewArrivalsEnabled { get; set; } = true;
+        public bool IsBestSellersEnabled { get; set; } = true;
+        public bool IsPromoBannerEnabled { get; set; } = true;
+        public bool IsWhyChooseUsEnabled { get; set; } = true;
     }
 }

@@ -32,6 +32,7 @@ namespace ToyShop.Infrastructure.Persistence
         public DbSet<ShipmentMethod> ShipmentMethods => Set<ShipmentMethod>();
         public DbSet<SuperAdminControl> SuperAdminControls => Set<SuperAdminControl>();
         public DbSet<CouponCode> CouponCodes => Set<CouponCode>();
+        public DbSet<ShopTheme> ShopThemes => Set<ShopTheme>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -59,6 +60,7 @@ namespace ToyShop.Infrastructure.Persistence
             modelBuilder.Entity<Admin>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<Shop>().HasQueryFilter(e => !e.IsDeleted);
             modelBuilder.Entity<ShipmentMethod>().HasQueryFilter(e => !e.IsDeleted);
+            modelBuilder.Entity<ShopTheme>().HasQueryFilter(e => !e.IsDeleted);
 
             // Configure entity relationships
             modelBuilder.Entity<Product>()

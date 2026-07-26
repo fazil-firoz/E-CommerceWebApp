@@ -1,58 +1,153 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Switch, Divider, Spin, Alert, Tooltip, Modal } from 'antd';
+import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Switch, Divider, Spin, Alert, Tooltip, Modal, Tag } from 'antd';
 import {
   CrownOutlined, LockOutlined, UnlockOutlined, SaveOutlined,
   AppstoreOutlined, SettingOutlined, WhatsAppOutlined, SafetyCertificateOutlined,
   CheckCircleOutlined, StopOutlined, ReloadOutlined, TagOutlined, PrinterOutlined, HeartOutlined,
-  DeleteOutlined, WarningOutlined, ExclamationCircleOutlined
+  DeleteOutlined, WarningOutlined, ExclamationCircleOutlined, BgColorsOutlined, StarOutlined
 } from '@ant-design/icons';
 import { superAdminApi } from '../../api/superAdminApi';
+import { themeApi } from '../../api/themeApi';
 
 const { Title, Text, Paragraph } = Typography;
 
 const SuperAdminManagement = () => {
   const [authForm] = Form.useForm();
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(() => {
+    return sessionStorage.getItem('super_admin_verified') === 'true';
+  });
   const [verifying, setVerifying] = useState(false);
   const [loadingControls, setLoadingControls] = useState(false);
   const [savingControls, setSavingControls] = useState(false);
+
+  // Theme Management State
+  const [themes, setThemes] = useState([
+    {
+      id: 1,
+      themeName: 'Default Store Theme (Original)',
+      themeKey: 'default',
+      primaryColor: '#1890ff',
+      secondaryColor: '#722ed1',
+      backgroundColor: '#f5f7fa',
+      accentColor: '#ff4d4f',
+      isActive: true
+    },
+    {
+      id: 2,
+      themeName: 'Kawaii Cute Pink Store',
+      themeKey: 'kawaii',
+      primaryColor: '#ff6584',
+      secondaryColor: '#ff85c0',
+      backgroundColor: '#fff5f7',
+      accentColor: '#ff2a6d',
+      isActive: false
+    },
+    {
+      id: 3,
+      themeName: 'Fancy Dress & Fashion Boutique',
+      themeKey: 'fancy_dress',
+      primaryColor: '#d47a8d',
+      secondaryColor: '#e8b4b8',
+      backgroundColor: '#fdfbf7',
+      accentColor: '#9b2c2c',
+      isActive: false
+    },
+    {
+      id: 4,
+      themeName: 'Luxe Emerald & Gold Store',
+      themeKey: 'luxe_emerald',
+      primaryColor: '#059669',
+      secondaryColor: '#10b981',
+      backgroundColor: '#f0fdf4',
+      accentColor: '#d97706',
+      isActive: false
+    }
+  ]);
+  const [activatingThemeId, setActivatingThemeId] = useState(null);
 
   // Reset Database State
   const [isResetModalVisible, setIsResetModalVisible] = useState(false);
   const [resetConfirmationInput, setResetConfirmationInput] = useState('');
   const [resetting, setResetting] = useState(false);
 
-  // Control state
-  const [controls, setControls] = useState({
+  // Default controls fallback
+  const defaultControls = {
     isShopSettingsMenuEnabled: true,
     isShipmentSettingsMenuEnabled: true,
     isInvoiceSettingsMenuEnabled: true,
     isTaxSettingsMenuEnabled: true,
     isReportsMenuEnabled: true,
-    isWhatsAppFloatingWidgetEnabled: true
-  });
+    isCouponMenuEnabled: true,
+    isWhatsAppFloatingWidgetEnabled: true,
+    isPrintInvoiceEnabled: true,
+    isProductBadgeEnabled: true,
+    isWishlistEnabled: true,
+    isHeroBannerEnabled: true,
+    isCategoriesSectionEnabled: true,
+    isFeaturedProductsEnabled: true,
+    isNewArrivalsEnabled: true,
+    isBestSellersEnabled: true,
+    isPromoBannerEnabled: true,
+    isWhyChooseUsEnabled: true
+  };
+
+  // Control state
+  const [controls, setControls] = useState(defaultControls);
+
+  const getCtrl = (key) => {
+    if (!controls) return true;
+    return controls[key] !== false;
+  };
 
   const fetchControls = async () => {
     setLoadingControls(true);
     try {
       const res = await superAdminApi.getControl();
       if (res.success && res.data) {
-        setControls(res.data);
+        setControls({ ...defaultControls, ...res.data });
       }
     } catch (err) {
-      message.error('Failed to load Super Admin control flags');
+      console.error('Failed to load Super Admin control flags', err);
     } finally {
       setLoadingControls(false);
     }
   };
 
-  useEffect(() => {
-    const verified = sessionStorage.getItem('super_admin_verified');
-    if (verified === 'true') {
-      setIsUnlocked(true);
-      fetchControls();
+  const fetchThemes = async () => {
+    try {
+      const res = await themeApi.getAllThemes();
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
+        setThemes(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load shop themes', err);
     }
-  }, []);
+  };
+
+  const handleSelectTheme = async (themeId) => {
+    setActivatingThemeId(themeId);
+    try {
+      const res = await themeApi.setActiveTheme(themeId);
+      if (res.success) {
+        message.success(res.message || 'Theme activated successfully!');
+        window.dispatchEvent(new Event('shopThemeUpdated'));
+        fetchThemes();
+      } else {
+        message.error(res.message || 'Failed to activate theme');
+      }
+    } catch (err) {
+      message.error('Error setting shop theme');
+    } finally {
+      setActivatingThemeId(null);
+    }
+  };
+
+  useEffect(() => {
+    if (isUnlocked) {
+      fetchControls();
+      fetchThemes();
+    }
+  }, [isUnlocked]);
 
   const handleLogin = async () => {
     try {
@@ -64,6 +159,7 @@ const SuperAdminManagement = () => {
         setIsUnlocked(true);
         message.success('Super Admin verification successful!');
         fetchControls();
+        fetchThemes();
       } else {
         message.error(res.message || 'Invalid Super Admin credentials');
       }
@@ -582,7 +678,147 @@ const SuperAdminManagement = () => {
           </Col>
         </Row>
 
-        {/* Section 3: Danger Zone & System Factory Reset */}
+        {/* Section 3: Homepage UI Section Controller */}
+        <Row style={{ marginTop: '24px' }}>
+          <Col span={24}>
+            <Card
+              title={
+                <span style={{ fontWeight: 700, fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <SettingOutlined style={{ color: '#ff4d4f' }} /> Section 3: Homepage UI Section Controller
+                </span>
+              }
+              style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+            >
+              <Paragraph type="secondary" style={{ fontSize: '13px', marginBottom: '20px' }}>
+                Super Admin control to dynamically show or hide individual layout sections on the customer Homepage.
+              </Paragraph>
+
+              <Row gutter={[16, 16]}>
+                {[
+                  { key: 'isHeroBannerEnabled', label: 'Hero Banner Section', desc: 'Main interactive hero showcase with glowing call-to-action' },
+                  { key: 'isCategoriesSectionEnabled', label: 'Categories Section', desc: 'Grid of toy categories with icon cards and item counts' },
+                  { key: 'isFeaturedProductsEnabled', label: 'Featured Products Section', desc: 'Curated featured products with ribbon badges' },
+                  { key: 'isNewArrivalsEnabled', label: 'New Arrivals Section', desc: 'Freshly added items grid' },
+                  { key: 'isBestSellersEnabled', label: 'Best Sellers Section', desc: 'Top selling popular toys grid' },
+                  { key: 'isPromoBannerEnabled', label: 'Promo Banner Section', desc: 'Promotional discount campaign banner' },
+                  { key: 'isWhyChooseUsEnabled', label: 'Why Choose Us Section', desc: 'Store trust badges (Fast Shipping, Safe Toys, 24/7 Support)' }
+                ].map((sec) => (
+                  <Col xs={24} sm={12} lg={8} key={sec.key}>
+                    <div style={{
+                      padding: '16px',
+                      borderRadius: '12px',
+                      border: '1px solid #f0f0f0',
+                      background: getCtrl(sec.key) ? '#f6ffed' : '#fff1f0',
+                      display: 'flex',
+                      justify: 'space-between',
+                      alignItems: 'center',
+                      height: '100%'
+                    }}>
+                      <div>
+                        <Text strong style={{ fontSize: '14px', display: 'block' }}>{sec.label}</Text>
+                        <Text type="secondary" style={{ fontSize: '12px' }}>{sec.desc}</Text>
+                      </div>
+                      <Switch
+                        checkedChildren={<CheckCircleOutlined />}
+                        unCheckedChildren={<StopOutlined />}
+                        checked={getCtrl(sec.key)}
+                        onChange={(checked) => setControls((prev) => ({ ...(prev || defaultControls), [sec.key]: checked }))}
+                      />
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Section 4: Shop Theme Selector & Multi-Client Styling Controller */}
+        <Row style={{ marginTop: '24px' }}>
+          <Col span={24}>
+            <Card
+              title={
+                <span style={{ fontWeight: 700, fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <BgColorsOutlined style={{ color: '#ff6584' }} /> Section 4: Shop Theme Selector (Multi-Client Brands)
+                </span>
+              }
+              style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+            >
+              <Paragraph type="secondary" style={{ fontSize: '13px', marginBottom: '20px' }}>
+                Select the active shop brand theme. Changes apply dynamically across the entire customer store area without touching the Admin panel.
+              </Paragraph>
+
+              <Row gutter={[20, 20]}>
+                {(themes || []).map((t) => (
+                  <Col xs={24} sm={12} lg={8} key={t.id}>
+                    <Card
+                      style={{
+                        borderRadius: '16px',
+                        border: t.isActive ? `2px solid ${t.primaryColor}` : '1px solid #e2e8f0',
+                        background: t.isActive ? '#fff' : '#fafafa',
+                        boxShadow: t.isActive ? `0 8px 24px ${t.primaryColor}25` : '0 2px 8px rgba(0,0,0,0.03)',
+                        transition: 'all 0.3s ease'
+                      }}
+                      styles={{ body: { padding: '20px' } }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                        <div>
+                          <Text strong style={{ fontSize: '16px', display: 'block', color: '#0f172a' }}>{t.themeName}</Text>
+                          <Tag style={{ borderRadius: '10px', marginTop: '4px', fontSize: '11px', textTransform: 'uppercase', fontWeight: 700 }}>
+                            {t.themeKey}
+                          </Tag>
+                        </div>
+                        {t.isActive ? (
+                          <Tag color="success" icon={<CheckCircleOutlined />} style={{ borderRadius: '12px', padding: '2px 10px', fontWeight: 700 }}>
+                            ACTIVE
+                          </Tag>
+                        ) : null}
+                      </div>
+
+                      {/* Color Swatch Preview */}
+                      <div style={{ background: t.backgroundColor, padding: '12px', borderRadius: '12px', border: '1px solid #f0f0f0', marginBottom: '16px' }}>
+                        <Text style={{ fontSize: '11px', color: '#64748b', display: 'block', marginBottom: '6px', fontWeight: 600 }}>Palette Preview:</Text>
+                        <Space size={8}>
+                          <Tooltip title={`Primary: ${t.primaryColor}`}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: t.primaryColor, boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }} />
+                          </Tooltip>
+                          <Tooltip title={`Secondary: ${t.secondaryColor}`}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: t.secondaryColor, boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }} />
+                          </Tooltip>
+                          <Tooltip title={`Accent: ${t.accentColor}`}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: t.accentColor, boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }} />
+                          </Tooltip>
+                          <Tooltip title={`Background: ${t.backgroundColor}`}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: t.backgroundColor, border: '1px solid #ccc', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }} />
+                          </Tooltip>
+                        </Space>
+                      </div>
+
+                      <Button
+                        type={t.isActive ? "default" : "primary"}
+                        block
+                        loading={activatingThemeId === t.id}
+                        disabled={t.isActive}
+                        onClick={() => handleSelectTheme(t.id)}
+                        style={{
+                          borderRadius: '10px',
+                          fontWeight: 700,
+                          height: '38px',
+                          background: t.isActive ? '#f5f5f5' : t.primaryColor,
+                          borderColor: t.isActive ? '#d9d9d9' : t.primaryColor,
+                          color: t.isActive ? '#8c8c8c' : '#ffffff'
+                        }}
+                      >
+                        {t.isActive ? 'Current Theme' : 'Activate Theme'}
+                      </Button>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Section 5: Danger Zone & System Factory Reset */}
         <Row style={{ marginTop: '24px' }}>
           <Col span={24}>
             <Card

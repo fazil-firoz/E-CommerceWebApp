@@ -35,6 +35,16 @@ namespace ToyShop.Application.DTOs
         public string? TwitterUrl { get; set; }
         public string? YouTubeUrl { get; set; }
         public string? OpeningHours { get; set; }
+
+        public string? HeroTitle { get; set; }
+        public string? HeroDescription { get; set; }
+        public string? HeroImageUrl1 { get; set; }
+        public string? HeroImageUrl2 { get; set; }
+        public string? HeroImageUrl3 { get; set; }
+        public string? HeroImageUrl4 { get; set; }
+        public string? PromoTitle { get; set; }
+        public string? PromoDescription { get; set; }
+        public string? PromoCouponCode { get; set; }
     }
 
     public class UpdateShopRequest
@@ -67,5 +77,15 @@ namespace ToyShop.Application.DTOs
         public string? TwitterUrl { get; set; }
         public string? YouTubeUrl { get; set; }
         public string? OpeningHours { get; set; }
+
+        public string? HeroTitle { get; set; }
+        public string? HeroDescription { get; set; }
+        public string? HeroImageUrl1 { get; set; }
+        public string? HeroImageUrl2 { get; set; }
+        public string? HeroImageUrl3 { get; set; }
+        public string? HeroImageUrl4 { get; set; }
+        public string? PromoTitle { get; set; }
+        public string? PromoDescription { get; set; }
+        public string? PromoCouponCode { get; set; }
     }
 }
