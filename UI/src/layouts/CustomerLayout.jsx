@@ -15,7 +15,6 @@ import { AdminAuthContext } from '../context/AdminAuthContext';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
 import { ThemeContext } from '../context/ThemeContext';
 import LoginDrawer from '../components/LoginDrawer';
-import RecentSearchInput from '../components/common/RecentSearchInput';
 import { shopApi } from '../api/shopApi';
 import { superAdminApi } from '../api/superAdminApi';
 import { resolveProductImageUrl } from '../utils/imageHelper';
@@ -119,42 +118,94 @@ const CustomerLayout = () => {
   const twitter = shopSettings?.twitterUrl;
   const yt = shopSettings?.youTubeUrl;
 
+  const primaryColor = activeTheme?.primaryColor || '#ff6584';
+  const headerBg = activeTheme?.headerBgColor || '#ffffff';
+
+  // Dynamic CSS to override Ant Design Menu active/hover colors with theme
+  const menuThemeStyle = `
+    /* Nav menu active/hover colors */
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-selected a,
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-selected span,
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-selected .ant-menu-title-content a,
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-active a,
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-active span {
+      color: ${primaryColor} !important;
+    }
+    .customer-nav.ant-menu-horizontal > .ant-menu-item-selected::after {
+      border-bottom-color: ${primaryColor} !important;
+    }
+    .customer-nav.ant-menu-horizontal > .ant-menu-item:hover::after {
+      border-bottom-color: ${primaryColor} !important;
+    }
+    .customer-nav.ant-menu-horizontal > .ant-menu-item:hover a,
+    .customer-nav.ant-menu-horizontal > .ant-menu-item:hover span {
+      color: ${primaryColor} !important;
+    }
+
+    /* Search button - Ant Design v4 & v5 */
+    .themed-search-input .ant-input-search-button,
+    .themed-search-input .ant-btn.ant-btn-primary,
+    .themed-search-input button[type=button].ant-btn-primary {
+      background: ${primaryColor} !important;
+      background-color: ${primaryColor} !important;
+      border-color: ${primaryColor} !important;
+      color: #fff !important;
+    }
+    .themed-search-input .ant-input-search-button:hover,
+    .themed-search-input .ant-btn.ant-btn-primary:hover {
+      background: ${primaryColor}cc !important;
+      background-color: ${primaryColor}cc !important;
+      border-color: ${primaryColor}cc !important;
+    }
+    /* Input focus ring */
+    .themed-search-input .ant-input:focus,
+    .themed-search-input .ant-input-affix-wrapper:focus-within,
+    .themed-search-input .ant-input-affix-wrapper-focused {
+      border-color: ${primaryColor} !important;
+      box-shadow: 0 0 0 2px ${primaryColor}28 !important;
+    }
+  `;
+
   return (
     <Layout className="layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      {/* Dynamic theme style injection */}
+      <style>{menuThemeStyle}</style>
       {/* Sticky Header */}
       <Header style={{
         display: 'flex',
-        justify: 'space-between',
+        justifyContent: 'space-between',
         alignItems: 'center',
-        background: '#fff',
+        background: activeTheme?.headerBgColor || '#ffffff',
         boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
         padding: '0 24px',
         position: 'sticky',
         top: 0,
-        zIndex: 1000
+        zIndex: 1000,
+        transition: 'background 0.3s ease'
       }}>
         {/* Brand Logo & Name */}
-        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer' }} onClick={() => navigate('/')}>
+        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '10px' }} onClick={() => navigate('/')}>
           {logoUrl ? (
-            <img src={logoUrl} alt={shopName} style={{ maxHeight: '40px', maxWidth: '120px', objectFit: 'contain', marginRight: '10px' }} />
+            <img src={logoUrl} alt={shopName} style={{ maxHeight: '40px', maxWidth: '120px', objectFit: 'contain' }} />
           ) : (
             <div style={{
-              background: 'linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%)',
+              background: `linear-gradient(135deg, ${activeTheme?.primaryColor || '#ff6584'} 0%, ${activeTheme?.secondaryColor || '#ff85c0'} 100%)`,
               width: '40px', height: '40px',
               borderRadius: '12px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              marginRight: '12px',
-              boxShadow: '0 4px 10px rgba(255, 77, 79, 0.3)'
+              boxShadow: `0 4px 10px ${activeTheme?.primaryColor || '#ff6584'}40`,
+              flexShrink: 0
             }}>
               <ShopOutlined style={{ color: '#fff', fontSize: '20px' }} />
             </div>
           )}
           <Typography.Title level={4} style={{
             margin: 0,
-            background: `linear-gradient(45deg, ${activeTheme?.primaryColor || '#ff6584'}, ${activeTheme?.secondaryColor || '#ff85c0'})`,
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
-            fontWeight: 800
+            color: activeTheme?.primaryColor || '#ff6584',
+            fontWeight: 800,
+            letterSpacing: '-0.3px',
+            whiteSpace: 'nowrap',
+            transition: 'color 0.3s ease'
           }}>
             {shopName}
           </Typography.Title>
@@ -165,24 +216,9 @@ const CustomerLayout = () => {
           mode="horizontal"
           selectedKeys={[location.pathname]}
           items={menuItems}
-          style={{ flex: 1, marginLeft: '24px', borderBottom: 'none' }}
+          className="customer-nav"
+          style={{ flex: 1, marginLeft: '24px', borderBottom: 'none', background: 'transparent', transition: 'all 0.3s ease' }}
         />
-
-        {/* Header Quick Search with Recently Searched dropdown */}
-        <div style={{ margin: '0 16px', flex: '0 1 280px' }}>
-          <RecentSearchInput
-            placeholder="Search products..."
-            size="middle"
-            onSearch={(term) => {
-              if (term) {
-                navigate(`/products?search=${encodeURIComponent(term)}`);
-              } else {
-                navigate('/products');
-              }
-            }}
-            maxWidth="280px"
-          />
-        </div>
 
         {/* Right actions */}
         <Space size={8} align="center">

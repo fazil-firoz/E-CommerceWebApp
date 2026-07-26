@@ -8,6 +8,7 @@ import {
   TagOutlined, SafetyCertificateOutlined
 } from '@ant-design/icons';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
+import { ThemeContext } from '../context/ThemeContext';
 import { authApi } from '../api/authApi';
 import { shopApi } from '../api/shopApi';
 import { orderApi } from '../api/orderApi';
@@ -18,6 +19,11 @@ const OTP_LENGTH = 6;
 
 const LoginDrawer = ({ open, onClose }) => {
   const { customer, isLoggedIn, login, logout } = useCustomerAuth();
+  const { activeTheme } = React.useContext(ThemeContext);
+
+  const primaryColor = activeTheme?.primaryColor || '#ff6584';
+  const secondaryColor = activeTheme?.secondaryColor || '#ff85c0';
+  const accentColor = activeTheme?.accentColor || '#ff2a6d';
 
   const [step, setStep] = useState('email'); // 'email' | 'otp' | 'success'
   const [email, setEmail] = useState('');
@@ -202,7 +208,7 @@ const LoginDrawer = ({ open, onClose }) => {
     <div className="ld-logged-in" style={{ width: '100%', padding: '16px 20px' }}>
       {/* Header Profile Info */}
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
-        <div className="ld-avatar" style={{ margin: '0 auto 10px', background: 'linear-gradient(135deg, #ec4899, #f472b6)' }}>
+        <div className="ld-avatar" style={{ margin: '0 auto 10px', background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`, boxShadow: `0 6px 18px ${primaryColor}40` }}>
           {customer?.name?.[0]?.toUpperCase() || '?'}
         </div>
         <Title level={4} style={{ margin: '0 0 2px', fontWeight: 800, color: '#1f1f1f' }}>
@@ -242,17 +248,17 @@ const LoginDrawer = ({ open, onClose }) => {
                     <Divider style={{ margin: '4px 0' }} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <Text type="secondary" style={{ fontSize: '13px' }}>Total Orders</Text>
-                      <Text strong style={{ fontSize: '14px', color: '#ec4899' }}>{myOrders.length} Orders</Text>
+                      <Text strong style={{ fontSize: '14px', color: primaryColor }}>{myOrders.length} Orders</Text>
                     </div>
                   </Space>
                 </Card>
 
                 <div style={{
-                  background: '#fdf2f8', border: '1px solid #fce7f3',
+                  background: `${primaryColor}10`, border: `1px solid ${primaryColor}30`,
                   borderRadius: '14px', padding: '14px', textAlign: 'center'
                 }}>
-                  <SafetyCertificateOutlined style={{ fontSize: '20px', color: '#ec4899', marginBottom: '6px' }} />
-                  <Text strong style={{ display: 'block', fontSize: '13px', color: '#be185d' }}>
+                  <SafetyCertificateOutlined style={{ fontSize: '20px', color: primaryColor, marginBottom: '6px' }} />
+                  <Text strong style={{ display: 'block', fontSize: '13px', color: primaryColor }}>
                     Linked Account History
                   </Text>
                   <Text style={{ fontSize: '12px', color: '#6b7280' }}>
@@ -441,6 +447,11 @@ const LoginDrawer = ({ open, onClose }) => {
         className="ld-primary-btn"
         icon={<ArrowRightOutlined />}
         iconPosition="end"
+        style={{
+          background: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor || primaryColor} 100%)`,
+          border: 'none',
+          boxShadow: `0 4px 16px ${primaryColor}40`
+        }}
       >
         Send OTP
       </Button>
@@ -449,7 +460,7 @@ const LoginDrawer = ({ open, onClose }) => {
         <Text type="secondary" style={{ fontSize: '12px' }}>By signing in you agree to our</Text>
       </Divider>
       <Text type="secondary" style={{ fontSize: '12px', display: 'block', textAlign: 'center' }}>
-        <a href="/privacy-policy" style={{ color: '#ec4899' }}>Privacy Policy</a> · <a href="/terms-conditions" style={{ color: '#ec4899' }}>Terms of Service</a>
+        <a href="/privacy-policy" style={{ color: primaryColor }}>Privacy Policy</a> · <a href="/terms-conditions" style={{ color: primaryColor }}>Terms of Service</a>
       </Text>
     </div>
   );
@@ -462,7 +473,7 @@ const LoginDrawer = ({ open, onClose }) => {
       <Text type="secondary" className="ld-step-desc">
         We sent a 6-digit code to
       </Text>
-      <Text strong style={{ display: 'block', textAlign: 'center', marginBottom: '28px', color: '#ec4899', fontSize: '15px' }}>
+      <Text strong style={{ display: 'block', textAlign: 'center', marginBottom: '28px', color: primaryColor, fontSize: '15px' }}>
         {email}
       </Text>
 
@@ -497,8 +508,13 @@ const LoginDrawer = ({ open, onClose }) => {
         loading={loading}
         onClick={handleVerifyOtp}
         className="ld-primary-btn"
-        style={{ marginTop: '8px' }}
         icon={<CheckCircleFilled />}
+        style={{
+          marginTop: '8px',
+          background: `linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor || primaryColor} 100%)`,
+          border: 'none',
+          boxShadow: `0 4px 16px ${primaryColor}40`
+        }}
       >
         Verify & Sign In
       </Button>
@@ -509,7 +525,7 @@ const LoginDrawer = ({ open, onClose }) => {
             Resend OTP in <strong>{resendTimer}s</strong>
           </Text>
         ) : (
-          <Button type="link" onClick={handleSendOtp} style={{ fontSize: '13px', padding: 0, color: '#ec4899' }}>
+          <Button type="link" onClick={handleSendOtp} style={{ fontSize: '13px', padding: 0, color: primaryColor }}>
             Didn't receive it? Resend OTP
           </Button>
         )}
@@ -540,6 +556,42 @@ const LoginDrawer = ({ open, onClose }) => {
     </div>
   );
 
+  const dynamicDrawerStyle = `
+    .login-drawer .ld-primary-btn {
+      background: linear-gradient(135deg, ${primaryColor} 0%, ${secondaryColor || primaryColor} 100%) !important;
+      border: none !important;
+      box-shadow: 0 4px 16px ${primaryColor}40 !important;
+    }
+    .login-drawer .ld-primary-btn:hover {
+      box-shadow: 0 8px 24px ${primaryColor}60 !important;
+    }
+    .login-drawer .ld-input:focus,
+    .login-drawer .ld-input:hover {
+      border-color: ${primaryColor} !important;
+      box-shadow: 0 0 0 3px ${primaryColor}20 !important;
+    }
+    .login-drawer .ld-otp-box:focus {
+      border-color: ${primaryColor} !important;
+      box-shadow: 0 0 0 3px ${primaryColor}20 !important;
+    }
+    .login-drawer .ld-otp-filled {
+      border-color: ${primaryColor} !important;
+      background: ${primaryColor}15 !important;
+      color: ${primaryColor} !important;
+    }
+    .login-drawer .ant-tabs-ink-bar {
+      background: ${primaryColor} !important;
+    }
+    .login-drawer .ant-tabs-tab-active .ant-tabs-tab-btn {
+      color: ${primaryColor} !important;
+    }
+    .login-drawer .ld-close-btn:hover {
+      background: ${primaryColor} !important;
+      border-color: ${primaryColor} !important;
+      color: #fff !important;
+    }
+  `;
+
   return (
     <Drawer
       open={open}
@@ -554,6 +606,7 @@ const LoginDrawer = ({ open, onClose }) => {
       }}
       className="login-drawer"
     >
+      <style>{dynamicDrawerStyle}</style>
       {/* Custom header */}
       <div className="ld-header">
         <div className="ld-header-brand">

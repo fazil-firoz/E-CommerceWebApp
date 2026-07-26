@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import { Card, Col, Row, Input, List, Space, Typography, Spin, message, Empty, Button, Tooltip } from 'antd';
-import { SearchOutlined, AppstoreOutlined, ShoppingCartOutlined, ThunderboltOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons';
+import { Card, Col, Row, List, Space, Typography, Spin, message, Empty, Button, Tooltip } from 'antd';
+import { AppstoreOutlined, ShoppingCartOutlined, ThunderboltOutlined, HeartOutlined, HeartFilled } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { categoryApi } from '../../api/categoryApi';
 import { superAdminApi } from '../../api/superAdminApi';
 import { CartContext } from '../../context/CartContext';
 import { WishlistContext } from '../../context/WishlistContext';
+import { ThemeContext } from '../../context/ThemeContext';
 import ProductBadge from '../../components/common/ProductBadge';
 import RecentSearchInput from '../../components/common/RecentSearchInput';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
@@ -18,6 +19,7 @@ const ProductListing = () => {
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
   const { toggleWishlist, isInWishlist } = useContext(WishlistContext);
+  const { activeTheme } = useContext(ThemeContext);
 
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -27,6 +29,13 @@ const ProductListing = () => {
   const [isWishlistEnabled, setIsWishlistEnabled] = useState(true);
 
   const categoryId = searchParams.get('categoryId') ? parseInt(searchParams.get('categoryId')) : null;
+
+  // Theme-derived colors
+  const primaryColor = activeTheme?.primaryColor || '#ff6584';
+  const secondaryColor = activeTheme?.secondaryColor || '#ff85c0';
+  const accentColor = activeTheme?.accentColor || '#ff2a6d';
+  const cardBgColor = activeTheme?.cardBgColor || '#ffffff';
+  const textColor = activeTheme?.textColor || '#0f172a';
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -129,19 +138,21 @@ const ProductListing = () => {
         <Card
           style={{
             borderRadius: '16px',
-            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.02)',
+            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.04)',
             position: 'sticky',
             top: '84px',
-            border: '1px solid #f0f0f0'
+            border: `1px solid ${primaryColor}22`,
+            background: cardBgColor,
+            transition: 'all 0.3s ease'
           }}
           title={
-            <span style={{ fontWeight: 700, fontSize: '16px' }}>
-              <AppstoreOutlined style={{ marginRight: '8px', color: '#1890ff' }} /> Categories
+            <span style={{ fontWeight: 700, fontSize: '16px', color: textColor }}>
+              <AppstoreOutlined style={{ marginRight: '8px', color: primaryColor }} /> Categories
             </span>
           }
         >
           <List
-            dataSource={[{ id: null, name: 'All Toys' }, ...categories]}
+            dataSource={[{ id: null, name: 'All Products' }, ...categories]}
             renderItem={(item) => {
               const isSelected = item.id === categoryId;
               return (
@@ -149,14 +160,15 @@ const ProductListing = () => {
                   onClick={() => handleCategorySelect(item.id)}
                   style={{
                     cursor: 'pointer',
-                    padding: '12px 16px',
-                    borderRadius: '8px',
+                    padding: '10px 14px',
+                    borderRadius: '10px',
                     marginBottom: '4px',
                     borderBottom: 'none',
                     fontWeight: isSelected ? 700 : 500,
-                    background: isSelected ? 'rgba(24, 144, 255, 0.08)' : 'transparent',
-                    color: isSelected ? '#1890ff' : '#595959',
-                    transition: 'all 0.2s'
+                    background: isSelected ? `${primaryColor}18` : 'transparent',
+                    color: isSelected ? primaryColor : '#595959',
+                    transition: 'all 0.2s',
+                    borderLeft: isSelected ? `3px solid ${primaryColor}` : '3px solid transparent'
                   }}
                 >
                   {item.name}
@@ -179,32 +191,37 @@ const ProductListing = () => {
             flexWrap: 'wrap',
             gap: '16px'
           }}>
-            <Title level={2} style={{ margin: 0, fontWeight: 800 }}>
-              {categoryId ? categories.find(c => c.id === categoryId)?.name : 'All Toys'}
+            <Title level={2} style={{ margin: 0, fontWeight: 800, color: textColor }}>
+              {categoryId ? categories.find(c => c.id === categoryId)?.name : 'All Products'}
             </Title>
 
             <RecentSearchInput
               placeholder="Search products..."
               value={search}
               onSearch={handleSearchSubmit}
+              primaryColor={primaryColor}
               maxWidth="340px"
             />
           </div>
 
           {loading ? (
             <div style={{ textAlign: 'center', padding: '80px 0' }}>
-              <Spin size="large" tip="Unboxing toys..." />
+              <Spin size="large" />
             </div>
           ) : products.length === 0 ? (
-            <Card style={{ borderRadius: '16px', textAlign: 'center', padding: '40px 0' }}>
+            <Card style={{ borderRadius: '16px', textAlign: 'center', padding: '40px 0', background: cardBgColor }}>
               <Empty
-                description="No toys match your criteria"
+                description="No products match your criteria"
                 image={Empty.PRESENTED_IMAGE_SIMPLE}
               >
-                <Button type="primary" onClick={() => {
-                  setSearchParams({});
-                  setSearch('');
-                }}>
+                <Button
+                  type="primary"
+                  style={{ background: primaryColor, borderColor: primaryColor }}
+                  onClick={() => {
+                    setSearchParams({});
+                    setSearch('');
+                  }}
+                >
                   Clear Filters
                 </Button>
               </Empty>
@@ -217,14 +234,14 @@ const ProductListing = () => {
                     hoverable
                     cover={
                       <div
-                        style={{ 
-                          position: 'relative', 
-                          overflow: 'hidden', 
-                          borderTopLeftRadius: '16px', 
-                          borderTopRightRadius: '16px', 
+                        style={{
+                          position: 'relative',
+                          overflow: 'hidden',
+                          borderTopLeftRadius: '16px',
+                          borderTopRightRadius: '16px',
                           cursor: 'pointer',
                           width: '100%',
-                          aspectRatio: '4/3' // Fixed aspect ratio container
+                          aspectRatio: '4/3'
                         }}
                         onClick={() => navigate(`/products/${prod.id}`)}
                       >
@@ -233,7 +250,10 @@ const ProductListing = () => {
                           <Button
                             type="text"
                             shape="circle"
-                            icon={isInWishlist(prod.id) ? <HeartFilled className="wishlist-heart-active" style={{ color: '#ff4d4f', fontSize: '18px' }} /> : <HeartOutlined style={{ color: '#ff4d4f', fontSize: '18px' }} />}
+                            icon={isInWishlist(prod.id)
+                              ? <HeartFilled className="wishlist-heart-active" style={{ color: accentColor, fontSize: '18px' }} />
+                              : <HeartOutlined style={{ color: accentColor, fontSize: '18px' }} />
+                            }
                             onClick={(e) => toggleWishlist(prod, e)}
                             className="wishlist-heart-btn"
                             style={{
@@ -241,7 +261,7 @@ const ProductListing = () => {
                               top: 10,
                               right: 10,
                               zIndex: 12,
-                              background: 'rgba(255, 255, 255, 0.9)',
+                              background: 'rgba(255, 255, 255, 0.92)',
                               backdropFilter: 'blur(4px)',
                               border: '1px solid rgba(0,0,0,0.06)',
                               boxShadow: '0 4px 10px rgba(0,0,0,0.12)',
@@ -259,13 +279,13 @@ const ProductListing = () => {
                               alt={prod.name}
                               src={resolveProductImageUrl(mainImage?.imageUrl, 'thumb')}
                               loading="lazy"
-                              style={{ 
-                                height: '100%', 
-                                width: '100%', 
-                                objectFit: 'cover', 
-                                display: 'block', 
+                              style={{
+                                height: '100%',
+                                width: '100%',
+                                objectFit: 'cover',
+                                display: 'block',
                                 transform: `scale(${zoom})`,
-                                transition: 'transform 0.3s ease' 
+                                transition: 'transform 0.3s ease'
                               }}
                               onMouseOver={e => e.currentTarget.style.transform = `scale(${zoom * 1.04})`}
                               onMouseOut={e => e.currentTarget.style.transform = `scale(${zoom})`}
@@ -285,20 +305,22 @@ const ProductListing = () => {
                     }
                     style={{
                       borderRadius: '16px',
-                      boxShadow: '0 4px 10px rgba(0,0,0,0.04)',
-                      border: '1px solid #f0f0f0',
-                      overflow: 'hidden'
+                      boxShadow: `0 4px 16px ${primaryColor}14`,
+                      border: `1px solid ${primaryColor}22`,
+                      overflow: 'hidden',
+                      background: cardBgColor,
+                      transition: 'all 0.3s ease'
                     }}
-                    bodyStyle={{ padding: '16px' }}
+                    styles={{ body: { padding: '16px' } }}
                   >
                     {/* Product info - clickable */}
                     <div onClick={() => navigate(`/products/${prod.id}`)} style={{ cursor: 'pointer', marginBottom: '14px' }}>
-                      <Text strong style={{ fontSize: '15px', color: '#262626', display: 'block', marginBottom: '4px', lineHeight: 1.4 }}>
+                      <Text strong style={{ fontSize: '15px', color: textColor, display: 'block', marginBottom: '4px', lineHeight: 1.4 }}>
                         {prod.name}
                       </Text>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                          <Text strong style={{ fontSize: '18px', color: '#ff4d4f' }}>
+                          <Text strong style={{ fontSize: '18px', color: primaryColor }}>
                             ₹{prod.price.toLocaleString('en-IN')}
                           </Text>
                           {prod.mrp > prod.price && (
@@ -310,8 +332,8 @@ const ProductListing = () => {
                         <Text
                           style={{
                             fontSize: '11px',
-                            background: prod.stockQuantity > 0 ? '#f6ffed' : '#fff2f0',
-                            color: prod.stockQuantity > 0 ? '#52c41a' : '#ff4d4f',
+                            background: prod.stockQuantity > 0 ? `${primaryColor}15` : '#fff2f0',
+                            color: prod.stockQuantity > 0 ? primaryColor : '#ff4d4f',
                             padding: '2px 8px',
                             borderRadius: '4px',
                             fontWeight: 600
@@ -335,7 +357,9 @@ const ProductListing = () => {
                             borderRadius: '8px',
                             height: '36px',
                             fontWeight: 600,
-                            fontSize: '13px'
+                            fontSize: '13px',
+                            borderColor: primaryColor,
+                            color: primaryColor
                           }}
                         >
                           Add to Cart
@@ -354,8 +378,8 @@ const ProductListing = () => {
                             height: '36px',
                             fontWeight: 600,
                             fontSize: '13px',
-                            background: prod.stockQuantity > 0 ? '#ff4d4f' : undefined,
-                            borderColor: prod.stockQuantity > 0 ? '#ff4d4f' : undefined
+                            background: prod.stockQuantity > 0 ? primaryColor : undefined,
+                            borderColor: prod.stockQuantity > 0 ? primaryColor : undefined
                           }}
                         >
                           Buy Now

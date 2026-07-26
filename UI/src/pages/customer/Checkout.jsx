@@ -9,6 +9,7 @@ import {
 } from '@ant-design/icons';
 import { CartContext } from '../../context/CartContext';
 import { useCustomerAuth } from '../../context/CustomerAuthContext';
+import { ThemeContext } from '../../context/ThemeContext';
 import LoginDrawer from '../../components/LoginDrawer';
 import { orderApi } from '../../api/orderApi';
 import { paymentApi } from '../../api/paymentApi';
@@ -23,6 +24,7 @@ const { Title, Text } = Typography;
 const Checkout = () => {
   const { cartItems, cartTotal, updateQuantity, clearCart } = useContext(CartContext);
   const { customer, isLoggedIn } = useCustomerAuth();
+  const { activeTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -248,7 +250,7 @@ const Checkout = () => {
         email: customerValues.email || '',
         contact: customerValues.phone
       },
-      theme: { color: '#1890ff' },
+      theme: { color: primaryColor },
       modal: { ondismiss: () => message.warning('Payment cancelled.') }
     };
     new window.Razorpay(options).open();
@@ -284,8 +286,13 @@ const Checkout = () => {
     }
   };
 
+  // Theme colors
+  const primaryColor = activeTheme?.primaryColor || '#ff6584';
+  const accentColor = activeTheme?.accentColor || '#ff2a6d';
+  const cardBgColor = activeTheme?.cardBgColor || '#ffffff';
+
   return (
-    <div className="checkout-wrapper">
+    <div className="checkout-wrapper" style={{ '--checkout-primary': primaryColor, '--checkout-accent': accentColor }}>
       {loading && (
         <div className="checkout-loading-overlay">
           <Spin size="large" tip="Processing your order..." />
@@ -303,10 +310,10 @@ const Checkout = () => {
 
         {/* Buy Now Express Banner */}
         {buyNowItem && (
-          <div style={{ background: '#e6f7ff', border: '1px solid #91d5ff', borderRadius: '10px', padding: '10px 16px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <ThunderboltOutlined style={{ fontSize: '20px', color: '#1890ff' }} />
+          <div style={{ background: `${primaryColor}12`, border: `1px solid ${primaryColor}40`, borderRadius: '10px', padding: '10px 16px', marginBottom: '20px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <ThunderboltOutlined style={{ fontSize: '20px', color: primaryColor }} />
             <div>
-              <Text strong style={{ color: '#003a8c', fontSize: '14px' }}>Express Buy Now Checkout</Text>
+              <Text strong style={{ color: primaryColor, fontSize: '14px' }}>Express Buy Now Checkout</Text>
               <Text type="secondary" style={{ display: 'block', fontSize: '12px' }}>
                 Purchasing <strong>{buyNowItem.name}</strong>. You can adjust quantity below. Main cart items are kept safe.
               </Text>
@@ -317,11 +324,11 @@ const Checkout = () => {
         {/* Mobile Order Summary Toggle */}
         <div className="checkout-mobile-summary" onClick={() => setOrderSummaryExpanded(!orderSummaryExpanded)}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <ShoppingOutlined />
-            <Text strong style={{ color: '#0066cc' }}>
+            <ShoppingOutlined style={{ color: primaryColor }} />
+            <Text strong style={{ color: primaryColor }}>
               {orderSummaryExpanded ? 'Hide' : 'Show'} order summary
             </Text>
-            <RightOutlined style={{ fontSize: '11px', color: '#0066cc', transform: orderSummaryExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
+            <RightOutlined style={{ fontSize: '11px', color: primaryColor, transform: orderSummaryExpanded ? 'rotate(90deg)' : 'none', transition: 'transform 0.2s' }} />
           </div>
           <Text strong style={{ fontSize: '16px' }}>₹{grandTotal.toLocaleString('en-IN')}</Text>
         </div>
@@ -387,9 +394,9 @@ const Checkout = () => {
             <div className="checkout-section-header" style={{ marginBottom: '14px' }}>
               <Title level={5} style={{ margin: 0, fontWeight: 700 }}>Contact Information</Title>
               {isLoggedIn ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: '#e6f7ff', border: '1px solid #bae7ff', borderRadius: '20px', padding: '4px 12px' }}>
-                  <CheckCircleFilled style={{ color: '#1890ff', fontSize: '13px' }} />
-                  <Text style={{ fontSize: '12px', color: '#003a8c', fontWeight: 600 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: `${primaryColor}12`, border: `1px solid ${primaryColor}40`, borderRadius: '20px', padding: '4px 12px' }}>
+                  <CheckCircleFilled style={{ color: primaryColor, fontSize: '13px' }} />
+                  <Text style={{ fontSize: '12px', color: primaryColor, fontWeight: 600 }}>
                     Signed in as <strong>{customer?.email}</strong>
                   </Text>
                 </div>
@@ -511,13 +518,18 @@ const Checkout = () => {
             loading={loading}
             className="checkout-pay-btn"
             icon={<LockOutlined />}
-            style={{ borderRadius: '10px', height: '50px', fontSize: '16px', fontWeight: 700 }}
+            style={{
+              borderRadius: '10px', height: '50px', fontSize: '16px', fontWeight: 700,
+              background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
+              border: 'none',
+              boxShadow: `0 4px 14px ${primaryColor}50`
+            }}
           >
             Pay now — ₹{grandTotal.toLocaleString('en-IN')}
           </Button>
 
           <div className="checkout-footer-links">
-            <SafetyCertificateOutlined style={{ color: '#1890ff' }} />
+            <SafetyCertificateOutlined style={{ color: primaryColor }} />
             <Text type="secondary" style={{ fontSize: '12px' }}>
               Secured by 256-bit SSL encryption
             </Text>
@@ -614,7 +626,7 @@ const Checkout = () => {
                     type="primary"
                     loading={validatingCoupon}
                     onClick={handleApplyCoupon}
-                    style={{ borderRadius: '0 8px 8px 0', background: '#722ed1', borderColor: '#722ed1', fontWeight: 700 }}
+                    style={{ borderRadius: '0 8px 8px 0', background: primaryColor, borderColor: primaryColor, fontWeight: 700 }}
                   >
                     Apply
                   </Button>
@@ -673,7 +685,7 @@ const Checkout = () => {
             <Text strong style={{ fontSize: '16px' }}>Total</Text>
             <div>
               <Text type="secondary" style={{ fontSize: '12px', marginRight: '6px' }}>INR</Text>
-              <Text strong style={{ fontSize: '20px', color: '#1890ff' }}>₹{grandTotal.toLocaleString('en-IN')}</Text>
+              <Text strong style={{ fontSize: '20px', color: primaryColor }}>₹{grandTotal.toLocaleString('en-IN')}</Text>
             </div>
           </div>
         </div>

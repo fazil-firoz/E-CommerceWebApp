@@ -14,7 +14,8 @@ const RecentSearchInput = ({
   placeholder = 'Search products...',
   size = 'large',
   style = {},
-  maxWidth = '360px'
+  maxWidth = '360px',
+  primaryColor = '#ff6584'
 }) => {
   const [inputValue, setInputValue] = useState(value);
   const [recentSearches, setRecentSearches] = useState([]);
@@ -129,6 +130,11 @@ const RecentSearchInput = ({
         enterButton={<SearchOutlined />}
         size={size}
         style={{ width: '100%' }}
+        styles={{
+          input: {},
+          affixWrapper: {},
+        }}
+        className={`themed-search-input`}
       />
 
       {/* Recently Searched Dropdown Overlay */}
@@ -164,7 +170,7 @@ const RecentSearchInput = ({
                 }}
               >
                 <Space align="center" size={6}>
-                  <ClockCircleOutlined style={{ color: '#1890ff', fontSize: '13px' }} />
+                  <ClockCircleOutlined style={{ color: primaryColor, fontSize: '13px' }} />
                   <Text strong style={{ fontSize: '12px', color: '#595959', letterSpacing: '0.2px' }}>
                     RECENTLY SEARCHED
                   </Text>
@@ -256,9 +262,9 @@ const RecentSearchInput = ({
                       transition: 'all 0.2s'
                     }}
                     onMouseEnter={(e) => {
-                      e.currentTarget.style.borderColor = '#1890ff';
-                      e.currentTarget.style.color = '#1890ff';
-                      e.currentTarget.style.background = '#e6f7ff';
+                      e.currentTarget.style.borderColor = primaryColor;
+                      e.currentTarget.style.color = primaryColor;
+                      e.currentTarget.style.background = `${primaryColor}15`;
                     }}
                     onMouseLeave={(e) => {
                       e.currentTarget.style.borderColor = '#e8e8e8';
