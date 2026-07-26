@@ -13,7 +13,9 @@ const { Title, Text, Paragraph } = Typography;
 
 const SuperAdminManagement = () => {
   const [authForm] = Form.useForm();
-  const [isUnlocked, setIsUnlocked] = useState(false);
+  const [isUnlocked, setIsUnlocked] = useState(() => {
+    return sessionStorage.getItem('super_admin_verified') === 'true';
+  });
   const [verifying, setVerifying] = useState(false);
   const [loadingControls, setLoadingControls] = useState(false);
   const [savingControls, setSavingControls] = useState(false);
@@ -141,13 +143,11 @@ const SuperAdminManagement = () => {
   };
 
   useEffect(() => {
-    const verified = sessionStorage.getItem('super_admin_verified');
-    if (verified === 'true') {
-      setIsUnlocked(true);
+    if (isUnlocked) {
       fetchControls();
       fetchThemes();
     }
-  }, []);
+  }, [isUnlocked]);
 
   const handleLogin = async () => {
     try {
