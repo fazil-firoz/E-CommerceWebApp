@@ -124,6 +124,13 @@ const Home = () => {
     }
   };
 
+  // Theme-derived colors (used throughout the page)
+  const primaryColor = activeTheme?.primaryColor || '#ff6584';
+  const secondaryColor = activeTheme?.secondaryColor || '#ff85c0';
+  const accentColor = activeTheme?.accentColor || '#ff2a6d';
+  const cardBgColor = activeTheme?.cardBgColor || '#ffffff';
+  const textColor = activeTheme?.textColor || '#0f172a';
+
   // Helper product card renderer
   const renderProductCard = (prod) => {
     const mainImage = prod.images?.find(img => img.isMain) || { imageUrl: prod.imageUrls?.[0], zoomScale: 1.0 };
@@ -152,7 +159,9 @@ const Home = () => {
                 <Button
                   type="text"
                   shape="circle"
-                  icon={isInWishlist(prod.id) ? <HeartFilled className="wishlist-heart-active" style={{ color: '#ff4d4f', fontSize: '18px' }} /> : <HeartOutlined style={{ color: '#ff4d4f', fontSize: '18px' }} />}
+                  icon={isInWishlist(prod.id)
+                    ? <HeartFilled className="wishlist-heart-active" style={{ color: accentColor, fontSize: '18px' }} />
+                    : <HeartOutlined style={{ color: accentColor, fontSize: '18px' }} />}
                   onClick={(e) => toggleWishlist(prod, e)}
                   className="wishlist-heart-btn"
                   style={{
@@ -160,7 +169,7 @@ const Home = () => {
                     top: 10,
                     right: 10,
                     zIndex: 12,
-                    background: 'rgba(255, 255, 255, 0.9)',
+                    background: 'rgba(255, 255, 255, 0.92)',
                     backdropFilter: 'blur(4px)',
                     border: '1px solid rgba(0,0,0,0.06)',
                     boxShadow: '0 4px 10px rgba(0,0,0,0.12)',
@@ -188,13 +197,15 @@ const Home = () => {
           onClick={() => navigate(`/products/${prod.id}`)}
           style={{
             borderRadius: '16px',
-            boxShadow: '0 4px 12px rgba(0,0,0,0.03)',
-            border: '1px solid #f0f0f0'
+            boxShadow: `0 4px 16px ${primaryColor}14`,
+            border: `1px solid ${primaryColor}22`,
+            background: cardBgColor,
+            transition: 'all 0.3s ease'
           }}
         >
           <Card.Meta
             title={
-              <span style={{ fontSize: '15px', fontWeight: 700, color: '#262626' }}>
+              <span style={{ fontSize: '15px', fontWeight: 700, color: textColor }}>
                 {prod.name}
               </span>
             }
@@ -205,7 +216,7 @@ const Home = () => {
                 </Text>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
                   <div>
-                    <Text strong style={{ fontSize: '17px', color: '#ff4d4f' }}>
+                    <Text strong style={{ fontSize: '17px', color: primaryColor }}>
                       ₹{prod.price.toLocaleString('en-IN')}
                     </Text>
                     {prod.mrp > prod.price && (
@@ -222,7 +233,8 @@ const Home = () => {
                     onClick={(e) => handleAddToCart(e, prod)}
                     style={{
                       borderRadius: '8px',
-                      background: prod.stockQuantity > 0 ? '#1890ff' : '#bfbfbf',
+                      background: prod.stockQuantity > 0 ? primaryColor : '#bfbfbf',
+                      borderColor: prod.stockQuantity > 0 ? primaryColor : '#bfbfbf',
                       fontWeight: 600
                     }}
                   >
@@ -375,10 +387,10 @@ const Home = () => {
       {superAdminControl.isCategoriesSectionEnabled !== false && categories.length > 0 && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <Title level={2} style={{ margin: 0, fontWeight: 800, fontSize: '26px' }}>
-              <AppstoreOutlined style={{ marginRight: '10px', color: '#1890ff' }} /> Explore Toy Collections
+            <Title level={2} style={{ margin: 0, fontWeight: 800, fontSize: '26px', color: textColor }}>
+              <AppstoreOutlined style={{ marginRight: '10px', color: primaryColor }} /> Explore Collections
             </Title>
-            <Link to="/products" style={{ fontWeight: 700, color: '#1890ff', fontSize: '14px' }}>
+            <Link to="/products" style={{ fontWeight: 700, color: primaryColor, fontSize: '14px' }}>
               View All <RightOutlined style={{ fontSize: '12px' }} />
             </Link>
           </div>
@@ -395,17 +407,18 @@ const Home = () => {
                     style={{
                       borderRadius: '20px',
                       textAlign: 'center',
-                      border: '1px solid #f0f0f0',
-                      boxShadow: '0 4px 14px rgba(0,0,0,0.03)',
+                      border: `1px solid ${primaryColor}22`,
+                      background: cardBgColor,
+                      boxShadow: `0 4px 14px ${primaryColor}10`,
                       transition: 'all 0.3s ease'
                     }}
-                    bodyStyle={{ padding: '24px 16px' }}
+                    styles={{ body: { padding: '24px 16px' } }}
                   >
                     <div style={{
                       width: '64px',
                       height: '64px',
                       borderRadius: '18px',
-                      background: 'linear-gradient(135deg, rgba(24, 144, 255, 0.1), rgba(114, 46, 209, 0.1))',
+                      background: `linear-gradient(135deg, ${primaryColor}18, ${secondaryColor}18)`,
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
@@ -414,7 +427,7 @@ const Home = () => {
                     }}>
                       {icon}
                     </div>
-                    <Text strong style={{ fontSize: '15px', color: '#262626', display: 'block' }}>
+                    <Text strong style={{ fontSize: '15px', color: textColor, display: 'block' }}>
                       {cat.name}
                     </Text>
                   </Card>
@@ -429,11 +442,11 @@ const Home = () => {
       {superAdminControl.isFeaturedProductsEnabled !== false && featuredProducts.length > 0 && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <Title level={2} style={{ margin: 0, fontWeight: 800, fontSize: '26px' }}>
-              <StarOutlined style={{ marginRight: '10px', color: '#fa8c16' }} /> Featured Toys
+            <Title level={2} style={{ margin: 0, fontWeight: 800, fontSize: '26px', color: textColor }}>
+              <StarOutlined style={{ marginRight: '10px', color: accentColor }} /> Featured Products
             </Title>
-            <Link to="/products" style={{ fontWeight: 700, color: '#1890ff', fontSize: '14px' }}>
-              View Full Store <RightOutlined style={{ fontSize: '12px' }} />
+            <Link to="/products" style={{ fontWeight: 700, color: primaryColor, fontSize: '14px' }}>
+              View All <RightOutlined style={{ fontSize: '12px' }} />
             </Link>
           </div>
 
@@ -447,10 +460,10 @@ const Home = () => {
       {superAdminControl.isNewArrivalsEnabled !== false && displayNewArrivals.length > 0 && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <Title level={2} style={{ margin: 0, fontWeight: 800, fontSize: '26px' }}>
-              <ThunderboltOutlined style={{ marginRight: '10px', color: '#1890ff' }} /> New Arrivals
+            <Title level={2} style={{ margin: 0, fontWeight: 800, fontSize: '26px', color: textColor }}>
+              <ThunderboltOutlined style={{ marginRight: '10px', color: primaryColor }} /> New Arrivals
             </Title>
-            <Link to="/products" style={{ fontWeight: 700, color: '#1890ff', fontSize: '14px' }}>
+            <Link to="/products" style={{ fontWeight: 700, color: primaryColor, fontSize: '14px' }}>
               See More <RightOutlined style={{ fontSize: '12px' }} />
             </Link>
           </div>
@@ -465,11 +478,11 @@ const Home = () => {
       {superAdminControl.isBestSellersEnabled !== false && displayBestSellers.length > 0 && (
         <div>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-            <Title level={2} style={{ margin: 0, fontWeight: 800, fontSize: '26px' }}>
-              <CrownOutlined style={{ marginRight: '10px', color: '#ff4d4f' }} /> Best Sellers & Popular Toys
+            <Title level={2} style={{ margin: 0, fontWeight: 800, fontSize: '26px', color: textColor }}>
+              <CrownOutlined style={{ marginRight: '10px', color: accentColor }} /> Best Sellers
             </Title>
-            <Link to="/products" style={{ fontWeight: 700, color: '#1890ff', fontSize: '14px' }}>
-              Browse Top Toys <RightOutlined style={{ fontSize: '12px' }} />
+            <Link to="/products" style={{ fontWeight: 700, color: primaryColor, fontSize: '14px' }}>
+              Browse All <RightOutlined style={{ fontSize: '12px' }} />
             </Link>
           </div>
 
@@ -484,13 +497,13 @@ const Home = () => {
         <Card
           style={{
             borderRadius: '24px',
-            background: 'linear-gradient(135deg, #ff4d4f 0%, #ff7a45 100%)',
+            background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
             border: 'none',
-            boxShadow: '0 10px 30px rgba(255, 77, 79, 0.25)',
+            boxShadow: `0 10px 30px ${primaryColor}40`,
             color: '#fff',
             overflow: 'hidden'
           }}
-          bodyStyle={{ padding: '40px 48px' }}
+          styles={{ body: { padding: '40px 48px' } }}
         >
           <Row align="middle" justify="space-between" gutter={[24, 24]}>
             <Col xs={24} md={16}>
@@ -512,7 +525,7 @@ const Home = () => {
                 onClick={() => navigate('/products')}
                 style={{
                   background: '#fff',
-                  color: '#ff4d4f',
+                  color: primaryColor,
                   border: 'none',
                   borderRadius: '14px',
                   height: '50px',
