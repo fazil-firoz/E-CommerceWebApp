@@ -78,17 +78,7 @@ const CustomerLayout = () => {
       key: '/products',
       icon: <ShopOutlined />,
       label: <Link to="/products">Products</Link>,
-    },
-    {
-      key: '/about',
-      icon: <InfoCircleOutlined />,
-      label: <Link to="/about">About Us</Link>,
-    },
-    {
-      key: '/contact',
-      icon: <PhoneOutlined />,
-      label: <Link to="/contact">Contact</Link>,
-    },
+    }
   ];
 
   const shopName = shopSettings?.shopName || 'Store';
@@ -186,20 +176,16 @@ const CustomerLayout = () => {
     <Layout className="layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Dynamic theme style injection */}
       <style>{menuThemeStyle}</style>
-      {/* Sticky Header - Blended Glassmorphism */}
+      {/* Sticky Header - White & Centered Nav */}
       <Header style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         height: '72px',
         lineHeight: '72px',
-        background: activeTheme?.backgroundColor
-          ? `linear-gradient(180deg, ${activeTheme.backgroundColor} 0%, ${activeTheme.backgroundColor}cc 100%)`
-          : 'rgba(255, 245, 247, 0.9)',
-        backdropFilter: 'blur(16px)',
-        WebkitBackdropFilter: 'blur(16px)',
-        boxShadow: `0 4px 20px ${activeTheme?.primaryColor || '#ff6584'}15`,
-        borderBottom: `1px solid ${activeTheme?.primaryColor || '#ff6584'}25`,
+        background: '#ffffff',
+        boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)',
+        borderBottom: '1px solid #f0f0f0',
         padding: '0 32px',
         position: 'sticky',
         top: 0,
@@ -224,12 +210,11 @@ const CustomerLayout = () => {
           )}
           <Typography.Title level={4} className="store-brand-title" style={{
             margin: 0,
-            color: activeTheme?.primaryColor || '#ff6584',
+            color: '#2d3748',
             fontSize: '22px',
-            fontWeight: 900,
-            letterSpacing: '3px',
+            fontWeight: 800,
+            letterSpacing: '2.5px',
             textTransform: 'uppercase',
-            textShadow: '0 2px 4px rgba(0,0,0,0.1)',
             whiteSpace: 'nowrap',
             transition: 'color 0.3s ease'
           }}>
@@ -237,13 +222,20 @@ const CustomerLayout = () => {
           </Typography.Title>
         </div>
 
-        {/* Nav menu */}
+        {/* Centered Nav menu */}
         <Menu
           mode="horizontal"
           selectedKeys={[location.pathname]}
           items={menuItems}
           className="customer-nav"
-          style={{ flex: 1, marginLeft: '28px', borderBottom: 'none', background: 'transparent', transition: 'all 0.3s ease' }}
+          style={{
+            flex: 1,
+            display: 'flex',
+            justifyContent: 'center',
+            borderBottom: 'none',
+            background: 'transparent',
+            transition: 'all 0.3s ease'
+          }}
         />
 
         {/* Right actions (Perfectly Aligned) */}
