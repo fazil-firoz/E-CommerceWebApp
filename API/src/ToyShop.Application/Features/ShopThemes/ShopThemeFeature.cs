@@ -17,14 +17,17 @@ namespace ToyShop.Application.Features.ShopThemes
         IRequestHandler<GetAllThemesQuery, BaseResponse<List<ShopThemeDto>>>
     {
         private readonly IRepository<ShopTheme> _themeRepo;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ShopThemeQueryHandler(IRepository<ShopTheme> themeRepo)
+        public ShopThemeQueryHandler(IRepository<ShopTheme> themeRepo, IUnitOfWork unitOfWork)
         {
             _themeRepo = themeRepo;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<BaseResponse<ShopThemeDto>> Handle(GetActiveThemeQuery request, CancellationToken cancellationToken)
         {
+            await SeedDefaultThemesIfEmpty(cancellationToken);
             var activeTheme = await _themeRepo.Query().FirstOrDefaultAsync(t => t.IsActive, cancellationToken);
             if (activeTheme == null)
             {
@@ -33,7 +36,6 @@ namespace ToyShop.Application.Features.ShopThemes
 
             if (activeTheme == null)
             {
-                // Fallback default Original Store Theme
                 return BaseResponse<ShopThemeDto>.Ok(new ShopThemeDto
                 {
                     Id = 1,
@@ -56,9 +58,83 @@ namespace ToyShop.Application.Features.ShopThemes
 
         public async Task<BaseResponse<List<ShopThemeDto>>> Handle(GetAllThemesQuery request, CancellationToken cancellationToken)
         {
+            await SeedDefaultThemesIfEmpty(cancellationToken);
             var list = await _themeRepo.Query().OrderBy(t => t.Id).ToListAsync(cancellationToken);
             var dtos = list.Select(MapToDto).ToList();
             return BaseResponse<List<ShopThemeDto>>.Ok(dtos);
+        }
+
+        private async Task SeedDefaultThemesIfEmpty(CancellationToken cancellationToken)
+        {
+            var count = await _themeRepo.Query().CountAsync(cancellationToken);
+            if (count == 0)
+            {
+                var defaults = new List<ShopTheme>
+                {
+                    new ShopTheme
+                    {
+                        ThemeName = "Default Store Theme (Original)",
+                        ThemeKey = "default",
+                        PrimaryColor = "#1890ff",
+                        SecondaryColor = "#722ed1",
+                        BackgroundColor = "#f5f7fa",
+                        AccentColor = "#ff4d4f",
+                        HeaderBgColor = "#ffffff",
+                        HeroBgGradient = "linear-gradient(135deg, #ffffff 0%, #f8fafc 45%, #eff6ff 100%)",
+                        CardBgColor = "#ffffff",
+                        TextColor = "#0f172a",
+                        IsActive = true
+                    },
+                    new ShopTheme
+                    {
+                        ThemeName = "Kawaii Cute Pink Store",
+                        ThemeKey = "kawaii",
+                        PrimaryColor = "#ff6584",
+                        SecondaryColor = "#ff85c0",
+                        BackgroundColor = "#fff5f7",
+                        AccentColor = "#ff2a6d",
+                        HeaderBgColor = "#ffffff",
+                        HeroBgGradient = "linear-gradient(135deg, #ffffff 0%, #fff0f5 45%, #ffe4e6 100%)",
+                        CardBgColor = "#ffffff",
+                        TextColor = "#2d3748",
+                        IsActive = false
+                    },
+                    new ShopTheme
+                    {
+                        ThemeName = "Fancy Dress & Fashion Boutique",
+                        ThemeKey = "fancy_dress",
+                        PrimaryColor = "#d47a8d",
+                        SecondaryColor = "#e8b4b8",
+                        BackgroundColor = "#fdfbf7",
+                        AccentColor = "#9b2c2c",
+                        HeaderBgColor = "#ffffff",
+                        HeroBgGradient = "linear-gradient(135deg, #ffffff 0%, #fdfbf7 50%, #f7fee7 100%)",
+                        CardBgColor = "#ffffff",
+                        TextColor = "#2c1810",
+                        IsActive = false
+                    },
+                    new ShopTheme
+                    {
+                        ThemeName = "Luxe Emerald & Gold Store",
+                        ThemeKey = "luxe_emerald",
+                        PrimaryColor = "#059669",
+                        SecondaryColor = "#10b981",
+                        BackgroundColor = "#f0fdf4",
+                        AccentColor = "#d97706",
+                        HeaderBgColor = "#ffffff",
+                        HeroBgGradient = "linear-gradient(135deg, #ffffff 0%, #f0fdf4 50%, #dcfce7 100%)",
+                        CardBgColor = "#ffffff",
+                        TextColor = "#064e3b",
+                        IsActive = false
+                    }
+                };
+
+                foreach (var item in defaults)
+                {
+                    await _themeRepo.AddAsync(item, cancellationToken);
+                }
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
+            }
         }
 
         public static ShopThemeDto MapToDto(ShopTheme t) => new ShopThemeDto

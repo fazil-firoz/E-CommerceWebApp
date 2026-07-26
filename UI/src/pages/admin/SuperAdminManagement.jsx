@@ -19,7 +19,48 @@ const SuperAdminManagement = () => {
   const [savingControls, setSavingControls] = useState(false);
 
   // Theme Management State
-  const [themes, setThemes] = useState([]);
+  const [themes, setThemes] = useState([
+    {
+      id: 1,
+      themeName: 'Default Store Theme (Original)',
+      themeKey: 'default',
+      primaryColor: '#1890ff',
+      secondaryColor: '#722ed1',
+      backgroundColor: '#f5f7fa',
+      accentColor: '#ff4d4f',
+      isActive: true
+    },
+    {
+      id: 2,
+      themeName: 'Kawaii Cute Pink Store',
+      themeKey: 'kawaii',
+      primaryColor: '#ff6584',
+      secondaryColor: '#ff85c0',
+      backgroundColor: '#fff5f7',
+      accentColor: '#ff2a6d',
+      isActive: false
+    },
+    {
+      id: 3,
+      themeName: 'Fancy Dress & Fashion Boutique',
+      themeKey: 'fancy_dress',
+      primaryColor: '#d47a8d',
+      secondaryColor: '#e8b4b8',
+      backgroundColor: '#fdfbf7',
+      accentColor: '#9b2c2c',
+      isActive: false
+    },
+    {
+      id: 4,
+      themeName: 'Luxe Emerald & Gold Store',
+      themeKey: 'luxe_emerald',
+      primaryColor: '#059669',
+      secondaryColor: '#10b981',
+      backgroundColor: '#f0fdf4',
+      accentColor: '#d97706',
+      isActive: false
+    }
+  ]);
   const [activatingThemeId, setActivatingThemeId] = useState(null);
 
   // Reset Database State
@@ -54,7 +95,7 @@ const SuperAdminManagement = () => {
   const fetchThemes = async () => {
     try {
       const res = await themeApi.getAllThemes();
-      if (res.success && res.data) {
+      if (res.success && Array.isArray(res.data) && res.data.length > 0) {
         setThemes(res.data);
       }
     } catch (err) {
@@ -99,6 +140,7 @@ const SuperAdminManagement = () => {
         setIsUnlocked(true);
         message.success('Super Admin verification successful!');
         fetchControls();
+        fetchThemes();
       } else {
         message.error(res.message || 'Invalid Super Admin credentials');
       }
