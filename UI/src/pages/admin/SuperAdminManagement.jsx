@@ -582,6 +582,60 @@ const SuperAdminManagement = () => {
           </Col>
         </Row>
 
+        {/* Section 3: Homepage UI Section Controller */}
+        <Row style={{ marginTop: '24px' }}>
+          <Col span={24}>
+            <Card
+              title={
+                <span style={{ fontWeight: 700, fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <SettingOutlined style={{ color: '#ff4d4f' }} /> Section 3: Homepage UI Section Controller
+                </span>
+              }
+              style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+            >
+              <Paragraph type="secondary" style={{ fontSize: '13px', marginBottom: '20px' }}>
+                Super Admin control to dynamically show or hide individual layout sections on the customer Homepage.
+              </Paragraph>
+
+              <Row gutter={[16, 16]}>
+                {[
+                  { key: 'isHeroBannerEnabled', label: 'Hero Banner Section', desc: 'Main interactive hero showcase with glowing call-to-action' },
+                  { key: 'isCategoriesSectionEnabled', label: 'Categories Section', desc: 'Grid of toy categories with icon cards and item counts' },
+                  { key: 'isFeaturedProductsEnabled', label: 'Featured Products Section', desc: 'Curated featured products with ribbon badges' },
+                  { key: 'isNewArrivalsEnabled', label: 'New Arrivals Section', desc: 'Freshly added items grid' },
+                  { key: 'isBestSellersEnabled', label: 'Best Sellers Section', desc: 'Top selling popular toys grid' },
+                  { key: 'isPromoBannerEnabled', label: 'Promo Banner Section', desc: 'Promotional discount campaign banner' },
+                  { key: 'isWhyChooseUsEnabled', label: 'Why Choose Us Section', desc: 'Store trust badges (Fast Shipping, Safe Toys, 24/7 Support)' }
+                ].map((sec) => (
+                  <Col xs={24} sm={12} lg={8} key={sec.key}>
+                    <div style={{
+                      padding: '16px',
+                      borderRadius: '12px',
+                      border: '1px solid #f0f0f0',
+                      background: controls[sec.key] !== false ? '#f6ffed' : '#fff1f0',
+                      display: 'flex',
+                      justify: 'space-between',
+                      alignItems: 'center',
+                      height: '100%'
+                    }}>
+                      <div>
+                        <Text strong style={{ fontSize: '14px', display: 'block' }}>{sec.label}</Text>
+                        <Text type="secondary" style={{ fontSize: '12px' }}>{sec.desc}</Text>
+                      </div>
+                      <Switch
+                        checkedChildren={<CheckCircleOutlined />}
+                        unCheckedChildren={<StopOutlined />}
+                        checked={controls[sec.key] !== false}
+                        onChange={(checked) => setControls({ ...controls, [sec.key]: checked })}
+                      />
+                    </div>
+                  </Col>
+                ))}
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+
         {/* Section 3: Danger Zone & System Factory Reset */}
         <Row style={{ marginTop: '24px' }}>
           <Col span={24}>
