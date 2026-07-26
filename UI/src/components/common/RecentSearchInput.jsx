@@ -11,7 +11,7 @@ const RecentSearchInput = ({
   value = '',
   onChange,
   onSearch,
-  placeholder = 'Search toys & products...',
+  placeholder = 'Search products...',
   size = 'large',
   style = {},
   maxWidth = '360px'

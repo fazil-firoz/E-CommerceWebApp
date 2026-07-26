@@ -184,7 +184,7 @@ const ProductListing = () => {
             </Title>
 
             <RecentSearchInput
-              placeholder="Search toys & products..."
+              placeholder="Search products..."
               value={search}
               onSearch={handleSearchSubmit}
               maxWidth="340px"
