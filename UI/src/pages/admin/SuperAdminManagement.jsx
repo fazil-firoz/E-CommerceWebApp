@@ -608,8 +608,8 @@ const SuperAdminManagement = () => {
                       Clear All Database Tables for New Company / Client Handover
                     </Text>
                     <Text type="secondary" style={{ fontSize: '13px', color: '#595959' }}>
-                      This action will permanently purge all <strong>Products, Categories, Orders, Order Items, Customers, Addresses, Payments, Coupons,</strong> and <strong>Financial Reports</strong>. 
-                      Shop configuration and Super Admin credentials remain preserved.
+                      This action will permanently purge all <strong>Products, Categories, Orders, Order Items, Customers, Saved Addresses, Payments, Coupons, Financial Reports,</strong> and <strong>Shop Settings</strong>. 
+                      Super Admin login credentials and system menu control flags remain preserved.
                     </Text>
                   </Space>
                 </Col>
