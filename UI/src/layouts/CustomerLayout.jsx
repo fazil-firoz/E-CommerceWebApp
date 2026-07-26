@@ -170,18 +170,23 @@ const CustomerLayout = () => {
     <Layout className="layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Dynamic theme style injection */}
       <style>{menuThemeStyle}</style>
-      {/* Sticky Header */}
+      {/* Sticky Header - Blended Glassmorphism */}
       <Header style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        background: activeTheme?.headerBgColor || '#ffffff',
-        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.06)',
-        padding: '0 24px',
+        background: activeTheme?.backgroundColor
+          ? `linear-gradient(180deg, ${activeTheme.backgroundColor} 0%, ${activeTheme.backgroundColor}cc 100%)`
+          : 'rgba(255, 245, 247, 0.9)',
+        backdropFilter: 'blur(16px)',
+        WebkitBackdropFilter: 'blur(16px)',
+        boxShadow: `0 4px 20px ${activeTheme?.primaryColor || '#ff6584'}15`,
+        borderBottom: `1px solid ${activeTheme?.primaryColor || '#ff6584'}25`,
+        padding: '0 32px',
         position: 'sticky',
         top: 0,
         zIndex: 1000,
-        transition: 'background 0.3s ease'
+        transition: 'all 0.3s ease'
       }}>
         {/* Brand Logo & Name */}
         <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '10px' }} onClick={() => navigate('/')}>
