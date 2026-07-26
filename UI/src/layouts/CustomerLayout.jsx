@@ -121,9 +121,25 @@ const CustomerLayout = () => {
   const primaryColor = activeTheme?.primaryColor || '#ff6584';
   const headerBg = activeTheme?.headerBgColor || '#ffffff';
 
-  // Dynamic CSS to override Ant Design Menu active/hover colors with theme
+  // Dynamic CSS to override Ant Design Menu active/hover colors with theme & import signboard font
   const menuThemeStyle = `
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700;800;900&family=Syne:wght@700;800&family=Outfit:wght@600;700;800&display=swap');
+
+    .store-brand-title {
+      font-family: 'Orbitron', 'Syne', 'Outfit', -apple-system, sans-serif !important;
+    }
+
     /* Nav menu active/hover colors */
+    .customer-nav.ant-menu-horizontal {
+      height: 72px !important;
+      line-height: 72px !important;
+    }
+    .customer-nav.ant-menu-horizontal > .ant-menu-item {
+      display: inline-flex !important;
+      align-items: center !important;
+      font-size: 15px !important;
+      font-weight: 700 !important;
+    }
     .customer-nav.ant-menu-horizontal > .ant-menu-item-selected a,
     .customer-nav.ant-menu-horizontal > .ant-menu-item-selected span,
     .customer-nav.ant-menu-horizontal > .ant-menu-item-selected .ant-menu-title-content a,
@@ -175,6 +191,8 @@ const CustomerLayout = () => {
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
+        height: '72px',
+        lineHeight: '72px',
         background: activeTheme?.backgroundColor
           ? `linear-gradient(180deg, ${activeTheme.backgroundColor} 0%, ${activeTheme.backgroundColor}cc 100%)`
           : 'rgba(255, 245, 247, 0.9)',
@@ -188,27 +206,30 @@ const CustomerLayout = () => {
         zIndex: 1000,
         transition: 'all 0.3s ease'
       }}>
-        {/* Brand Logo & Name */}
-        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '10px' }} onClick={() => navigate('/')}>
+        {/* Brand Logo & Name (Styled matching ELLA LUMIA signboard) */}
+        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '12px' }} onClick={() => navigate('/')}>
           {logoUrl ? (
-            <img src={logoUrl} alt={shopName} style={{ maxHeight: '40px', maxWidth: '120px', objectFit: 'contain' }} />
+            <img src={logoUrl} alt={shopName} style={{ maxHeight: '44px', maxWidth: '140px', objectFit: 'contain' }} />
           ) : (
             <div style={{
               background: `linear-gradient(135deg, ${activeTheme?.primaryColor || '#ff6584'} 0%, ${activeTheme?.secondaryColor || '#ff85c0'} 100%)`,
-              width: '40px', height: '40px',
+              width: '42px', height: '42px',
               borderRadius: '12px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
-              boxShadow: `0 4px 10px ${activeTheme?.primaryColor || '#ff6584'}40`,
+              boxShadow: `0 4px 12px ${activeTheme?.primaryColor || '#ff6584'}40`,
               flexShrink: 0
             }}>
-              <ShopOutlined style={{ color: '#fff', fontSize: '20px' }} />
+              <ShopOutlined style={{ color: '#fff', fontSize: '22px' }} />
             </div>
           )}
-          <Typography.Title level={4} style={{
+          <Typography.Title level={4} className="store-brand-title" style={{
             margin: 0,
             color: activeTheme?.primaryColor || '#ff6584',
-            fontWeight: 800,
-            letterSpacing: '-0.3px',
+            fontSize: '22px',
+            fontWeight: 900,
+            letterSpacing: '3px',
+            textTransform: 'uppercase',
+            textShadow: '0 2px 4px rgba(0,0,0,0.1)',
             whiteSpace: 'nowrap',
             transition: 'color 0.3s ease'
           }}>
@@ -222,28 +243,28 @@ const CustomerLayout = () => {
           selectedKeys={[location.pathname]}
           items={menuItems}
           className="customer-nav"
-          style={{ flex: 1, marginLeft: '24px', borderBottom: 'none', background: 'transparent', transition: 'all 0.3s ease' }}
+          style={{ flex: 1, marginLeft: '28px', borderBottom: 'none', background: 'transparent', transition: 'all 0.3s ease' }}
         />
 
-        {/* Right actions */}
-        <Space size={8} align="center">
+        {/* Right actions (Perfectly Aligned) */}
+        <Space size={12} align="center">
           {/* Customer Login / Avatar */}
           <Tooltip title={isLoggedIn ? `Signed in as ${customer?.email}` : 'Sign in'} placement="bottom">
             <Button
               type="text"
               onClick={() => setLoginDrawerOpen(true)}
               style={{
-                height: '40px',
+                height: '42px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '6px',
-                borderRadius: '8px',
-                padding: '0 10px'
+                gap: '8px',
+                borderRadius: '10px',
+                padding: '0 12px'
               }}
             >
               {isLoggedIn ? (
                 <Avatar
-                  size={32}
+                  size={34}
                   style={{
                     background: `linear-gradient(135deg, ${activeTheme?.primaryColor || '#ff6584'}, ${activeTheme?.secondaryColor || '#ff85c0'})`,
                     fontSize: '14px',
@@ -255,13 +276,13 @@ const CustomerLayout = () => {
                 </Avatar>
               ) : (
                 <div style={{
-                  width: '32px', height: '32px',
+                  width: '34px', height: '34px',
                   border: '2px solid #e0e0e0',
                   borderRadius: '50%',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#595959'
                 }}>
-                  <UserOutlined style={{ fontSize: '15px' }} />
+                  <UserOutlined style={{ fontSize: '16px' }} />
                 </div>
               )}
             </Button>
@@ -274,9 +295,9 @@ const CustomerLayout = () => {
                 <Button
                   type="text"
                   icon={<HeartFilled style={{ fontSize: '20px', color: activeTheme?.accentColor || '#ff4d4f' }} />}
-                  style={{ height: '40px', display: 'flex', alignItems: 'center', borderRadius: '8px', padding: '0 10px' }}
+                  style={{ height: '42px', display: 'flex', alignItems: 'center', borderRadius: '10px', padding: '0 12px' }}
                 >
-                  <span style={{ marginLeft: '4px', fontWeight: 600, color: activeTheme?.accentColor || '#ff4d4f' }}>Wishlist</span>
+                  <span style={{ marginLeft: '6px', fontWeight: 700, fontSize: '14px', color: activeTheme?.accentColor || '#ff4d4f' }}>Wishlist</span>
                 </Button>
               </Badge>
             </Link>
