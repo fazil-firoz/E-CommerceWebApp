@@ -112,6 +112,8 @@ const Home = () => {
   const bestSellers = products.filter(p => (p.badgeLabel || '').toLowerCase() === 'best seller' || (p.badgeLabel || '').toLowerCase() === 'popular').slice(0, 4);
   const displayBestSellers = bestSellers.length >= 4 ? bestSellers : products.slice(4, 8);
 
+  const isWishlistEnabled = superAdminControl.isWishlistEnabled !== false;
+
   const handleAddToCart = (e, prod) => {
     e.stopPropagation();
     if (prod.stockQuantity > 0) {
