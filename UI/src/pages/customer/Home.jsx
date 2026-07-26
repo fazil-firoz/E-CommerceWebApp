@@ -112,7 +112,13 @@ const Home = () => {
   const bestSellers = products.filter(p => (p.badgeLabel || '').toLowerCase() === 'best seller' || (p.badgeLabel || '').toLowerCase() === 'popular').slice(0, 4);
   const displayBestSellers = bestSellers.length >= 4 ? bestSellers : products.slice(4, 8);
 
-  const isWishlistEnabled = superAdminControl.isWishlistEnabled !== false;
+  const handleAddToCart = (e, prod) => {
+    e.stopPropagation();
+    if (prod.stockQuantity > 0) {
+      addToCart(prod);
+      message.success(`Added ${prod.name} to cart!`);
+    }
+  };
 
   // Helper product card renderer
   const renderProductCard = (prod) => {
@@ -209,10 +215,7 @@ const Home = () => {
                     size="small"
                     icon={<ShoppingCartOutlined />}
                     disabled={prod.stockQuantity === 0}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (prod.stockQuantity > 0) addToCart(prod);
-                    }}
+                    onClick={(e) => handleAddToCart(e, prod)}
                     style={{
                       borderRadius: '8px',
                       background: prod.stockQuantity > 0 ? '#1890ff' : '#bfbfbf',
