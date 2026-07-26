@@ -251,20 +251,33 @@ const Home = () => {
 
   return (
     <Space direction="vertical" size={48} style={{ width: '100%', paddingBottom: '32px' }}>
-      {/* 1. SIMPLE AESTHETIC HERO BANNER */}
+      {/* Dynamic Shiny & Cute Keyframe Animations */}
+      <style>{`
+        @keyframes kawaii-text-shine {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        .shiny-hero-title {
+          background: linear-gradient(120deg, ${textColor} 0%, ${primaryColor} 40%, ${accentColor} 70%, ${textColor} 100%);
+          background-size: 250% auto;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: kawaii-text-shine 6s ease infinite;
+        }
+      `}</style>
+
+      {/* 1. SEAMLESS BLENDED HERO BANNER */}
       {superAdminControl.isHeroBannerEnabled !== false && (
         <div style={{
-          background: activeTheme?.heroBgGradient || `linear-gradient(135deg, #ffffff 0%, ${primaryColor}0d 50%, ${secondaryColor}15 100%)`,
-          borderRadius: '24px',
-          padding: '48px 40px',
+          background: 'transparent',
+          borderRadius: '0px',
+          padding: '24px 0 16px',
           color: textColor,
-          boxShadow: `0 12px 32px ${primaryColor}12`,
-          border: `1px solid ${primaryColor}25`,
-          position: 'relative',
-          overflow: 'hidden'
+          position: 'relative'
         }}>
           {/* Ambient soft glow */}
-          <div style={{ position: 'absolute', top: '-20%', right: '-5%', width: '350px', height: '350px', borderRadius: '50%', background: `radial-gradient(circle, ${primaryColor}18 0%, rgba(255, 255, 255, 0) 70%)`, filter: 'blur(40px)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: '-10%', right: '5%', width: '320px', height: '320px', borderRadius: '50%', background: `radial-gradient(circle, ${primaryColor}18 0%, rgba(255, 255, 255, 0) 70%)`, filter: 'blur(40px)', pointerEvents: 'none' }} />
 
           <Row align="middle" gutter={[36, 32]}>
             <Col xs={24} md={14}>
@@ -277,18 +290,17 @@ const Home = () => {
                 padding: '5px 16px',
                 fontWeight: 700,
                 fontSize: '12px',
-                marginBottom: '16px',
+                marginBottom: '14px',
                 letterSpacing: '0.4px'
               }}>
                 🌸 WELCOME TO KAWAII STORE
               </span>
 
-              <Title level={1} style={{
-                color: textColor,
-                fontSize: '38px',
-                fontWeight: 800,
+              <Title level={1} className="shiny-hero-title" style={{
+                fontSize: '42px',
+                fontWeight: 900,
                 marginBottom: '14px',
-                lineHeight: '1.25',
+                lineHeight: '1.2',
                 letterSpacing: '-0.5px'
               }}>
                 {heroTitle}
@@ -343,7 +355,7 @@ const Home = () => {
               </Space>
 
               {/* Minimal Stats Row */}
-              <div style={{ display: 'flex', gap: '24px', paddingTop: '20px', borderTop: `1px solid ${primaryColor}18` }}>
+              <div style={{ display: 'flex', gap: '28px', paddingTop: '20px', borderTop: `1px solid ${primaryColor}18` }}>
                 <div>
                   <Text strong style={{ display: 'block', color: textColor, fontSize: '18px', fontWeight: 800 }}>500+</Text>
                   <Text style={{ color: '#64748b', fontSize: '12px' }}>Kawaii Items</Text>
@@ -359,29 +371,27 @@ const Home = () => {
               </div>
             </Col>
 
-            {/* Clean Carousel Showcase */}
+            {/* Cute Frameless Image Carousel Showcase */}
             <Col xs={24} md={10} style={{ textAlign: 'center' }}>
               <div style={{
-                borderRadius: '24px',
+                borderRadius: '28px',
                 overflow: 'hidden',
-                boxShadow: `0 12px 32px ${primaryColor}18`,
+                boxShadow: `0 12px 32px ${primaryColor}20`,
                 maxWidth: '380px',
-                margin: '0 auto',
-                background: '#ffffff',
-                border: '3px solid #ffffff'
+                margin: '0 auto'
               }}>
                 <Carousel autoplay autoplaySpeed={3500} fadeDots>
                   {heroImagesToDisplay.map((imgUrl, idx) => (
-                    <div key={idx} style={{ height: '300px', borderRadius: '20px', overflow: 'hidden' }}>
+                    <div key={idx} style={{ height: '320px', borderRadius: '28px', overflow: 'hidden' }}>
                       <img
                         src={resolveProductImageUrl(imgUrl)}
                         alt={`Hero Slide ${idx + 1}`}
                         style={{
                           width: '100%',
-                          height: '300px',
+                          height: '320px',
                           objectFit: 'cover',
                           display: 'block',
-                          borderRadius: '20px'
+                          borderRadius: '28px'
                         }}
                       />
                     </div>
