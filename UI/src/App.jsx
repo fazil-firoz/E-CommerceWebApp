@@ -4,6 +4,7 @@ import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { AdminAuthProvider as AuthProvider } from './context/AdminAuthContext';
 import { CustomerAuthProvider } from './context/CustomerAuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 
 // Layouts
 import CustomerLayout from './layouts/CustomerLayout';
@@ -44,6 +45,7 @@ function App() {
     <Router>
       <AuthProvider>
         <CustomerAuthProvider>
+        <ThemeProvider>
         <CartProvider>
         <WishlistProvider>
           <Routes>
@@ -86,6 +88,7 @@ function App() {
           </Routes>
         </WishlistProvider>
         </CartProvider>
+        </ThemeProvider>
         </CustomerAuthProvider>
       </AuthProvider>
     </Router>

@@ -12,6 +12,7 @@ import { shopApi } from '../../api/shopApi';
 import { superAdminApi } from '../../api/superAdminApi';
 import { WishlistContext } from '../../context/WishlistContext';
 import { CartContext } from '../../context/CartContext';
+import { ThemeContext } from '../../context/ThemeContext';
 import ProductBadge from '../../components/common/ProductBadge';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
@@ -20,6 +21,7 @@ const { Title, Paragraph, Text } = Typography;
 const Home = () => {
   const { toggleWishlist, isInWishlist } = useContext(WishlistContext);
   const { addToCart } = useContext(CartContext);
+  const { activeTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
 
   const [categories, setCategories] = useState([]);
@@ -240,26 +242,26 @@ const Home = () => {
       {/* 1. HERO BANNER */}
       {superAdminControl.isHeroBannerEnabled !== false && (
         <div style={{
-          background: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 45%, #eff6ff 100%)',
+          background: activeTheme?.heroBgGradient || 'linear-gradient(135deg, #ffffff 0%, #fff0f5 45%, #ffe4e6 100%)',
           borderRadius: '28px',
           padding: '64px 48px',
-          color: '#0f172a',
+          color: activeTheme?.textColor || '#0f172a',
           boxShadow: '0 20px 40px -15px rgba(15, 23, 42, 0.05)',
-          border: '1px solid #e2e8f0',
+          border: `1px solid ${activeTheme?.secondaryColor ? `${activeTheme.secondaryColor}40` : '#e2e8f0'}`,
           position: 'relative',
           overflow: 'hidden'
         }}>
           {/* Subtle pastel ambient background glow graphics */}
-          <div style={{ position: 'absolute', top: '-15%', right: '-5%', width: '380px', height: '380px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, rgba(255, 255, 255, 0) 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
-          <div style={{ position: 'absolute', bottom: '-15%', left: '30%', width: '300px', height: '300px', borderRadius: '50%', background: 'radial-gradient(circle, rgba(236, 72, 153, 0.08) 0%, rgba(255, 255, 255, 0) 70%)', filter: 'blur(40px)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', top: '-15%', right: '-5%', width: '380px', height: '380px', borderRadius: '50%', background: `radial-gradient(circle, ${activeTheme?.primaryColor || '#ff6584'}20 0%, rgba(255, 255, 255, 0) 70%)`, filter: 'blur(40px)', pointerEvents: 'none' }} />
+          <div style={{ position: 'absolute', bottom: '-15%', left: '30%', width: '300px', height: '300px', borderRadius: '50%', background: `radial-gradient(circle, ${activeTheme?.accentColor || '#ff2a6d'}15 0%, rgba(255, 255, 255, 0) 70%)`, filter: 'blur(40px)', pointerEvents: 'none' }} />
 
           <Row align="middle" gutter={[32, 32]}>
             <Col xs={24} md={14}>
               <span style={{
                 display: 'inline-block',
-                background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%)',
-                color: '#1d4ed8',
-                border: '1px solid #bfdbfe',
+                background: `${activeTheme?.primaryColor || '#ff6584'}15`,
+                color: activeTheme?.primaryColor || '#ff6584',
+                border: `1px solid ${activeTheme?.primaryColor || '#ff6584'}35`,
                 borderRadius: '20px',
                 padding: '6px 16px',
                 fontWeight: 700,
@@ -270,11 +272,11 @@ const Home = () => {
                 ✨ DISCOVER MAGICAL PLAYTIME
               </span>
 
-              <Title level={1} style={{ color: '#0f172a', fontSize: '44px', fontWeight: 900, marginBottom: '16px', lineHeight: '1.2' }}>
+              <Title level={1} style={{ color: activeTheme?.textColor || '#0f172a', fontSize: '44px', fontWeight: 900, marginBottom: '16px', lineHeight: '1.2' }}>
                 {heroTitle}
               </Title>
 
-              <Paragraph style={{ color: '#475569', fontSize: '17px', marginBottom: '32px', lineHeight: '1.6', maxWidth: '540px' }}>
+              <Paragraph style={{ color: activeTheme?.textColor ? `${activeTheme.textColor}c0` : '#475569', fontSize: '17px', marginBottom: '32px', lineHeight: '1.6', maxWidth: '540px' }}>
                 {heroDescription}
               </Paragraph>
 
@@ -284,7 +286,7 @@ const Home = () => {
                   size="large"
                   onClick={() => navigate('/products')}
                   style={{
-                    background: 'linear-gradient(135deg, #1890ff 0%, #0050b3 100%)',
+                    background: activeTheme?.primaryColor ? `linear-gradient(135deg, ${activeTheme.primaryColor} 0%, ${activeTheme.accentColor || activeTheme.primaryColor} 100%)` : 'linear-gradient(135deg, #ff6584 0%, #ff2a6d 100%)',
                     color: '#ffffff',
                     border: 'none',
                     height: '52px',
@@ -292,7 +294,7 @@ const Home = () => {
                     borderRadius: '14px',
                     fontWeight: 800,
                     fontSize: '16px',
-                    boxShadow: '0 8px 24px rgba(24, 144, 255, 0.3)'
+                    boxShadow: `0 8px 24px ${activeTheme?.primaryColor || '#ff6584'}40`
                   }}
                 >
                   Explore All Products <RightOutlined />

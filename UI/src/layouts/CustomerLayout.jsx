@@ -13,6 +13,7 @@ import { CartContext } from '../context/CartContext';
 import { WishlistContext } from '../context/WishlistContext';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import { useCustomerAuth } from '../context/CustomerAuthContext';
+import { ThemeContext } from '../context/ThemeContext';
 import LoginDrawer from '../components/LoginDrawer';
 import RecentSearchInput from '../components/common/RecentSearchInput';
 import { shopApi } from '../api/shopApi';
@@ -27,6 +28,7 @@ const CustomerLayout = () => {
   const { wishlistCount } = useContext(WishlistContext);
   const { isAuthenticated } = useContext(AdminAuthContext);
   const { customer, isLoggedIn } = useCustomerAuth();
+  const { activeTheme } = useContext(ThemeContext);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -149,7 +151,7 @@ const CustomerLayout = () => {
           )}
           <Typography.Title level={4} style={{
             margin: 0,
-            background: 'linear-gradient(45deg, #1890ff, #722ed1)',
+            background: `linear-gradient(45deg, ${activeTheme?.primaryColor || '#ff6584'}, ${activeTheme?.secondaryColor || '#ff85c0'})`,
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             fontWeight: 800
@@ -202,7 +204,7 @@ const CustomerLayout = () => {
                 <Avatar
                   size={32}
                   style={{
-                    background: 'linear-gradient(135deg, #1677ff, #4096ff)',
+                    background: `linear-gradient(135deg, ${activeTheme?.primaryColor || '#ff6584'}, ${activeTheme?.secondaryColor || '#ff85c0'})`,
                     fontSize: '14px',
                     fontWeight: 700,
                     cursor: 'pointer'
@@ -227,13 +229,13 @@ const CustomerLayout = () => {
           {/* Wishlist Header Icon */}
           {superAdminControl.isWishlistEnabled !== false && (
             <Link to="/wishlist">
-              <Badge count={wishlistCount} offset={[2, 0]} color="#ff4d4f">
+              <Badge count={wishlistCount} offset={[2, 0]} color={activeTheme?.accentColor || '#ff4d4f'}>
                 <Button
                   type="text"
-                  icon={<HeartFilled style={{ fontSize: '20px', color: '#ff4d4f' }} />}
+                  icon={<HeartFilled style={{ fontSize: '20px', color: activeTheme?.accentColor || '#ff4d4f' }} />}
                   style={{ height: '40px', display: 'flex', alignItems: 'center', borderRadius: '8px', padding: '0 10px' }}
                 >
-                  <span style={{ marginLeft: '4px', fontWeight: 600, color: '#ff4d4f' }}>Wishlist</span>
+                  <span style={{ marginLeft: '4px', fontWeight: 600, color: activeTheme?.accentColor || '#ff4d4f' }}>Wishlist</span>
                 </Button>
               </Badge>
             </Link>
@@ -244,10 +246,10 @@ const CustomerLayout = () => {
             <Badge count={cartCount} offset={[2, 0]} color="#52c41a">
               <Button
                 type="text"
-                icon={<ShoppingCartOutlined style={{ fontSize: '22px', color: '#1890ff' }} />}
+                icon={<ShoppingCartOutlined style={{ fontSize: '22px', color: activeTheme?.primaryColor || '#1890ff' }} />}
                 style={{ height: '40px', display: 'flex', alignItems: 'center', borderRadius: '8px', padding: '0 10px' }}
               >
-                <span style={{ marginLeft: '4px', fontWeight: 600, color: '#1890ff' }}>Cart</span>
+                <span style={{ marginLeft: '4px', fontWeight: 600, color: activeTheme?.primaryColor || '#1890ff' }}>Cart</span>
               </Button>
             </Badge>
           </Link>
@@ -268,7 +270,7 @@ const CustomerLayout = () => {
       </Header>
 
       {/* Main Content View */}
-      <Content style={{ flex: 1, padding: '24px 50px', background: '#f5f7fa', display: 'flex', flexDirection: 'column' }}>
+      <Content style={{ flex: 1, padding: '24px 50px', background: activeTheme?.backgroundColor || '#fff5f7', display: 'flex', flexDirection: 'column', transition: 'background 0.3s ease' }}>
         <div style={{ flex: 1, maxWidth: '1200px', width: '100%', margin: '0 auto' }}>
           <Outlet />
         </div>

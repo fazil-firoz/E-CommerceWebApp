@@ -216,6 +216,40 @@ using (var scope = app.Services.CreateScope())
                   ""IsDeleted"" BOOLEAN NOT NULL DEFAULT FALSE
               );
 
+              CREATE TABLE IF NOT EXISTS ""ShopThemes"" (
+                  ""Id"" SERIAL PRIMARY KEY,
+                  ""ThemeName"" VARCHAR(255) NOT NULL,
+                  ""ThemeKey"" VARCHAR(100) NOT NULL,
+                  ""PrimaryColor"" VARCHAR(50) NOT NULL,
+                  ""SecondaryColor"" VARCHAR(50) NOT NULL,
+                  ""BackgroundColor"" VARCHAR(50) NOT NULL,
+                  ""AccentColor"" VARCHAR(50) NOT NULL,
+                  ""HeaderBgColor"" VARCHAR(50) NOT NULL,
+                  ""HeroBgGradient"" TEXT NOT NULL,
+                  ""CardBgColor"" VARCHAR(50) NOT NULL,
+                  ""TextColor"" VARCHAR(50) NOT NULL,
+                  ""IsActive"" BOOLEAN NOT NULL DEFAULT FALSE,
+                  ""CreatedDate"" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                  ""CreatedBy"" VARCHAR(255) DEFAULT 'System',
+                  ""UpdatedDate"" TIMESTAMPTZ NULL,
+                  ""UpdatedBy"" VARCHAR(255) NULL,
+                  ""DeletedDate"" TIMESTAMPTZ NULL,
+                  ""DeletedBy"" VARCHAR(255) NULL,
+                  ""IsDeleted"" BOOLEAN NOT NULL DEFAULT FALSE
+              );
+
+              INSERT INTO ""ShopThemes"" (""Id"", ""ThemeName"", ""ThemeKey"", ""PrimaryColor"", ""SecondaryColor"", ""BackgroundColor"", ""AccentColor"", ""HeaderBgColor"", ""HeroBgGradient"", ""CardBgColor"", ""TextColor"", ""IsActive"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
+              SELECT 1, 'Kawaii Cute Pink Store', 'kawaii', '#ff6584', '#ff85c0', '#fff5f7', '#ff2a6d', '#ffffff', 'linear-gradient(135deg, #ffffff 0%, #fff0f5 45%, #ffe4e6 100%)', '#ffffff', '#2d3748', TRUE, NOW(), 'System', FALSE
+              WHERE NOT EXISTS (SELECT 1 FROM ""ShopThemes"" WHERE ""Id"" = 1);
+
+              INSERT INTO ""ShopThemes"" (""Id"", ""ThemeName"", ""ThemeKey"", ""PrimaryColor"", ""SecondaryColor"", ""BackgroundColor"", ""AccentColor"", ""HeaderBgColor"", ""HeroBgGradient"", ""CardBgColor"", ""TextColor"", ""IsActive"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
+              SELECT 2, 'Classic Modern ToyVerse', 'classic_modern', '#1890ff', '#722ed1', '#f5f7fa', '#ff4d4f', '#ffffff', 'linear-gradient(135deg, #ffffff 0%, #f8fafc 45%, #eff6ff 100%)', '#ffffff', '#0f172a', FALSE, NOW(), 'System', FALSE
+              WHERE NOT EXISTS (SELECT 1 FROM ""ShopThemes"" WHERE ""Id"" = 2);
+
+              INSERT INTO ""ShopThemes"" (""Id"", ""ThemeName"", ""ThemeKey"", ""PrimaryColor"", ""SecondaryColor"", ""BackgroundColor"", ""AccentColor"", ""HeaderBgColor"", ""HeroBgGradient"", ""CardBgColor"", ""TextColor"", ""IsActive"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
+              SELECT 3, 'Chic Dress & Fashion Boutique', 'fashion_boutique', '#d47a8d', '#e8b4b8', '#fdfbf7', '#9b2c2c', '#ffffff', 'linear-gradient(135deg, #ffffff 0%, #fdfbf7 50%, #f7fee7 100%)', '#ffffff', '#2c1810', FALSE, NOW(), 'System', FALSE
+              WHERE NOT EXISTS (SELECT 1 FROM ""ShopThemes"" WHERE ""Id"" = 3);
+
               INSERT INTO ""CouponCodes"" (""Code"", ""DiscountPercentage"", ""ExpiryDate"", ""MinPurchaseAmount"", ""IsActive"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
               SELECT 'TOYSHOP10', 10, NOW() + INTERVAL '30 days', 500, TRUE, NOW(), 'System', FALSE
               WHERE NOT EXISTS (SELECT 1 FROM ""CouponCodes"" WHERE ""Code"" = 'TOYSHOP10');

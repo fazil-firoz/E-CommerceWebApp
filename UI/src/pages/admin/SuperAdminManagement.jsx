@@ -4,9 +4,10 @@ import {
   CrownOutlined, LockOutlined, UnlockOutlined, SaveOutlined,
   AppstoreOutlined, SettingOutlined, WhatsAppOutlined, SafetyCertificateOutlined,
   CheckCircleOutlined, StopOutlined, ReloadOutlined, TagOutlined, PrinterOutlined, HeartOutlined,
-  DeleteOutlined, WarningOutlined, ExclamationCircleOutlined
+  DeleteOutlined, WarningOutlined, ExclamationCircleOutlined, BgColorsOutlined, StarOutlined
 } from '@ant-design/icons';
 import { superAdminApi } from '../../api/superAdminApi';
+import { themeApi } from '../../api/themeApi';
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -16,6 +17,10 @@ const SuperAdminManagement = () => {
   const [verifying, setVerifying] = useState(false);
   const [loadingControls, setLoadingControls] = useState(false);
   const [savingControls, setSavingControls] = useState(false);
+
+  // Theme Management State
+  const [themes, setThemes] = useState([]);
+  const [activatingThemeId, setActivatingThemeId] = useState(null);
 
   // Reset Database State
   const [isResetModalVisible, setIsResetModalVisible] = useState(false);
@@ -46,11 +51,41 @@ const SuperAdminManagement = () => {
     }
   };
 
+  const fetchThemes = async () => {
+    try {
+      const res = await themeApi.getAllThemes();
+      if (res.success && res.data) {
+        setThemes(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load shop themes', err);
+    }
+  };
+
+  const handleSelectTheme = async (themeId) => {
+    setActivatingThemeId(themeId);
+    try {
+      const res = await themeApi.setActiveTheme(themeId);
+      if (res.success) {
+        message.success(res.message || 'Theme activated successfully!');
+        window.dispatchEvent(new Event('shopThemeUpdated'));
+        fetchThemes();
+      } else {
+        message.error(res.message || 'Failed to activate theme');
+      }
+    } catch (err) {
+      message.error('Error setting shop theme');
+    } finally {
+      setActivatingThemeId(null);
+    }
+  };
+
   useEffect(() => {
     const verified = sessionStorage.getItem('super_admin_verified');
     if (verified === 'true') {
       setIsUnlocked(true);
       fetchControls();
+      fetchThemes();
     }
   }, []);
 
@@ -636,7 +671,93 @@ const SuperAdminManagement = () => {
           </Col>
         </Row>
 
-        {/* Section 3: Danger Zone & System Factory Reset */}
+        {/* Section 4: Shop Theme Selector & Multi-Client Styling Controller */}
+        <Row style={{ marginTop: '24px' }}>
+          <Col span={24}>
+            <Card
+              title={
+                <span style={{ fontWeight: 700, fontSize: '16px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <BgColorsOutlined style={{ color: '#ff6584' }} /> Section 4: Shop Theme Selector (Multi-Client Brands)
+                </span>
+              }
+              style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}
+            >
+              <Paragraph type="secondary" style={{ fontSize: '13px', marginBottom: '20px' }}>
+                Select the active shop brand theme. Changes apply dynamically across the entire customer store area without touching the Admin panel.
+              </Paragraph>
+
+              <Row gutter={[20, 20]}>
+                {themes.map((t) => (
+                  <Col xs={24} sm={12} lg={8} key={t.id}>
+                    <Card
+                      style={{
+                        borderRadius: '16px',
+                        border: t.isActive ? `2px solid ${t.primaryColor}` : '1px solid #e2e8f0',
+                        background: t.isActive ? '#fff' : '#fafafa',
+                        boxShadow: t.isActive ? `0 8px 24px ${t.primaryColor}25` : '0 2px 8px rgba(0,0,0,0.03)',
+                        transition: 'all 0.3s ease'
+                      }}
+                      bodyStyle={{ padding: '20px' }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
+                        <div>
+                          <Text strong style={{ fontSize: '16px', display: 'block', color: '#0f172a' }}>{t.themeName}</Text>
+                          <Tag style={{ borderRadius: '10px', marginTop: '4px', fontSize: '11px', textTransform: 'uppercase', fontWeight: 700 }}>
+                            {t.themeKey}
+                          </Tag>
+                        </div>
+                        {t.isActive ? (
+                          <Tag color="success" icon={<CheckCircleOutlined />} style={{ borderRadius: '12px', padding: '2px 10px', fontWeight: 700 }}>
+                            ACTIVE
+                          </Tag>
+                        ) : null}
+                      </div>
+
+                      {/* Color Swatch Preview */}
+                      <div style={{ background: t.backgroundColor, padding: '12px', borderRadius: '12px', border: '1px solid #f0f0f0', marginBottom: '16px' }}>
+                        <Text style={{ fontSize: '11px', color: '#64748b', display: 'block', marginBottom: '6px', fontWeight: 600 }}>Palette Preview:</Text>
+                        <Space size={8}>
+                          <Tooltip title={`Primary: ${t.primaryColor}`}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: t.primaryColor, boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }} />
+                          </Tooltip>
+                          <Tooltip title={`Secondary: ${t.secondaryColor}`}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: t.secondaryColor, boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }} />
+                          </Tooltip>
+                          <Tooltip title={`Accent: ${t.accentColor}`}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: t.accentColor, boxShadow: '0 2px 6px rgba(0,0,0,0.15)' }} />
+                          </Tooltip>
+                          <Tooltip title={`Background: ${t.backgroundColor}`}>
+                            <div style={{ width: '28px', height: '28px', borderRadius: '50%', background: t.backgroundColor, border: '1px solid #ccc', boxShadow: '0 2px 6px rgba(0,0,0,0.08)' }} />
+                          </Tooltip>
+                        </Space>
+                      </div>
+
+                      <Button
+                        type={t.isActive ? "default" : "primary"}
+                        block
+                        loading={activatingThemeId === t.id}
+                        disabled={t.isActive}
+                        onClick={() => handleSelectTheme(t.id)}
+                        style={{
+                          borderRadius: '10px',
+                          fontWeight: 700,
+                          height: '38px',
+                          background: t.isActive ? '#f5f5f5' : t.primaryColor,
+                          borderColor: t.isActive ? '#d9d9d9' : t.primaryColor,
+                          color: t.isActive ? '#8c8c8c' : '#ffffff'
+                        }}
+                      >
+                        {t.isActive ? 'Current Theme' : 'Activate Theme'}
+                      </Button>
+                    </Card>
+                  </Col>
+                ))}
+              </Row>
+            </Card>
+          </Col>
+        </Row>
+
+        {/* Section 5: Danger Zone & System Factory Reset */}
         <Row style={{ marginTop: '24px' }}>
           <Col span={24}>
             <Card
