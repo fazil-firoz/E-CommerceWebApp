@@ -283,7 +283,7 @@ const Home = () => {
                     boxShadow: '0 6px 20px rgba(0,0,0,0.2)'
                   }}
                 >
-                  Explore All Toys <RightOutlined />
+                  Explore All Products <RightOutlined />
                 </Button>
 
                 <Button
@@ -308,11 +308,11 @@ const Home = () => {
               <Row gutter={[24, 16]} style={{ marginTop: '40px', paddingTop: '24px', borderTop: '1px solid rgba(255,255,255,0.15)' }}>
                 <Col span={8}>
                   <Text strong style={{ display: 'block', color: '#fff', fontSize: '22px', fontWeight: 800 }}>500+</Text>
-                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px' }}>Unique Toys</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px' }}>Unique Products</Text>
                 </Col>
                 <Col span={8}>
-                  <Text strong style={{ display: 'block', color: '#fff', fontSize: '22px', fontWeight: 800 }}>50,000+</Text>
-                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px' }}>Happy Kids</Text>
+                  <Text strong style={{ display: 'block', color: '#fff', fontSize: '22px', fontWeight: 800 }}>1,000+</Text>
+                  <Text style={{ color: 'rgba(255,255,255,0.7)', fontSize: '12px' }}>Happy Customers</Text>
                 </Col>
                 <Col span={8}>
                   <Text strong style={{ display: 'block', color: '#fff', fontSize: '22px', fontWeight: 800 }}>4.9 ★</Text>
