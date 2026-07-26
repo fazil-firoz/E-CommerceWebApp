@@ -33,20 +33,20 @@ namespace ToyShop.Application.Features.ShopThemes
 
             if (activeTheme == null)
             {
-                // Fallback default Kawaii Pink Theme
+                // Fallback default Original Store Theme
                 return BaseResponse<ShopThemeDto>.Ok(new ShopThemeDto
                 {
                     Id = 1,
-                    ThemeName = "Kawaii Pink Wonderland",
-                    ThemeKey = "kawaii",
-                    PrimaryColor = "#ff6584",
-                    SecondaryColor = "#ff85c0",
-                    BackgroundColor = "#fff5f7",
-                    AccentColor = "#ff2a6d",
+                    ThemeName = "Default Store Theme (Original)",
+                    ThemeKey = "default",
+                    PrimaryColor = "#1890ff",
+                    SecondaryColor = "#722ed1",
+                    BackgroundColor = "#f5f7fa",
+                    AccentColor = "#ff4d4f",
                     HeaderBgColor = "#ffffff",
-                    HeroBgGradient = "linear-gradient(135deg, #ffffff 0%, #fff0f5 50%, #ffe4e6 100%)",
+                    HeroBgGradient = "linear-gradient(135deg, #ffffff 0%, #f8fafc 45%, #eff6ff 100%)",
                     CardBgColor = "#ffffff",
-                    TextColor = "#2d3748",
+                    TextColor = "#0f172a",
                     IsActive = true
                 });
             }

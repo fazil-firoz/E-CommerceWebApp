@@ -6,16 +6,16 @@ export const ThemeContext = createContext();
 export const ThemeProvider = ({ children }) => {
   const [activeTheme, setActiveTheme] = useState({
     id: 1,
-    themeName: 'Kawaii Cute Pink Store',
-    themeKey: 'kawaii',
-    primaryColor: '#ff6584',
-    secondaryColor: '#ff85c0',
-    backgroundColor: '#fff5f7',
-    accentColor: '#ff2a6d',
+    themeName: 'Default Store Theme (Original)',
+    themeKey: 'default',
+    primaryColor: '#1890ff',
+    secondaryColor: '#722ed1',
+    backgroundColor: '#f5f7fa',
+    accentColor: '#ff4d4f',
     headerBgColor: '#ffffff',
-    heroBgGradient: 'linear-gradient(135deg, #ffffff 0%, #fff0f5 45%, #ffe4e6 100%)',
+    heroBgGradient: 'linear-gradient(135deg, #ffffff 0%, #f8fafc 45%, #eff6ff 100%)',
     cardBgColor: '#ffffff',
-    textColor: '#2d3748',
+    textColor: '#0f172a',
     isActive: true
   });
   const [loading, setLoading] = useState(true);
