@@ -293,6 +293,36 @@ const Home = () => {
           animation: pulse-aura 3.5s ease-in-out infinite;
           z-index: 0;
         }
+        @keyframes kawaii-marquee-scroll {
+          0% { transform: translateX(0%); }
+          100% { transform: translateX(-50%); }
+        }
+        .kawaii-marquee-wrapper {
+          overflow: hidden;
+          white-space: nowrap;
+          position: relative;
+          width: 100%;
+          background: linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%);
+          border-radius: 20px;
+          padding: 12px 0;
+          box-shadow: 0 6px 20px ${primaryColor}35;
+          margin-top: 10px;
+        }
+        .kawaii-marquee-track {
+          display: inline-flex;
+          gap: 36px;
+          animation: kawaii-marquee-scroll 22s linear infinite;
+        }
+        .kawaii-marquee-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 8px;
+          color: #ffffff;
+          font-weight: 800;
+          font-size: 13px;
+          letter-spacing: 0.5px;
+          text-transform: uppercase;
+        }
       `}</style>
 
       {/* 1. SEAMLESS BLENDED HERO BANNER WITH ANIMATED FLOATING HEARTS */}
@@ -468,6 +498,26 @@ const Home = () => {
           </Row>
         </div>
       )}
+
+      {/* INFINITE KAWAII MARQUEE TICKER RIBBON */}
+      <div className="kawaii-marquee-wrapper">
+        <div className="kawaii-marquee-track">
+          {[...Array(3)].flatMap((_, arrayIdx) => [
+            { icon: '💖', text: 'Free Express Gift Wrapping' },
+            { icon: '✨', text: '100% Authentic Korean & Japanese Kawaii Merch' },
+            { icon: '🔥', text: 'Trending On TikTok & Instagram' },
+            { icon: '🏷️', text: 'Use Code KAWAII30 For Extra 30% OFF' },
+            { icon: '⭐', text: '50,000+ Happy Smiles Delivered' },
+            { icon: '🎀', text: 'Limited Edition Plushies & Cute Stationery' }
+          ]).map((item, idx) => (
+            <div key={idx} className="kawaii-marquee-item">
+              <span>{item.icon}</span>
+              <span>{item.text}</span>
+              <span style={{ opacity: 0.6, marginLeft: '12px' }}>•</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* 2. CATEGORIES SECTION */}
       {superAdminControl.isCategoriesSectionEnabled !== false && categories.length > 0 && (
