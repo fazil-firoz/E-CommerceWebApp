@@ -183,3 +183,39 @@ code {
   color: #ff4d4f !important;
   animation: heartPopScale 0.45s ease-in-out;
 }
+
+/* Clean modern navbar header styling */
+.ant-layout-header {
+  background: #ffffff !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05) !important;
+  border-bottom: 1px solid #f0f0f0 !important;
+}
+
+.ant-menu-horizontal {
+  background: transparent !important;
+  border-bottom: none !important;
+}
+
+.ant-menu-horizontal .ant-menu-item {
+  color: #334155 !important;
+  font-size: 15px !important;
+  border-radius: 10px !important;
+  padding: 0 16px !important;
+  margin: 0 4px !important;
+  transition: all 0.2s ease !important;
+}
+
+.ant-menu-horizontal .ant-menu-item:hover {
+  background: rgba(24, 144, 255, 0.06) !important;
+  color: #1890ff !important;
+}
+
+.ant-menu-horizontal .ant-menu-item-selected {
+  background: rgba(24, 144, 255, 0.1) !important;
+  color: #1890ff !important;
+  font-weight: 700 !important;
+}
+
+.ant-menu-horizontal .ant-menu-item-selected::after {
+  display: none !important;
+}
