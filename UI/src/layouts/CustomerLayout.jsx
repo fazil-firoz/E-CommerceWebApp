@@ -207,6 +207,77 @@ const CustomerLayout = () => {
       align-items: center;
       justify-content: center;
     }
+
+    /* ===== 3D KAWAII FLOATING OBJECTS SCROLL STRIP ===== */
+    @keyframes kawaii-scroll-left {
+      0%   { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    @keyframes kawaii-float-bob {
+      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
+      25%       { transform: translateY(-7px) rotate(-4deg) scale(1.06); }
+      50%       { transform: translateY(-13px) rotate(2deg) scale(1.1); }
+      75%       { transform: translateY(-6px) rotate(-2deg) scale(1.05); }
+    }
+
+    @keyframes kawaii-shimmer-pulse {
+      0%, 100% { box-shadow: 0 8px 24px rgba(0,0,0,0.10), 0 0 0 0 ${primaryColor}44; }
+      50%       { box-shadow: 0 16px 40px rgba(0,0,0,0.18), 0 0 18px 4px ${primaryColor}55; }
+    }
+
+    .kawaii-strip-track {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      animation: kawaii-scroll-left 28s linear infinite;
+      will-change: transform;
+      width: max-content;
+    }
+
+    .kawaii-strip-track:hover {
+      animation-play-state: paused;
+    }
+
+    .kawaii-3d-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 18px;
+      border-radius: 40px;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      white-space: nowrap;
+      cursor: default;
+      transform-style: preserve-3d;
+      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+      animation: kawaii-shimmer-pulse 3.5s ease-in-out infinite;
+      user-select: none;
+    }
+
+    .kawaii-3d-chip:hover {
+      transform: translateY(-8px) rotateX(12deg) rotateY(-6deg) scale(1.12) !important;
+      animation-play-state: paused;
+    }
+
+    .kawaii-3d-chip .chip-emoji {
+      font-size: 20px;
+      display: inline-block;
+      animation: kawaii-float-bob var(--bob-dur, 3.2s) ease-in-out infinite;
+      animation-delay: var(--bob-delay, 0s);
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+    }
+
+    .kawaii-strip-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: ${primaryColor}70;
+      margin: 0 14px;
+      flex-shrink: 0;
+      animation: kawaii-shimmer-pulse 2s ease-in-out infinite;
+    }
   `;
 
   return (
@@ -359,6 +430,88 @@ const CustomerLayout = () => {
           )}
         </Space>
       </Header>
+
+      {/* ===== 3D KAWAII FLOATING OBJECTS SCROLL STRIP ===== */}
+      <div style={{
+        overflow: 'hidden',
+        background: `linear-gradient(135deg, ${activeTheme?.backgroundColor || '#fff5f7'} 0%, #ffffff 40%, ${activeTheme?.backgroundColor || '#fff5f7'} 100%)`,
+        borderBottom: `2px solid ${primaryColor}22`,
+        padding: '10px 0',
+        perspective: '900px',
+        position: 'relative',
+        zIndex: 5
+      }}>
+        {/* Subtle side fade masks */}
+        <div style={{
+          position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 2,
+          background: `linear-gradient(90deg, ${activeTheme?.backgroundColor || '#fff5f7'} 0%, transparent 6%, transparent 94%, ${activeTheme?.backgroundColor || '#fff5f7'} 100%)`
+        }} />
+        <div className="kawaii-strip-track">
+          {[
+            { emoji: '🧸', label: 'Teddy Bears', color: `${primaryColor}18`, border: `${primaryColor}30`, delay: '0s', dur: '3.0s' },
+            { emoji: '🌸', label: 'Kawaii Gifts', color: '#fff0f5', border: '#ffb3c6', delay: '0.4s', dur: '3.4s' },
+            { emoji: '🎀', label: 'Gift Wrapping', color: '#f9f0ff', border: '#d3adf7', delay: '0.8s', dur: '2.8s' },
+            { emoji: '🚀', label: 'Fast Delivery', color: '#e6f7ff', border: '#91d5ff', delay: '0.2s', dur: '3.6s' },
+            { emoji: '✨', label: 'Premium Quality', color: '#fffbe6', border: '#ffe58f', delay: '0.6s', dur: '3.1s' },
+            { emoji: '🎮', label: 'Fun & Play', color: '#f6ffed', border: '#b7eb8f', delay: '1.0s', dur: '2.9s' },
+            { emoji: '💖', label: 'Made with Love', color: '#fff1f0', border: '#ffccc7', delay: '0.3s', dur: '3.3s' },
+            { emoji: '🌈', label: 'Bright Colors', color: '#e6fffb', border: '#87e8de', delay: '0.7s', dur: '3.5s' },
+            { emoji: '🎁', label: 'Special Offers', color: `${primaryColor}14`, border: `${primaryColor}28`, delay: '0.5s', dur: '3.2s' },
+            { emoji: '⭐', label: '5-Star Rated',  color: '#fffbe6', border: '#ffd666', delay: '0.9s', dur: '2.7s' },
+            { emoji: '🦄', label: 'Unique & Rare',  color: '#f9f0ff', border: '#c9b4f5', delay: '1.1s', dur: '3.7s' },
+            { emoji: '🍬', label: 'Sweet Deals',   color: '#fff0f5', border: '#ffadd2', delay: '0.1s', dur: '3.0s' },
+          ].flatMap((item, i) => [
+            <div
+              key={`chip-${i}`}
+              className="kawaii-3d-chip"
+              style={{
+                background: item.color,
+                border: `1.5px solid ${item.border}`,
+                boxShadow: `0 6px 20px ${item.border}50, inset 0 1px 0 rgba(255,255,255,0.7)`,
+                '--bob-delay': item.delay,
+                '--bob-dur': item.dur,
+                animationDelay: item.delay,
+              }}
+            >
+              <span className="chip-emoji" style={{ '--bob-delay': item.delay, '--bob-dur': item.dur }}>{item.emoji}</span>
+              <span style={{ color: '#374151', fontWeight: 700, fontSize: '12px', letterSpacing: '0.4px' }}>{item.label}</span>
+            </div>,
+            <div key={`dot-${i}`} className="kawaii-strip-dot" />
+          ])}
+          {/* Duplicated set for seamless loop */}
+          {[
+            { emoji: '🧸', label: 'Teddy Bears', color: `${primaryColor}18`, border: `${primaryColor}30`, delay: '0s', dur: '3.0s' },
+            { emoji: '🌸', label: 'Kawaii Gifts', color: '#fff0f5', border: '#ffb3c6', delay: '0.4s', dur: '3.4s' },
+            { emoji: '🎀', label: 'Gift Wrapping', color: '#f9f0ff', border: '#d3adf7', delay: '0.8s', dur: '2.8s' },
+            { emoji: '🚀', label: 'Fast Delivery', color: '#e6f7ff', border: '#91d5ff', delay: '0.2s', dur: '3.6s' },
+            { emoji: '✨', label: 'Premium Quality', color: '#fffbe6', border: '#ffe58f', delay: '0.6s', dur: '3.1s' },
+            { emoji: '🎮', label: 'Fun & Play', color: '#f6ffed', border: '#b7eb8f', delay: '1.0s', dur: '2.9s' },
+            { emoji: '💖', label: 'Made with Love', color: '#fff1f0', border: '#ffccc7', delay: '0.3s', dur: '3.3s' },
+            { emoji: '🌈', label: 'Bright Colors', color: '#e6fffb', border: '#87e8de', delay: '0.7s', dur: '3.5s' },
+            { emoji: '🎁', label: 'Special Offers', color: `${primaryColor}14`, border: `${primaryColor}28`, delay: '0.5s', dur: '3.2s' },
+            { emoji: '⭐', label: '5-Star Rated',  color: '#fffbe6', border: '#ffd666', delay: '0.9s', dur: '2.7s' },
+            { emoji: '🦄', label: 'Unique & Rare',  color: '#f9f0ff', border: '#c9b4f5', delay: '1.1s', dur: '3.7s' },
+            { emoji: '🍬', label: 'Sweet Deals',   color: '#fff0f5', border: '#ffadd2', delay: '0.1s', dur: '3.0s' },
+          ].flatMap((item, i) => [
+            <div
+              key={`chip-b-${i}`}
+              className="kawaii-3d-chip"
+              style={{
+                background: item.color,
+                border: `1.5px solid ${item.border}`,
+                boxShadow: `0 6px 20px ${item.border}50, inset 0 1px 0 rgba(255,255,255,0.7)`,
+                '--bob-delay': item.delay,
+                '--bob-dur': item.dur,
+                animationDelay: item.delay,
+              }}
+            >
+              <span className="chip-emoji" style={{ '--bob-delay': item.delay, '--bob-dur': item.dur }}>{item.emoji}</span>
+              <span style={{ color: '#374151', fontWeight: 700, fontSize: '12px', letterSpacing: '0.4px' }}>{item.label}</span>
+            </div>,
+            <div key={`dot-b-${i}`} className="kawaii-strip-dot" />
+          ])}
+        </div>
+      </div>
 
       {/* 3-Second Auto-Rotating Words Ribbon Directly Below Navbar */}
       <div style={{
