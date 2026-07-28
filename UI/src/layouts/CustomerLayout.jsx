@@ -88,12 +88,12 @@ const CustomerLayout = () => {
   const menuItems = [
     {
       key: '/',
-      icon: <HomeOutlined />,
+      // icon: <HomeOutlined />,
       label: <Link to="/">Home</Link>,
     },
     {
       key: '/products',
-      icon: <ShopOutlined />,
+      // icon: <ShopOutlined />,
       label: <Link to="/products">Products</Link>,
     }
   ];

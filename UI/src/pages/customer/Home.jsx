@@ -418,7 +418,7 @@ const Home = () => {
                   Shop Collection <RightOutlined style={{ fontSize: '13px' }} />
                 </Button>
 
-                <Button
+                {/* <Button
                   size="large"
                   onClick={() => navigate('/products')}
                   style={{
@@ -433,7 +433,7 @@ const Home = () => {
                   }}
                 >
                   Categories
-                </Button>
+                </Button> */}
               </Space>
 
               {/* Minimal Stats Row */}
