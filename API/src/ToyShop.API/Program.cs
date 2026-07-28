@@ -198,6 +198,7 @@ using (var scope = app.Services.CreateScope())
               ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""PromoDescription"" TEXT NULL;
               ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""PromoCouponCode"" VARCHAR(100) NULL;
               ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""MarqueeText"" TEXT NULL;
+              ALTER TABLE ""Shops"" ADD COLUMN IF NOT EXISTS ""BadgeRibbonText"" TEXT NULL;
 
               INSERT INTO ""SuperAdminControls"" (""Id"", ""IsShopSettingsMenuEnabled"", ""IsShipmentSettingsMenuEnabled"", ""IsInvoiceSettingsMenuEnabled"", ""IsTaxSettingsMenuEnabled"", ""IsReportsMenuEnabled"", ""IsCouponMenuEnabled"", ""IsAppControlMenuEnabled"", ""IsWhatsAppFloatingWidgetEnabled"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
               SELECT 1, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, TRUE, NOW(), 'System', FALSE

@@ -68,14 +68,20 @@ const CustomerLayout = () => {
     return () => window.removeEventListener('superAdminControlUpdated', fetchSuperAdminControls);
   }, []);
 
-  // 3-Second Rotating Tagline Ribbon
-  const rotatingPhrases = [
+  // Dynamic 3-Second Rotating Tagline Ribbon (Configured via UI Control)
+  const defaultPhrases = [
     '✨ Surprisingly Affordable',
     '💖 100% Genuine & Certified Products',
     '🚀 Fast Express Doorstep Delivery',
     '⭐ 50,000+ Happy Smiles Delivered',
     '🎁 Free Gift Wrapping On All Orders'
   ];
+
+  const parsedPhrases = shopSettings?.badgeRibbonText
+    ? shopSettings.badgeRibbonText.split(/•|,|\|/).map(s => s.trim()).filter(Boolean)
+    : [];
+
+  const rotatingPhrases = parsedPhrases.length > 0 ? parsedPhrases : defaultPhrases;
   const [phraseIndex, setPhraseIndex] = useState(0);
 
   useEffect(() => {

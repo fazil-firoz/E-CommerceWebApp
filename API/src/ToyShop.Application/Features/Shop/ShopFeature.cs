@@ -82,7 +82,8 @@ namespace ToyShop.Application.Features.Shop
             PromoTitle = s.PromoTitle,
             PromoDescription = s.PromoDescription,
             PromoCouponCode = s.PromoCouponCode,
-            MarqueeText = s.MarqueeText
+            MarqueeText = s.MarqueeText,
+            BadgeRibbonText = s.BadgeRibbonText
         };
     }
 
@@ -142,6 +143,7 @@ namespace ToyShop.Application.Features.Shop
             shop.PromoDescription = req.PromoDescription;
             shop.PromoCouponCode = req.PromoCouponCode;
             shop.MarqueeText = req.MarqueeText;
+            shop.BadgeRibbonText = req.BadgeRibbonText;
             shop.UpdatedDate = DateTimeOffset.UtcNow;
 
             if (shop.Id > 0)

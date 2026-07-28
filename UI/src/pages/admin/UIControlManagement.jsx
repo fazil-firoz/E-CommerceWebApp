@@ -148,6 +148,25 @@ const UIControlManagement = () => {
               </Row>
             </Card>
 
+            {/* Navbar Top Badge Ribbon Controls */}
+            <Card
+              title={
+                <Text strong style={{ color: '#52c41a', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <ControlOutlined /> 🏷️ Top Navbar Badge Ribbon (3-Second Auto-Rotating Messages)
+                </Text>
+              }
+              size="small"
+              style={{ background: '#f6ffed', borderRadius: '10px', border: '1px solid #b7eb8f' }}
+            >
+              <Row gutter={[16, 16]}>
+                <Col span={24}>
+                  <Form.Item name="badgeRibbonText" label="Navbar Top Badge Ribbon Messages (Use bullet • or commas to separate rotating messages)">
+                    <Input.TextArea rows={2} placeholder="✨ Surprisingly Affordable • 💖 100% Genuine & Certified Products • 🚀 Fast Express Doorstep Delivery • ⭐ 50,000+ Happy Smiles Delivered • 🎁 Free Gift Wrapping On All Orders" />
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Card>
+
             {/* Marquee Ticker Ribbon Controls */}
             <Card
               title={

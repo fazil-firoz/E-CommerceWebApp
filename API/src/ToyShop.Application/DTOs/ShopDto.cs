@@ -46,6 +46,7 @@ namespace ToyShop.Application.DTOs
         public string? PromoDescription { get; set; }
         public string? PromoCouponCode { get; set; }
         public string? MarqueeText { get; set; }
+        public string? BadgeRibbonText { get; set; }
     }
 
     public class UpdateShopRequest
@@ -89,5 +90,6 @@ namespace ToyShop.Application.DTOs
         public string? PromoDescription { get; set; }
         public string? PromoCouponCode { get; set; }
         public string? MarqueeText { get; set; }
+        public string? BadgeRibbonText { get; set; }
     }
 }
