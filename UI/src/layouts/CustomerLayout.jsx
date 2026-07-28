@@ -283,7 +283,7 @@ const CustomerLayout = () => {
   const isHomePage = location.pathname === '/';
 
   return (
-    <Layout className="layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+    <Layout className="layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', overflowX: 'hidden', width: '100%' }}>
       {/* Dynamic theme style injection */}
       <style>{menuThemeStyle}</style>
       {/* =============================================== */}
@@ -638,8 +638,17 @@ const CustomerLayout = () => {
       )}
 
       {/* Main Content View */}
-      <Content style={{ flex: 1, padding: isHomePage ? '0' : '24px 50px', background: activeTheme?.backgroundColor || '#fff5f7', display: 'flex', flexDirection: 'column', transition: 'background 0.3s ease' }}>
-        <div style={{ flex: 1, maxWidth: isHomePage ? '100%' : '1200px', width: '100%', margin: isHomePage ? '0' : '0 auto' }}>
+      <Content style={{
+        flex: 1,
+        padding: isHomePage ? '20px 24px 48px' : '24px 50px',
+        background: activeTheme?.backgroundColor || '#fff5f7',
+        display: 'flex',
+        flexDirection: 'column',
+        transition: 'background 0.3s ease',
+        width: '100%',
+        overflowX: 'hidden'
+      }}>
+        <div style={{ flex: 1, maxWidth: '1200px', width: '100%', margin: '0 auto' }}>
           <Outlet />
         </div>
       </Content>
