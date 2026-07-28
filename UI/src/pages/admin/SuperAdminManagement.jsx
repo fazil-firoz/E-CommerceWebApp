@@ -89,7 +89,10 @@ const SuperAdminManagement = () => {
     isNewArrivalsEnabled: true,
     isBestSellersEnabled: true,
     isPromoBannerEnabled: true,
-    isWhyChooseUsEnabled: true
+    isWhyChooseUsEnabled: true,
+    isMarqueeEnabled: true,
+    isKawaiiScrollStripEnabled: true,
+    isBadgeRibbonEnabled: true
   };
 
   // Control state
@@ -183,7 +186,7 @@ const SuperAdminManagement = () => {
     try {
       const res = await superAdminApi.updateControl(controls);
       if (res.success && res.data) {
-        setControls(res.data);
+        setControls({ ...defaultControls, ...res.data });
         message.success('Super Admin control settings saved successfully!');
         // Dispatch custom event so AdminLayout & CustomerLayout react immediately
         window.dispatchEvent(new Event('superAdminControlUpdated'));
