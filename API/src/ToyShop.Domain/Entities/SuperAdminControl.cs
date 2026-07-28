@@ -26,5 +26,7 @@ namespace ToyShop.Domain.Entities
         public bool IsPromoBannerEnabled { get; set; } = true;
         public bool IsWhyChooseUsEnabled { get; set; } = true;
         public bool IsMarqueeEnabled { get; set; } = true;
+        public bool IsKawaiiScrollStripEnabled { get; set; } = true;
+        public bool IsBadgeRibbonEnabled { get; set; } = true;
     }
 }

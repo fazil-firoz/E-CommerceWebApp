@@ -733,7 +733,9 @@ const SuperAdminManagement = () => {
                   { key: 'isNewArrivalsEnabled', label: 'New Arrivals Section', desc: 'Freshly added items grid' },
                   { key: 'isBestSellersEnabled', label: 'Best Sellers Section', desc: 'Top selling popular toys grid' },
                   { key: 'isPromoBannerEnabled', label: 'Promo Banner Section', desc: 'Promotional discount campaign banner' },
-                  { key: 'isWhyChooseUsEnabled', label: 'Why Choose Us Section', desc: 'Store trust badges (Fast Shipping, Safe Toys, 24/7 Support)' }
+                  { key: 'isWhyChooseUsEnabled', label: 'Why Choose Us Section', desc: 'Store trust badges (Fast Shipping, Safe Toys, 24/7 Support)' },
+                  { key: 'isKawaiiScrollStripEnabled', label: '🎀 Kawaii 3D Scroll Strip', desc: 'Floating 3D emoji chip strip scrolling between navbar and ribbon' },
+                  { key: 'isBadgeRibbonEnabled', label: '✨ Badge Ribbon Ticker', desc: '3-second rotating tagline ribbon below the kawaii strip' }
                 ].map((sec) => (
                   <Col xs={24} sm={12} lg={8} key={sec.key}>
                     <div style={{

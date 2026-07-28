@@ -432,6 +432,7 @@ const CustomerLayout = () => {
       </Header>
 
       {/* ===== 3D KAWAII FLOATING OBJECTS SCROLL STRIP ===== */}
+      {superAdminControl.isKawaiiScrollStripEnabled !== false && (
       <div style={{
         overflow: 'hidden',
         background: `linear-gradient(135deg, ${activeTheme?.backgroundColor || '#fff5f7'} 0%, #ffffff 40%, ${activeTheme?.backgroundColor || '#fff5f7'} 100%)`,
@@ -512,8 +513,10 @@ const CustomerLayout = () => {
           ])}
         </div>
       </div>
+      )}
 
       {/* 3-Second Auto-Rotating Words Ribbon Directly Below Navbar */}
+      {superAdminControl.isBadgeRibbonEnabled !== false && (
       <div style={{
         background: activeTheme?.backgroundColor
           ? `linear-gradient(90deg, ${activeTheme.backgroundColor} 0%, #ffffff 50%, ${activeTheme.backgroundColor} 100%)`
@@ -531,6 +534,7 @@ const CustomerLayout = () => {
           <span style={{ color: primaryColor, fontWeight: 800 }}>{rotatingPhrases[phraseIndex]}</span>
         </div>
       </div>
+      )}
 
       {/* Main Content View */}
       <Content style={{ flex: 1, padding: '24px 50px', background: activeTheme?.backgroundColor || '#fff5f7', display: 'flex', flexDirection: 'column', transition: 'background 0.3s ease' }}>

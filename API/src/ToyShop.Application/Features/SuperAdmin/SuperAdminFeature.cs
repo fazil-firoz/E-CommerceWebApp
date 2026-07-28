@@ -33,6 +33,8 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsPromoBannerEnabled { get; set; } = true;
         public bool IsWhyChooseUsEnabled { get; set; } = true;
         public bool IsMarqueeEnabled { get; set; } = true;
+        public bool IsKawaiiScrollStripEnabled { get; set; } = true;
+        public bool IsBadgeRibbonEnabled { get; set; } = true;
     }
 
     public class UpdateSuperAdminControlRequest
@@ -58,6 +60,8 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsPromoBannerEnabled { get; set; } = true;
         public bool IsWhyChooseUsEnabled { get; set; } = true;
         public bool IsMarqueeEnabled { get; set; } = true;
+        public bool IsKawaiiScrollStripEnabled { get; set; } = true;
+        public bool IsBadgeRibbonEnabled { get; set; } = true;
     }
 
     public class SuperAdminLoginRequest
@@ -165,6 +169,8 @@ namespace ToyShop.Application.Features.SuperAdmin
             control.IsPromoBannerEnabled = request.Request.IsPromoBannerEnabled;
             control.IsWhyChooseUsEnabled = request.Request.IsWhyChooseUsEnabled;
             control.IsMarqueeEnabled = request.Request.IsMarqueeEnabled;
+            control.IsKawaiiScrollStripEnabled = request.Request.IsKawaiiScrollStripEnabled;
+            control.IsBadgeRibbonEnabled = request.Request.IsBadgeRibbonEnabled;
 
             control.UpdatedDate = System.DateTimeOffset.UtcNow;
 
@@ -217,7 +223,9 @@ namespace ToyShop.Application.Features.SuperAdmin
             IsBestSellersEnabled = c.IsBestSellersEnabled,
             IsPromoBannerEnabled = c.IsPromoBannerEnabled,
             IsWhyChooseUsEnabled = c.IsWhyChooseUsEnabled,
-            IsMarqueeEnabled = c.IsMarqueeEnabled
+            IsMarqueeEnabled = c.IsMarqueeEnabled,
+            IsKawaiiScrollStripEnabled = c.IsKawaiiScrollStripEnabled,
+            IsBadgeRibbonEnabled = c.IsBadgeRibbonEnabled
         };
     }
 }
