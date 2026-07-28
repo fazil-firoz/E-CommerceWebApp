@@ -33,6 +33,7 @@ import CategoryManagement from './pages/admin/CategoryManagement';
 import ProductManagement from './pages/admin/ProductManagement';
 import OrderManagement from './pages/admin/OrderManagement';
 import ShopManagement from './pages/admin/ShopManagement';
+import UIControlManagement from './pages/admin/UIControlManagement';
 import ShipmentManagement from './pages/admin/ShipmentManagement';
 import InvoiceManagement from './pages/admin/InvoiceManagement';
 import TaxManagement from './pages/admin/TaxManagement';
@@ -83,6 +84,7 @@ function App() {
               <Route path="invoice-settings" element={<InvoiceManagement />} />
               <Route path="tax-settings" element={<TaxManagement />} />
               <Route path="shop-settings" element={<ShopManagement />} />
+              <Route path="ui-control" element={<UIControlManagement />} />
               <Route path="super-admin" element={<SuperAdminManagement />} />
             </Route>
           </Routes>

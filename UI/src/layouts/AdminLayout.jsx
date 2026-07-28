@@ -35,6 +35,7 @@ const AdminLayout = () => {
   const [shopSettings, setShopSettings] = useState(null);
   const [superAdminControl, setSuperAdminControl] = useState({
     isShopSettingsMenuEnabled: true,
+    isUIControlMenuEnabled: true,
     isAppControlMenuEnabled: true,
     isWhatsAppFloatingWidgetEnabled: true
   });
@@ -164,6 +165,11 @@ const AdminLayout = () => {
       key: '/admin/shop-settings',
       icon: <ShopOutlined />,
       label: <Link to="/admin/shop-settings">Shop Settings</Link>,
+    }] : []),
+    ...(superAdminControl.isUIControlMenuEnabled !== false ? [{
+      key: '/admin/ui-control',
+      icon: <ControlOutlined />,
+      label: <Link to="/admin/ui-control">UI Control</Link>,
     }] : []),
     {
       key: '/admin/super-admin',

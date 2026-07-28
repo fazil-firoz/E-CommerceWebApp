@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Switch, Divider, Spin, Alert, Tooltip, Modal, Tag } from 'antd';
 import {
   CrownOutlined, LockOutlined, UnlockOutlined, SaveOutlined,
-  AppstoreOutlined, SettingOutlined, WhatsAppOutlined, SafetyCertificateOutlined,
+  AppstoreOutlined, SettingOutlined, WhatsAppOutlined, SafetyCertificateOutlined, ControlOutlined,
   CheckCircleOutlined, StopOutlined, ReloadOutlined, TagOutlined, PrinterOutlined, HeartOutlined,
   DeleteOutlined, WarningOutlined, ExclamationCircleOutlined, BgColorsOutlined, StarOutlined
 } from '@ant-design/icons';
@@ -73,6 +73,7 @@ const SuperAdminManagement = () => {
   // Default controls fallback
   const defaultControls = {
     isShopSettingsMenuEnabled: true,
+    isUIControlMenuEnabled: true,
     isShipmentSettingsMenuEnabled: true,
     isInvoiceSettingsMenuEnabled: true,
     isTaxSettingsMenuEnabled: true,
@@ -376,6 +377,36 @@ const SuperAdminManagement = () => {
                     unCheckedChildren={<StopOutlined />}
                     checked={controls.isShopSettingsMenuEnabled}
                     onChange={(checked) => setControls({ ...controls, isShopSettingsMenuEnabled: checked })}
+                  />
+                </div>
+
+                {/* UI Control Menu Toggle */}
+                <div style={{
+                  padding: '14px 16px',
+                  borderRadius: '12px',
+                  border: '1px solid #f0f0f0',
+                  background: controls.isUIControlMenuEnabled !== false ? '#f6ffed' : '#fff1f0',
+                  display: 'flex',
+                  justify: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <div>
+                    <Space align="center" size={8}>
+                      <ControlOutlined style={{ fontSize: '18px', color: '#1890ff' }} />
+                      <Text strong style={{ fontSize: '14px' }}>UI Control Menu</Text>
+                    </Space>
+                    <div>
+                      <Text type="secondary" style={{ fontSize: '12px' }}>
+                        Controls `/admin/ui-control` menu visibility (Homepage Hero & Banners)
+                      </Text>
+                    </div>
+                  </div>
+
+                  <Switch
+                    checkedChildren={<CheckCircleOutlined />}
+                    unCheckedChildren={<StopOutlined />}
+                    checked={controls.isUIControlMenuEnabled !== false}
+                    onChange={(checked) => setControls({ ...controls, isUIControlMenuEnabled: checked })}
                   />
                 </div>
 

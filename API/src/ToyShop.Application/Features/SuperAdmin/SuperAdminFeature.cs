@@ -13,6 +13,7 @@ namespace ToyShop.Application.Features.SuperAdmin
     public class SuperAdminControlDto
     {
         public bool IsShopSettingsMenuEnabled { get; set; } = true;
+        public bool IsUIControlMenuEnabled { get; set; } = true;
         public bool IsShipmentSettingsMenuEnabled { get; set; } = true;
         public bool IsInvoiceSettingsMenuEnabled { get; set; } = true;
         public bool IsTaxSettingsMenuEnabled { get; set; } = true;
@@ -37,6 +38,7 @@ namespace ToyShop.Application.Features.SuperAdmin
     public class UpdateSuperAdminControlRequest
     {
         public bool IsShopSettingsMenuEnabled { get; set; }
+        public bool IsUIControlMenuEnabled { get; set; } = true;
         public bool IsShipmentSettingsMenuEnabled { get; set; }
         public bool IsInvoiceSettingsMenuEnabled { get; set; }
         public bool IsTaxSettingsMenuEnabled { get; set; }
@@ -102,6 +104,7 @@ namespace ToyShop.Application.Features.SuperAdmin
                 control = new SuperAdminControl
                 {
                     IsShopSettingsMenuEnabled = true,
+                    IsUIControlMenuEnabled = true,
                     IsShipmentSettingsMenuEnabled = true,
                     IsInvoiceSettingsMenuEnabled = true,
                     IsTaxSettingsMenuEnabled = true,
@@ -142,6 +145,7 @@ namespace ToyShop.Application.Features.SuperAdmin
             }
 
             control.IsShopSettingsMenuEnabled = request.Request.IsShopSettingsMenuEnabled;
+            control.IsUIControlMenuEnabled = request.Request.IsUIControlMenuEnabled;
             control.IsShipmentSettingsMenuEnabled = request.Request.IsShipmentSettingsMenuEnabled;
             control.IsInvoiceSettingsMenuEnabled = request.Request.IsInvoiceSettingsMenuEnabled;
             control.IsTaxSettingsMenuEnabled = request.Request.IsTaxSettingsMenuEnabled;
@@ -195,6 +199,7 @@ namespace ToyShop.Application.Features.SuperAdmin
         private static SuperAdminControlDto MapToDto(SuperAdminControl c) => new SuperAdminControlDto
         {
             IsShopSettingsMenuEnabled = c.IsShopSettingsMenuEnabled,
+            IsUIControlMenuEnabled = c.IsUIControlMenuEnabled,
             IsShipmentSettingsMenuEnabled = c.IsShipmentSettingsMenuEnabled,
             IsInvoiceSettingsMenuEnabled = c.IsInvoiceSettingsMenuEnabled,
             IsTaxSettingsMenuEnabled = c.IsTaxSettingsMenuEnabled,
