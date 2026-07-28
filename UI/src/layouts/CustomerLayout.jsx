@@ -280,11 +280,16 @@ const CustomerLayout = () => {
     }
   `;
 
+  const isHomePage = location.pathname === '/';
+
   return (
     <Layout className="layout" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       {/* Dynamic theme style injection */}
       <style>{menuThemeStyle}</style>
-      {/* Sticky Header - White & Centered Nav */}
+      {/* =============================================== */}
+      {/* STICKY NAVBAR — shown on all pages EXCEPT home  */}
+      {/* =============================================== */}
+      {!isHomePage && (
       <Header style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -430,9 +435,105 @@ const CustomerLayout = () => {
           )}
         </Space>
       </Header>
+      )}
 
-      {/* ===== 3D KAWAII FLOATING OBJECTS SCROLL STRIP ===== */}
-      {superAdminControl.isKawaiiScrollStripEnabled !== false && (
+      {/* ======================================================== */}
+      {/* FLOATING PILL NAV — home page only, fixed top-right corner */}
+      {/* ======================================================== */}
+      {isHomePage && (
+        <div style={{
+          position: 'fixed',
+          top: '14px',
+          right: '22px',
+          zIndex: 1200,
+          display: 'flex',
+          alignItems: 'center',
+          gap: '6px',
+          background: 'rgba(255,255,255,0.72)',
+          backdropFilter: 'blur(18px)',
+          WebkitBackdropFilter: 'blur(18px)',
+          border: `1.5px solid ${primaryColor}30`,
+          borderRadius: '50px',
+          padding: '6px 12px 6px 10px',
+          boxShadow: `0 4px 24px rgba(0,0,0,0.10), 0 0 0 1px ${primaryColor}18`,
+          transition: 'all 0.3s ease'
+        }}>
+          {/* Brand logo mini */}
+          <div
+            onClick={() => navigate('/')}
+            style={{
+              background: `linear-gradient(135deg, ${primaryColor}, ${activeTheme?.secondaryColor || '#ff85c0'})`,
+              width: '30px', height: '30px', borderRadius: '50%',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer', flexShrink: 0,
+              boxShadow: `0 2px 8px ${primaryColor}50`
+            }}
+          >
+            <ShopOutlined style={{ color: '#fff', fontSize: '14px' }} />
+          </div>
+
+          {/* Nav links */}
+          {menuItems.map((item) => (
+            <div key={item.key} style={{ fontSize: '13px', fontWeight: 700 }}>
+              {item.label}
+            </div>
+          ))}
+
+          <div style={{ width: '1px', height: '20px', background: `${primaryColor}30`, margin: '0 2px' }} />
+
+          {/* Login avatar */}
+          <Tooltip title={isLoggedIn ? `Hi, ${customer?.name}` : 'Sign in'}>
+            <div
+              onClick={() => setLoginDrawerOpen(true)}
+              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
+            >
+              {isLoggedIn ? (
+                <Avatar size={28} style={{
+                  background: `linear-gradient(135deg, ${primaryColor}, ${activeTheme?.secondaryColor || '#ff85c0'})`,
+                  fontSize: '12px', fontWeight: 700
+                }}>{customer?.name?.[0]?.toUpperCase()}</Avatar>
+              ) : (
+                <div style={{
+                  width: '28px', height: '28px', borderRadius: '50%',
+                  border: `1.5px solid ${primaryColor}50`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center'
+                }}>
+                  <UserOutlined style={{ fontSize: '13px', color: primaryColor }} />
+                </div>
+              )}
+            </div>
+          </Tooltip>
+
+          {/* Wishlist */}
+          {superAdminControl.isWishlistEnabled !== false && (
+            <Link to="/wishlist">
+              <Badge count={wishlistCount} size="small" color={activeTheme?.accentColor || '#ff4d4f'}>
+                <HeartFilled style={{ fontSize: '18px', color: activeTheme?.accentColor || '#ff4d4f' }} />
+              </Badge>
+            </Link>
+          )}
+
+          {/* Cart */}
+          <Link to="/cart">
+            <Badge count={cartCount} size="small" color={primaryColor}>
+              <ShoppingCartOutlined style={{ fontSize: '20px', color: primaryColor }} />
+            </Badge>
+          </Link>
+
+          {/* Admin shortcut */}
+          {isAuthenticated && (
+            <Tooltip title="Admin Dashboard">
+              <DashboardOutlined
+                onClick={() => navigate('/admin')}
+                style={{ fontSize: '17px', color: '#8c8c8c', cursor: 'pointer' }}
+              />
+            </Tooltip>
+          )}
+        </div>
+      )}
+
+      {/* ===== 3D KAWAII FLOATING OBJECTS SCROLL STRIP — home page only ===== */}
+      {isHomePage && superAdminControl.isKawaiiScrollStripEnabled !== false && (
       <div style={{
         overflow: 'hidden',
         background: `linear-gradient(135deg, ${activeTheme?.backgroundColor || '#fff5f7'} 0%, #ffffff 40%, ${activeTheme?.backgroundColor || '#fff5f7'} 100%)`,
@@ -515,8 +616,8 @@ const CustomerLayout = () => {
       </div>
       )}
 
-      {/* 3-Second Auto-Rotating Words Ribbon Directly Below Navbar */}
-      {superAdminControl.isBadgeRibbonEnabled !== false && (
+      {/* 3-Second Auto-Rotating Words Ribbon — home page only */}
+      {isHomePage && superAdminControl.isBadgeRibbonEnabled !== false && (
       <div style={{
         background: activeTheme?.backgroundColor
           ? `linear-gradient(90deg, ${activeTheme.backgroundColor} 0%, #ffffff 50%, ${activeTheme.backgroundColor} 100%)`
@@ -537,8 +638,8 @@ const CustomerLayout = () => {
       )}
 
       {/* Main Content View */}
-      <Content style={{ flex: 1, padding: '24px 50px', background: activeTheme?.backgroundColor || '#fff5f7', display: 'flex', flexDirection: 'column', transition: 'background 0.3s ease' }}>
-        <div style={{ flex: 1, maxWidth: '1200px', width: '100%', margin: '0 auto' }}>
+      <Content style={{ flex: 1, padding: isHomePage ? '0' : '24px 50px', background: activeTheme?.backgroundColor || '#fff5f7', display: 'flex', flexDirection: 'column', transition: 'background 0.3s ease' }}>
+        <div style={{ flex: 1, maxWidth: isHomePage ? '100%' : '1200px', width: '100%', margin: isHomePage ? '0' : '0 auto' }}>
           <Outlet />
         </div>
       </Content>
