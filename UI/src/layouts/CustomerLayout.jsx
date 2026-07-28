@@ -437,100 +437,7 @@ const CustomerLayout = () => {
       </Header>
       )}
 
-      {/* ======================================================== */}
-      {/* FLOATING PILL NAV — home page only, fixed top-right corner */}
-      {/* ======================================================== */}
-      {isHomePage && (
-        <div style={{
-          position: 'fixed',
-          top: '14px',
-          right: '22px',
-          zIndex: 1200,
-          display: 'flex',
-          alignItems: 'center',
-          gap: '6px',
-          background: 'rgba(255,255,255,0.72)',
-          backdropFilter: 'blur(18px)',
-          WebkitBackdropFilter: 'blur(18px)',
-          border: `1.5px solid ${primaryColor}30`,
-          borderRadius: '50px',
-          padding: '6px 12px 6px 10px',
-          boxShadow: `0 4px 24px rgba(0,0,0,0.10), 0 0 0 1px ${primaryColor}18`,
-          transition: 'all 0.3s ease'
-        }}>
-          {/* Brand logo mini */}
-          <div
-            onClick={() => navigate('/')}
-            style={{
-              background: `linear-gradient(135deg, ${primaryColor}, ${activeTheme?.secondaryColor || '#ff85c0'})`,
-              width: '30px', height: '30px', borderRadius: '50%',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              cursor: 'pointer', flexShrink: 0,
-              boxShadow: `0 2px 8px ${primaryColor}50`
-            }}
-          >
-            <ShopOutlined style={{ color: '#fff', fontSize: '14px' }} />
-          </div>
 
-          {/* Nav links */}
-          {menuItems.map((item) => (
-            <div key={item.key} style={{ fontSize: '13px', fontWeight: 700 }}>
-              {item.label}
-            </div>
-          ))}
-
-          <div style={{ width: '1px', height: '20px', background: `${primaryColor}30`, margin: '0 2px' }} />
-
-          {/* Login avatar */}
-          <Tooltip title={isLoggedIn ? `Hi, ${customer?.name}` : 'Sign in'}>
-            <div
-              onClick={() => setLoginDrawerOpen(true)}
-              style={{ cursor: 'pointer', display: 'flex', alignItems: 'center' }}
-            >
-              {isLoggedIn ? (
-                <Avatar size={28} style={{
-                  background: `linear-gradient(135deg, ${primaryColor}, ${activeTheme?.secondaryColor || '#ff85c0'})`,
-                  fontSize: '12px', fontWeight: 700
-                }}>{customer?.name?.[0]?.toUpperCase()}</Avatar>
-              ) : (
-                <div style={{
-                  width: '28px', height: '28px', borderRadius: '50%',
-                  border: `1.5px solid ${primaryColor}50`,
-                  display: 'flex', alignItems: 'center', justifyContent: 'center'
-                }}>
-                  <UserOutlined style={{ fontSize: '13px', color: primaryColor }} />
-                </div>
-              )}
-            </div>
-          </Tooltip>
-
-          {/* Wishlist */}
-          {superAdminControl.isWishlistEnabled !== false && (
-            <Link to="/wishlist">
-              <Badge count={wishlistCount} size="small" color={activeTheme?.accentColor || '#ff4d4f'}>
-                <HeartFilled style={{ fontSize: '18px', color: activeTheme?.accentColor || '#ff4d4f' }} />
-              </Badge>
-            </Link>
-          )}
-
-          {/* Cart */}
-          <Link to="/cart">
-            <Badge count={cartCount} size="small" color={primaryColor}>
-              <ShoppingCartOutlined style={{ fontSize: '20px', color: primaryColor }} />
-            </Badge>
-          </Link>
-
-          {/* Admin shortcut */}
-          {isAuthenticated && (
-            <Tooltip title="Admin Dashboard">
-              <DashboardOutlined
-                onClick={() => navigate('/admin')}
-                style={{ fontSize: '17px', color: '#8c8c8c', cursor: 'pointer' }}
-              />
-            </Tooltip>
-          )}
-        </div>
-      )}
 
       {/* ===== 3D KAWAII FLOATING OBJECTS SCROLL STRIP — home page only ===== */}
       {isHomePage && superAdminControl.isKawaiiScrollStripEnabled !== false && (
@@ -635,6 +542,70 @@ const CustomerLayout = () => {
           <span style={{ color: primaryColor, fontWeight: 800 }}>{rotatingPhrases[phraseIndex]}</span>
         </div>
       </div>
+      )}
+
+      {/* Clean Centered Simple Nav Row — home page only, directly below ribbon (no background fill) */}
+      {isHomePage && (
+        <div style={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          gap: '24px',
+          padding: '12px 16px 4px',
+          background: 'transparent'
+        }}>
+          <Link to="/" style={{ color: '#2d3748', fontWeight: 700, fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <HomeOutlined style={{ color: primaryColor, fontSize: '16px' }} /> Home
+          </Link>
+
+          <Link to="/products" style={{ color: '#2d3748', fontWeight: 700, fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+            <ShopOutlined style={{ color: primaryColor, fontSize: '16px' }} /> Products
+          </Link>
+
+          <span style={{ color: '#cbd5e1', fontWeight: 300, fontSize: '14px' }}>|</span>
+
+          {/* User Sign in / Profile Icon */}
+          <Tooltip title={isLoggedIn ? `Signed in as ${customer?.email}` : 'Sign in'}>
+            <div
+              onClick={() => setLoginDrawerOpen(true)}
+              style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
+            >
+              {isLoggedIn ? (
+                <Avatar size={26} style={{ background: primaryColor, fontSize: '12px', fontWeight: 700 }}>
+                  {customer?.name?.[0]?.toUpperCase()}
+                </Avatar>
+              ) : (
+                <UserOutlined style={{ fontSize: '18px', color: '#475569' }} />
+              )}
+            </div>
+          </Tooltip>
+
+          {/* Wishlist Icon */}
+          {superAdminControl.isWishlistEnabled !== false && (
+            <Link to="/wishlist" style={{ display: 'inline-flex', alignItems: 'center' }}>
+              <Badge count={wishlistCount} size="small" color={activeTheme?.accentColor || '#ff4d4f'}>
+                <HeartFilled style={{ fontSize: '18px', color: activeTheme?.accentColor || '#ff4d4f' }} />
+              </Badge>
+            </Link>
+          )}
+
+          {/* Cart Icon */}
+          <Link to="/cart" style={{ display: 'inline-flex', alignItems: 'center' }}>
+            <Badge count={cartCount} size="small" color={primaryColor}>
+              <ShoppingCartOutlined style={{ fontSize: '20px', color: primaryColor }} />
+            </Badge>
+          </Link>
+
+          {/* Admin shortcut */}
+          {isAuthenticated && (
+            <Tooltip title="Admin Dashboard">
+              <DashboardOutlined
+                onClick={() => navigate('/admin')}
+                style={{ fontSize: '17px', color: '#64748b', cursor: 'pointer' }}
+              />
+            </Tooltip>
+          )}
+        </div>
       )}
 
       {/* Main Content View */}
