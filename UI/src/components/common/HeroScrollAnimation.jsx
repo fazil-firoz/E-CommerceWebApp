@@ -101,25 +101,27 @@ export default function HeroScrollAnimation({
     if (canvasRatio > imgRatio) {
       drawH = h;
       drawW = h * imgRatio;
-      drawX = (w - drawW) / 2;
+      drawX = (w - drawW) / 2 - (drawW * 0.11); // Optical shift: dead center gift box
     } else {
       drawW = w;
       drawH = w / imgRatio;
       drawY = (h - drawH) / 2;
+      drawX = - (drawW * 0.11); // Optical shift: dead center gift box
     }
 
-    // Draw cropped image cleanly
+    // Draw cropped image cleanly with optical centering
     ctx.drawImage(img, sx, sy, imgW, imgH, drawX, drawY, drawW, drawH);
 
-    // 3. Radial edge-feathering to smoothly dissolve any rectangular image boundary into the page
-    const innerRadius = Math.min(drawW, drawH) * 0.30;
-    const outerRadius = Math.max(drawW, drawH) * 0.52;
-    const centerX = drawX + drawW / 2;
+    // 3. Radial edge-feathering centered on the gift box position
+    const centerX = drawX + drawW * 0.61; // Center feathering on the 3D gift box location
     const centerY = drawY + drawH / 2;
+    const innerRadius = Math.min(drawW, drawH) * 0.26;
+    const outerRadius = Math.max(drawW, drawH) * 0.48;
 
     const gradient = ctx.createRadialGradient(centerX, centerY, innerRadius, centerX, centerY, outerRadius);
     gradient.addColorStop(0, 'rgba(250, 213, 217, 0)');
-    gradient.addColorStop(0.70, 'rgba(250, 213, 217, 0.40)');
+    gradient.addColorStop(0.50, 'rgba(250, 213, 217, 0.35)');
+    gradient.addColorStop(0.80, 'rgba(250, 213, 217, 0.85)');
     gradient.addColorStop(1, 'rgba(250, 213, 217, 1)');
 
     ctx.fillStyle = gradient;
@@ -266,15 +268,17 @@ export default function HeroScrollAnimation({
             </p>
           </motion.div>
 
-          {/* ── CENTER 3D CANVAS (Medium Screen Size & 100% Seamless Blend) ── */}
+          {/* ── CENTER 3D CANVAS (Optically Centered, Larger Size & 100% Borderless Masking) ── */}
           <div style={{
             position: 'relative',
-            width: 'clamp(280px, 46vw, 680px)',
-            height: 'clamp(280px, 52vh, 560px)',
+            width: 'clamp(360px, 68vw, 920px)',
+            height: 'clamp(360px, 72vh, 700px)',
             zIndex: 20,
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
+            maskImage: 'radial-gradient(ellipse 65% 65% at 50% 50%, #000 35%, rgba(0,0,0,0.85) 60%, transparent 85%)',
+            WebkitMaskImage: 'radial-gradient(ellipse 65% 65% at 50% 50%, #000 35%, rgba(0,0,0,0.85) 60%, transparent 85%)',
           }}>
             <canvas
               ref={canvasRef}
@@ -282,7 +286,6 @@ export default function HeroScrollAnimation({
                 width: '100%',
                 height: '100%',
                 display: 'block',
-                filter: 'drop-shadow(0 16px 36px rgba(0,0,0,0.06))',
               }}
             />
           </div>
