@@ -69,7 +69,7 @@ export default function HeroScrollAnimation({
   const progressWidth = useTransform(smooth, [0, 1], ['0%', '100%']);
   const hintOpacity   = useTransform(smooth, [0, 0.05], [1, 0]);
 
-  // ── Aspect-ratio contain canvas draw (Seamless Color Blending) ─────────────
+  // ── Aspect-ratio contain canvas draw (With Black Line Cropping & Seamless Feathering)
   const drawFrame = useCallback((index) => {
     const canvas = canvasRef.current;
     const img    = imagesRef.current[Math.round(index)];
@@ -79,10 +79,18 @@ export default function HeroScrollAnimation({
     const w = canvas.width / dpr;
     const h = canvas.height / dpr;
 
-    ctx.clearRect(0, 0, w, h);
+    const bgTone = backgroundColor || '#fad5d9';
 
+    // 1. Fill canvas with exact background tone #fad5d9
+    ctx.fillStyle = bgTone;
+    ctx.fillRect(0, 0, w, h);
+
+    // 2. Crop out 6px black letterbox lines from top and bottom of source frame
+    const sx = 0;
+    const sy = 6;
     const imgW = img.naturalWidth || 1920;
-    const imgH = img.naturalHeight || 1080;
+    const imgH = Math.max(100, (img.naturalHeight || 1080) - 12);
+
     const imgRatio = imgW / imgH;
     const canvasRatio = w / h;
     let drawW = w;
@@ -100,8 +108,23 @@ export default function HeroScrollAnimation({
       drawY = (h - drawH) / 2;
     }
 
-    ctx.drawImage(img, drawX, drawY, drawW, drawH);
-  }, []);
+    // Draw cropped image cleanly
+    ctx.drawImage(img, sx, sy, imgW, imgH, drawX, drawY, drawW, drawH);
+
+    // 3. Radial edge-feathering to smoothly dissolve any rectangular image boundary into the page
+    const innerRadius = Math.min(drawW, drawH) * 0.30;
+    const outerRadius = Math.max(drawW, drawH) * 0.52;
+    const centerX = drawX + drawW / 2;
+    const centerY = drawY + drawH / 2;
+
+    const gradient = ctx.createRadialGradient(centerX, centerY, innerRadius, centerX, centerY, outerRadius);
+    gradient.addColorStop(0, 'rgba(250, 213, 217, 0)');
+    gradient.addColorStop(0.70, 'rgba(250, 213, 217, 0.40)');
+    gradient.addColorStop(1, 'rgba(250, 213, 217, 1)');
+
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, w, h);
+  }, [backgroundColor]);
 
   useMotionValueEvent(frameIndex, 'change', (latest) => {
     const idx = Math.max(0, Math.min(TOTAL_FRAMES - 1, Math.round(latest)));
@@ -147,7 +170,7 @@ export default function HeroScrollAnimation({
         top: 0,
         height: '100vh',
         overflow: 'hidden',
-        background: `linear-gradient(135deg, ${blendedBg} 0%, #ffdadf 50%, #f7cad0 100%)`,
+        background: blendedBg || '#fad5d9',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
