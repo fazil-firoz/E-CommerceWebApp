@@ -208,22 +208,10 @@ const CustomerLayout = () => {
       justify-content: center;
     }
 
-    /* ===== 3D KAWAII FLOATING OBJECTS SCROLL STRIP ===== */
+    /* ===== KAWAII FLOATING OBJECTS SCROLL STRIP (100% Straight Line) ===== */
     @keyframes kawaii-scroll-left {
       0%   { transform: translateX(0); }
       100% { transform: translateX(-50%); }
-    }
-
-    @keyframes kawaii-float-bob {
-      0%, 100% { transform: translateY(0) rotate(0deg) scale(1); }
-      25%       { transform: translateY(-7px) rotate(-4deg) scale(1.06); }
-      50%       { transform: translateY(-13px) rotate(2deg) scale(1.1); }
-      75%       { transform: translateY(-6px) rotate(-2deg) scale(1.05); }
-    }
-
-    @keyframes kawaii-shimmer-pulse {
-      0%, 100% { box-shadow: 0 8px 24px rgba(0,0,0,0.10), 0 0 0 0 ${primaryColor}44; }
-      50%       { box-shadow: 0 16px 40px rgba(0,0,0,0.18), 0 0 18px 4px ${primaryColor}55; }
     }
 
     .kawaii-strip-track {
@@ -233,6 +221,7 @@ const CustomerLayout = () => {
       animation: kawaii-scroll-left 28s linear infinite;
       will-change: transform;
       width: max-content;
+      height: 48px;
     }
 
     .kawaii-strip-track:hover {
@@ -242,31 +231,31 @@ const CustomerLayout = () => {
     .kawaii-3d-chip {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 8px;
-      padding: 8px 18px;
-      border-radius: 40px;
+      padding: 6px 16px;
+      height: 36px;
+      border-radius: 20px;
       font-size: 13px;
       font-weight: 700;
       letter-spacing: 0.3px;
       white-space: nowrap;
       cursor: default;
-      transform-style: preserve-3d;
-      transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
-      animation: kawaii-shimmer-pulse 3.5s ease-in-out infinite;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
       user-select: none;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     }
 
     .kawaii-3d-chip:hover {
-      transform: translateY(-8px) rotateX(12deg) rotateY(-6deg) scale(1.12) !important;
+      transform: translateY(-2px) scale(1.05);
       animation-play-state: paused;
     }
 
     .kawaii-3d-chip .chip-emoji {
-      font-size: 20px;
-      display: inline-block;
-      animation: kawaii-float-bob var(--bob-dur, 3.2s) ease-in-out infinite;
-      animation-delay: var(--bob-delay, 0s);
-      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.2));
+      font-size: 18px;
+      display: inline-flex;
+      align-items: center;
+      line-height: 1;
     }
 
     .kawaii-strip-dot {
@@ -276,7 +265,6 @@ const CustomerLayout = () => {
       background: ${primaryColor}70;
       margin: 0 14px;
       flex-shrink: 0;
-      animation: kawaii-shimmer-pulse 2s ease-in-out infinite;
     }
   `;
 
@@ -444,9 +432,8 @@ const CustomerLayout = () => {
       <div style={{
         overflow: 'hidden',
         background: `linear-gradient(135deg, ${activeTheme?.backgroundColor || '#fff5f7'} 0%, #ffffff 40%, ${activeTheme?.backgroundColor || '#fff5f7'} 100%)`,
-        borderBottom: `2px solid ${primaryColor}22`,
-        padding: '10px 0',
-        perspective: '900px',
+        borderBottom: `1px solid ${primaryColor}22`,
+        padding: '6px 0',
         position: 'relative',
         zIndex: 5
       }}>
