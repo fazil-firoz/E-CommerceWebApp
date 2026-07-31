@@ -342,6 +342,54 @@ const Home = () => {
         .home-section-spacer {
           margin-top: 44px;
         }
+
+        /* Shining Light Sweep Animation for Coupon Badge */
+        @keyframes coupon-code-shimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        .shiny-coupon-badge {
+          background: linear-gradient(
+            110deg,
+            #fef08a 0%,
+            #ffffff 30%,
+            #fef08a 60%,
+            #ffffff 85%,
+            #fef08a 100%
+          ) !important;
+          background-size: 200% 100% !important;
+          animation: coupon-code-shimmer 2.8s linear infinite !important;
+          color: #854d0e !important;
+          box-shadow: 0 4px 16px rgba(250, 204, 21, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+          border: 1px solid #fde047 !important;
+          display: inline-flex !important;
+          align-items: center !important;
+        }
+
+        /* Playful Jump & Bouncing Aura Animation for Claim Offer Button */
+        @keyframes claim-button-jump {
+          0%, 100% {
+            transform: translateY(0) scale(1);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.18), 0 0 0 0 rgba(255, 255, 255, 0.6);
+          }
+          40% {
+            transform: translateY(-9px) scale(1.06);
+            box-shadow: 0 18px 36px rgba(0,0,0,0.28), 0 0 24px 8px rgba(255, 255, 255, 0.85);
+          }
+          60% {
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.22), 0 0 14px 4px rgba(255, 255, 255, 0.5);
+          }
+        }
+        .claim-offer-btn {
+          animation: claim-button-jump 2.2s cubic-bezier(0.34, 1.56, 0.64, 1) infinite !important;
+          transition: transform 0.22s ease, box-shadow 0.22s ease !important;
+        }
+        .claim-offer-btn:hover {
+          transform: scale(1.1) translateY(-4px) !important;
+          box-shadow: 0 20px 44px rgba(0,0,0,0.35), 0 0 28px 10px rgba(255,255,255,0.95) !important;
+          animation-play-state: paused !important;
+        }
       `}</style>
 
       {/* 0. 3D SCROLL UNBOXING ANIMATION — Blended seamlessly into page background */}
@@ -668,7 +716,7 @@ const Home = () => {
           <Row align="middle" justify="space-between" gutter={[24, 24]}>
             <Col xs={24} md={16}>
               <Space direction="vertical" size={8}>
-                <Tag color="gold" style={{ borderRadius: '12px', padding: '4px 12px', fontWeight: 800 }}>
+                <Tag className="shiny-coupon-badge" style={{ borderRadius: '20px', padding: '6px 16px', fontWeight: 800, fontSize: '13px', letterSpacing: '0.4px' }}>
                   🎉 SPECIAL OFFER: USE CODE {promoCouponCode}
                 </Tag>
                 <Title level={2} style={{ color: '#fff', margin: 0, fontWeight: 900, fontSize: '32px' }}>
@@ -682,20 +730,22 @@ const Home = () => {
             <Col xs={24} md={8} style={{ textAlign: 'right' }}>
               <Button
                 size="large"
+                className="claim-offer-btn"
                 onClick={() => navigate('/products')}
                 style={{
-                  background: '#fff',
+                  background: '#ffffff',
                   color: primaryColor,
                   border: 'none',
-                  borderRadius: '14px',
-                  height: '50px',
-                  padding: '0 32px',
-                  fontWeight: 800,
+                  borderRadius: '50px',
+                  height: '52px',
+                  padding: '0 36px',
+                  fontWeight: 900,
                   fontSize: '16px',
-                  boxShadow: '0 6px 16px rgba(0,0,0,0.15)'
+                  letterSpacing: '0.3px',
+                  cursor: 'pointer'
                 }}
               >
-                Claim Offer Now
+                Claim Offer Now &nbsp;🎁
               </Button>
             </Col>
           </Row>
