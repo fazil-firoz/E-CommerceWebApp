@@ -266,7 +266,7 @@ const Home = () => {
   };
 
   return (
-    <Space direction="vertical" size={48} style={{ width: '100%', paddingBottom: '32px' }}>
+    <Space direction="vertical" size={0} style={{ width: '100%', paddingBottom: '32px' }}>
       {/* Dynamic Shiny & Floating Heart Keyframe Animations */}
       <style>{`
         @keyframes kawaii-text-shine {
@@ -339,10 +339,13 @@ const Home = () => {
           letter-spacing: 0.5px;
           text-transform: uppercase;
         }
+        .home-section-spacer {
+          margin-top: 44px;
+        }
       `}</style>
 
       {/* 0. 3D SCROLL UNBOXING ANIMATION — Blended seamlessly into page background */}
-      <div style={{ margin: '0 -24px', width: 'calc(100% + 48px)' }}>
+      <div style={{ margin: '0 -24px -16px', width: 'calc(100% + 48px)' }}>
         <HeroScrollAnimation
           primaryColor={primaryColor}
           accentColor={accentColor}
@@ -356,7 +359,7 @@ const Home = () => {
         <div style={{
           background: 'transparent',
           borderRadius: '0px',
-          padding: '24px 0 16px',
+          padding: '0px 0 24px',
           color: textColor,
           position: 'relative',
           overflow: 'hidden'

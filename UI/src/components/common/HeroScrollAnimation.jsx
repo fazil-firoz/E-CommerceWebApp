@@ -1,5 +1,5 @@
 import React, { useRef, useEffect, useState, useCallback } from 'react';
-import { useScroll, useTransform, motion, useSpring, useMotionValueEvent } from 'framer-motion';
+import { useScroll, useTransform, motion, useSpring, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 
 // ─── Exact PNG file list present in UI/public/Images/Animation ───────────────
 const FRAME_FILES = Array.from({ length: 54 }, (_, i) => `frame_${String(i + 1).padStart(3, '0')}.png`).concat(['frame_056.png']);
@@ -68,6 +68,37 @@ export default function HeroScrollAnimation({
 
   const progressWidth = useTransform(smooth, [0, 1], ['0%', '100%']);
   const hintOpacity   = useTransform(smooth, [0, 0.05], [1, 0]);
+
+  // Word stagger animation variants for left/right side text
+  const wordVariants = {
+    hidden: { opacity: 0, y: 22, filter: 'blur(4px)' },
+    visible: (i) => ({
+      opacity: 1,
+      y: 0,
+      filter: 'blur(0px)',
+      transition: {
+        delay: i * 0.13,
+        duration: 0.75,
+        ease: [0.16, 1, 0.3, 1],
+      },
+    }),
+  };
+
+  // Helper to split text into per-word animated spans
+  const AnimatedWords = ({ text, style }) => (
+    <span style={{ display: 'inline', ...style }}>
+      {text.split(' ').map((word, i) => (
+        <motion.span
+          key={i}
+          custom={i}
+          variants={wordVariants}
+          style={{ display: 'inline-block', marginRight: '0.28em' }}
+        >
+          {word}
+        </motion.span>
+      ))}
+    </span>
+  );
 
   // ── Aspect-ratio contain canvas draw (With Black Line Cropping & Seamless Feathering)
   const drawFrame = useCallback((index) => {
@@ -164,7 +195,7 @@ export default function HeroScrollAnimation({
   return (
     <div
       ref={containerRef}
-      style={{ height: '135vh', position: 'relative' }}
+      style={{ height: '120vh', position: 'relative' }}
     >
       {/* ── STICKY VIEWPORT — Seamless Blending with Studio Backdrop Tone ─── */}
       <div style={{
@@ -216,14 +247,16 @@ export default function HeroScrollAnimation({
           justifyContent: 'center',
         }}>
 
-          {/* ── LEFT SIDE TEXT (Emerged from behind video & stays) ──────── */}
+          {/* ── LEFT SIDE TEXT ────────────────────────────────────── */}
           <motion.div
             className="hs-side-text-left"
+            initial="hidden"
+            animate={leftOpacity.get() > 0.05 ? 'visible' : 'hidden'}
             style={{
               position: 'absolute',
               left: '3%',
-              top: '30%',
-              maxWidth: '320px',
+              top: '28%',
+              maxWidth: '300px',
               zIndex: 10,
               opacity: leftOpacity,
               x: leftX,
@@ -231,41 +264,59 @@ export default function HeroScrollAnimation({
               pointerEvents: 'none',
             }}
           >
-            <span style={{
-              display: 'inline-block',
-              background: '#ffffff90',
-              backdropFilter: 'blur(8px)',
-              color: primaryColor,
-              border: `1px solid ${primaryColor}40`,
-              borderRadius: '20px',
-              padding: '4px 14px',
-              fontWeight: 800,
-              fontSize: '11px',
-              marginBottom: '10px',
-              letterSpacing: '0.6px',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
-            }}>
-              🌸 KAWAII UNBOXING
-            </span>
+            <motion.span
+              variants={wordVariants}
+              custom={0}
+              style={{
+                display: 'inline-block',
+                background: 'rgba(255,255,255,0.72)',
+                backdropFilter: 'blur(12px)',
+                color: primaryColor,
+                border: `1px solid ${primaryColor}35`,
+                borderRadius: '20px',
+                padding: '4px 14px',
+                fontWeight: 700,
+                fontSize: '10px',
+                marginBottom: '12px',
+                letterSpacing: '1.2px',
+                textTransform: 'uppercase',
+                fontFamily: "'Outfit', sans-serif",
+                boxShadow: `0 2px 12px ${primaryColor}18`,
+              }}
+            >
+              🌸 Kawaii Unboxing
+            </motion.span>
+
             <h2 style={{
-              fontSize: 'clamp(22px, 2.6vw, 36px)',
-              fontWeight: 900,
+              fontSize: 'clamp(20px, 2.2vw, 32px)',
+              fontWeight: 700,
+              fontFamily: "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
+              fontStyle: 'italic',
               color: '#1e293b',
-              marginBottom: '8px',
-              lineHeight: 1.18,
-              letterSpacing: '-0.5px'
+              marginBottom: '10px',
+              lineHeight: 1.22,
+              letterSpacing: '0.2px'
             }}>
-              Magical Plushies &amp; Gift Boxes
+              <AnimatedWords text="Magical Plushies" />
+              <br />
+              <AnimatedWords text="& Gift Boxes" />
             </h2>
-            <p style={{
-              color: '#475569',
-              fontSize: '14px',
-              lineHeight: 1.55,
-              fontWeight: 600,
-              margin: 0
-            }}>
+
+            <motion.p
+              variants={wordVariants}
+              custom={6}
+              style={{
+                color: '#64748b',
+                fontSize: '13px',
+                lineHeight: 1.65,
+                fontFamily: "'Outfit', sans-serif",
+                fontWeight: 500,
+                margin: 0,
+                letterSpacing: '0.1px'
+              }}
+            >
               Handcrafted with love to bring pure joy, comfort &amp; endless smiles.
-            </p>
+            </motion.p>
           </motion.div>
 
           {/* ── CENTER 3D CANVAS (Optically Centered, Larger Size & 100% Borderless Masking) ── */}
@@ -290,14 +341,16 @@ export default function HeroScrollAnimation({
             />
           </div>
 
-          {/* ── RIGHT SIDE TEXT (Emerged from behind video & stays) ─────── */}
+          {/* ── RIGHT SIDE TEXT ────────────────────────────────────── */}
           <motion.div
             className="hs-side-text-right"
+            initial="hidden"
+            animate={rightOpacity.get() > 0.05 ? 'visible' : 'hidden'}
             style={{
               position: 'absolute',
               right: '3%',
-              top: '30%',
-              maxWidth: '320px',
+              top: '28%',
+              maxWidth: '300px',
               zIndex: 10,
               opacity: rightOpacity,
               x: rightX,
@@ -305,41 +358,59 @@ export default function HeroScrollAnimation({
               pointerEvents: 'none',
             }}
           >
-            <span style={{
-              display: 'inline-block',
-              background: '#ffffff90',
-              backdropFilter: 'blur(8px)',
-              color: accentColor,
-              border: `1px solid ${accentColor}40`,
-              borderRadius: '20px',
-              padding: '4px 14px',
-              fontWeight: 800,
-              fontSize: '11px',
-              marginBottom: '10px',
-              letterSpacing: '0.6px',
-              boxShadow: '0 2px 10px rgba(0,0,0,0.04)',
-            }}>
-              ✨ EXCLUSIVE SURPRISES
-            </span>
+            <motion.span
+              variants={wordVariants}
+              custom={0}
+              style={{
+                display: 'inline-block',
+                background: 'rgba(255,255,255,0.72)',
+                backdropFilter: 'blur(12px)',
+                color: accentColor,
+                border: `1px solid ${accentColor}35`,
+                borderRadius: '20px',
+                padding: '4px 14px',
+                fontWeight: 700,
+                fontSize: '10px',
+                marginBottom: '12px',
+                letterSpacing: '1.2px',
+                textTransform: 'uppercase',
+                fontFamily: "'Outfit', sans-serif",
+                boxShadow: `0 2px 12px ${accentColor}18`,
+              }}
+            >
+              ✨ Exclusive Surprises
+            </motion.span>
+
             <h2 style={{
-              fontSize: 'clamp(22px, 2.6vw, 36px)',
-              fontWeight: 900,
+              fontSize: 'clamp(20px, 2.2vw, 32px)',
+              fontWeight: 700,
+              fontFamily: "'Cormorant Garamond', 'Playfair Display', Georgia, serif",
+              fontStyle: 'italic',
               color: '#1e293b',
-              marginBottom: '8px',
-              lineHeight: 1.18,
-              letterSpacing: '-0.5px'
+              marginBottom: '10px',
+              lineHeight: 1.22,
+              letterSpacing: '0.2px'
             }}>
-              Every Box Holds Magic Inside
+              <AnimatedWords text="Every Box Holds" />
+              <br />
+              <AnimatedWords text="Magic Inside" />
             </h2>
-            <p style={{
-              color: '#475569',
-              fontSize: '14px',
-              lineHeight: 1.55,
-              fontWeight: 600,
-              margin: 0
-            }}>
+
+            <motion.p
+              variants={wordVariants}
+              custom={6}
+              style={{
+                color: '#64748b',
+                fontSize: '13px',
+                lineHeight: 1.65,
+                fontFamily: "'Outfit', sans-serif",
+                fontWeight: 500,
+                margin: 0,
+                letterSpacing: '0.1px'
+              }}
+            >
               Discover cute plush toys, kawaii accessories &amp; mystery sets.
-            </p>
+            </motion.p>
           </motion.div>
 
           {/* ── CTA BUTTON BELOW VIDEO CANVAS (Emerged & Stays) ─────────── */}
@@ -388,11 +459,22 @@ export default function HeroScrollAnimation({
             bottom: '14px',
             opacity: hintOpacity,
             pointerEvents: 'none',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '6px',
           }}>
+            <div style={{
+              width: '1px',
+              height: '24px',
+              background: `linear-gradient(to bottom, transparent, ${primaryColor}90)`,
+              animation: 'hs-scroll-line 1.6s ease-in-out infinite',
+            }} />
             <p style={{
-              color: '#64748b', fontSize: '11px',
-              fontWeight: 800, letterSpacing: '2px',
+              color: '#94a3b8', fontSize: '9px',
+              fontWeight: 700, letterSpacing: '2.5px',
               textTransform: 'uppercase', margin: 0,
+              fontFamily: "'Outfit', sans-serif",
             }}>
               Scroll to Unwrap
             </p>
@@ -402,23 +484,15 @@ export default function HeroScrollAnimation({
         {/* ── Progress bar ──────────────────────────────────────────────── */}
         <div style={{
           position: 'absolute', bottom: 0, left: 0, right: 0,
-          height: '3px', background: 'rgba(0,0,0,0.06)',
+          height: '2px', background: 'rgba(0,0,0,0.04)',
         }}>
           <motion.div style={{
             height: '100%',
             background: `linear-gradient(90deg, ${primaryColor}, ${accentColor})`,
             width: progressWidth,
-            boxShadow: `0 0 10px ${primaryColor}80`,
+            boxShadow: `0 0 8px ${primaryColor}70`,
           }} />
         </div>
-
-        {/* ── Frame counter ─────────────────────────────────────────────── */}
-        {isLoaded && (
-          <div style={{
-            position: 'absolute', top: '14px', right: '18px',
-            background: 'rgba(255,255,255,0.75)', backdropFilter: 'blur(10px)',
-            borderRadius: '8px', padding: '3px 10px',
-            color: '#475569', fontSize: '11px',
             fontFamily: 'monospace', letterSpacing: '0.5px',
             pointerEvents: 'none', border: '1px solid rgba(255,255,255,0.60)',
           }}>

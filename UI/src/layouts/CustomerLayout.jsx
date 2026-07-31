@@ -526,10 +526,8 @@ const CustomerLayout = () => {
       {/* 3-Second Auto-Rotating Words Ribbon — home page only */}
       {isHomePage && superAdminControl.isBadgeRibbonEnabled !== false && (
       <div style={{
-        background: activeTheme?.backgroundColor
-          ? `linear-gradient(90deg, ${activeTheme.backgroundColor} 0%, #ffffff 50%, ${activeTheme.backgroundColor} 100%)`
-          : 'linear-gradient(90deg, #fff0f5 0%, #ffffff 50%, #fff0f5 100%)',
-        borderBottom: '1px solid #f0f0f0',
+        background: activeTheme?.backgroundColor || '#fff5f7',
+        borderBottom: `1px solid ${primaryColor}15`,
         padding: '7px 16px',
         textAlign: 'center',
         fontSize: '13px',
@@ -544,15 +542,16 @@ const CustomerLayout = () => {
       </div>
       )}
 
-      {/* Clean Centered Simple Nav Row — home page only, directly below ribbon (no background fill) */}
+      {/* Clean Centered Simple Nav Row — home page only, matching page background */}
       {isHomePage && (
         <div style={{
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
           gap: '24px',
-          padding: '12px 16px 4px',
-          background: 'transparent'
+          padding: '10px 16px 8px',
+          background: activeTheme?.backgroundColor || '#fff5f7',
+          borderBottom: `1px solid ${primaryColor}12`,
         }}>
           <Link to="/" style={{ color: '#2d3748', fontWeight: 700, fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             <HomeOutlined style={{ color: primaryColor, fontSize: '16px' }} /> Home
