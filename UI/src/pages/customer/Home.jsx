@@ -345,7 +345,7 @@ const Home = () => {
       `}</style>
 
       {/* 0. 3D SCROLL UNBOXING ANIMATION — Blended seamlessly into page background */}
-      <div style={{ margin: '0 -24px -16px', width: 'calc(100% + 48px)' }}>
+      <div style={{ margin: '0 -24px 0', width: 'calc(100% + 48px)' }}>
         <HeroScrollAnimation
           primaryColor={primaryColor}
           accentColor={accentColor}
@@ -354,12 +354,151 @@ const Home = () => {
         />
       </div>
 
+      {/* 0.5 GENIUS PRODUCT HIGHLIGHTS & QUICK CATEGORIES BAR — Utilizes transition space efficiently */}
+      <div style={{
+        margin: '16px auto 8px',
+        maxWidth: '1200px',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: '14px',
+        position: 'relative',
+        zIndex: 10,
+      }}>
+        {/* Subtle section label */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          color: '#64748b',
+          fontSize: '11px',
+          fontWeight: 800,
+          letterSpacing: '1.8px',
+          textTransform: 'uppercase',
+        }}>
+          <span style={{ height: '1px', width: '28px', background: `${primaryColor}40` }} />
+          <span>✨ Popular Categories To Explore</span>
+          <span style={{ height: '1px', width: '28px', background: `${primaryColor}40` }} />
+        </div>
+
+        {/* Interactive Quick-Pills Row */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          flexWrap: 'wrap',
+          gap: '10px',
+          padding: '0 12px',
+        }}>
+          {categories.length > 0 ? (
+            categories.slice(0, 6).map((cat, idx) => {
+              const icons = ['🧸', '🧩', '🎀', '🎁', '🎮', '✨', '🌸'];
+              const catIcon = cat.icon || icons[idx % icons.length];
+              return (
+                <div
+                  key={cat.id}
+                  onClick={() => navigate(`/products?category=${cat.id}`)}
+                  style={{
+                    background: '#ffffffb8',
+                    backdropFilter: 'blur(12px)',
+                    border: `1.5px solid ${primaryColor}25`,
+                    borderRadius: '24px',
+                    padding: '8px 18px',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    cursor: 'pointer',
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.transform = 'translateY(-3px) scale(1.04)';
+                    e.currentTarget.style.boxShadow = `0 8px 24px ${primaryColor}35`;
+                    e.currentTarget.style.borderColor = primaryColor;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.transform = '';
+                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.03)';
+                    e.currentTarget.style.borderColor = `${primaryColor}25`;
+                  }}
+                >
+                  <span style={{ fontSize: '15px' }}>{catIcon}</span>
+                  <span style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>{cat.name}</span>
+                  <span style={{
+                    fontSize: '10px',
+                    fontWeight: 800,
+                    color: primaryColor,
+                    background: `${primaryColor}14`,
+                    padding: '2px 8px',
+                    borderRadius: '10px',
+                    letterSpacing: '0.3px',
+                  }}>
+                    Explore →
+                  </span>
+                </div>
+              );
+            })
+          ) : (
+            /* Fallback Default Badges if no API categories loaded yet */
+            [
+              { icon: '🧸', name: 'Plushies & Toys' },
+              { icon: '🧩', name: 'STEM & Educational' },
+              { icon: '🎀', name: 'Kawaii Stationery' },
+              { icon: '🎁', name: 'Surprise Mystery Boxes' },
+              { icon: '✨', name: 'Limited Editions' }
+            ].map((item, idx) => (
+              <div
+                key={idx}
+                onClick={() => navigate('/products')}
+                style={{
+                  background: '#ffffffb8',
+                  backdropFilter: 'blur(12px)',
+                  border: `1.5px solid ${primaryColor}25`,
+                  borderRadius: '24px',
+                  padding: '8px 18px',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  cursor: 'pointer',
+                  boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+                  transition: 'all 0.25s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-3px) scale(1.04)';
+                  e.currentTarget.style.boxShadow = `0 8px 24px ${primaryColor}35`;
+                  e.currentTarget.style.borderColor = primaryColor;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = '';
+                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.03)';
+                  e.currentTarget.style.borderColor = `${primaryColor}25`;
+                }}
+              >
+                <span style={{ fontSize: '15px' }}>{item.icon}</span>
+                <span style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>{item.name}</span>
+                <span style={{
+                  fontSize: '10px',
+                  fontWeight: 800,
+                  color: primaryColor,
+                  background: `${primaryColor}14`,
+                  padding: '2px 8px',
+                  borderRadius: '10px',
+                }}>
+                  Shop →
+                </span>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
       {/* 1. SEAMLESS BLENDED HERO BANNER WITH ANIMATED FLOATING HEARTS */}
       {superAdminControl.isHeroBannerEnabled !== false && (
         <div style={{
           background: 'transparent',
           borderRadius: '0px',
-          padding: '0px 0 24px',
+          padding: '16px 0 24px',
           color: textColor,
           position: 'relative',
           overflow: 'hidden'

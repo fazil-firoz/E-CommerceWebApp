@@ -195,7 +195,7 @@ export default function HeroScrollAnimation({
   return (
     <div
       ref={containerRef}
-      style={{ height: '120vh', position: 'relative' }}
+      style={{ height: '105vh', position: 'relative' }}
     >
       {/* ── STICKY VIEWPORT — Seamless Blending with Studio Backdrop Tone ─── */}
       <div style={{
