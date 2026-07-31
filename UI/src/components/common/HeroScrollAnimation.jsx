@@ -479,8 +479,24 @@ export default function HeroScrollAnimation({
               Scroll to Unwrap
             </p>
           </motion.div>
+        {/* ── Scroll Progress Line Separator (Loads left-to-right on scroll) ── */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '3px',
+          background: 'rgba(0,0,0,0.06)',
+          zIndex: 40,
+        }}>
+          <motion.div style={{
+            height: '100%',
+            background: `linear-gradient(90deg, ${primaryColor}, ${accentColor})`,
+            width: progressWidth,
+            boxShadow: `0 0 10px ${primaryColor}90`,
+            borderRadius: '0 4px 4px 0',
+          }} />
         </div>
-
       </div>
 
       {/* Responsive adjustments for mobile screens */}
