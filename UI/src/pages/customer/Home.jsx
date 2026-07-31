@@ -393,7 +393,7 @@ const Home = () => {
       `}</style>
 
       {/* 0. 3D SCROLL UNBOXING ANIMATION — Blended seamlessly into page background */}
-      <div style={{ margin: '0 -24px 0', width: 'calc(100% + 48px)' }}>
+      <div style={{ width: '100%', margin: '0 auto' }}>
         <HeroScrollAnimation
           primaryColor={primaryColor}
           accentColor={accentColor}

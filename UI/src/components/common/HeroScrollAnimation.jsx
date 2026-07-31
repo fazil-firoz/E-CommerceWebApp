@@ -132,12 +132,12 @@ export default function HeroScrollAnimation({
     if (canvasRatio > imgRatio) {
       drawH = h;
       drawW = h * imgRatio;
-      drawX = (w - drawW) / 2 - (drawW * 0.11); // Optical shift: dead center gift box
+      drawX = (w - drawW) / 2;
     } else {
       drawW = w;
       drawH = w / imgRatio;
       drawY = (h - drawH) / 2;
-      drawX = - (drawW * 0.11); // Optical shift: dead center gift box
+      drawX = 0;
     }
 
     // Draw cropped image cleanly with optical centering
