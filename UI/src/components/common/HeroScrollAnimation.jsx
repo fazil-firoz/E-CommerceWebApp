@@ -479,6 +479,8 @@ export default function HeroScrollAnimation({
               Scroll to Unwrap
             </p>
           </motion.div>
+        </div>
+
         {/* ── Scroll Progress Line Separator (Loads left-to-right on scroll) ── */}
         <div style={{
           position: 'absolute',
@@ -501,6 +503,7 @@ export default function HeroScrollAnimation({
 
       {/* Responsive adjustments for mobile screens */}
       <style>{`
+        @keyframes hs-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
         @media (max-width: 900px) {
           .hs-side-text-left { top: 12% !important; left: 5% !important; max-width: 90% !important; text-align: center !important; }
           .hs-side-text-right { top: 70% !important; right: 5% !important; max-width: 90% !important; text-align: center !important; }
