@@ -481,18 +481,6 @@ export default function HeroScrollAnimation({
           </motion.div>
         </div>
 
-        {/* ── Progress bar ──────────────────────────────────────────────── */}
-        <div style={{
-          position: 'absolute', bottom: 0, left: 0, right: 0,
-          height: '2px', background: 'rgba(0,0,0,0.04)',
-        }}>
-          <motion.div style={{
-            height: '100%',
-            background: `linear-gradient(90deg, ${primaryColor}, ${accentColor})`,
-            width: progressWidth,
-            boxShadow: `0 0 8px ${primaryColor}70`,
-          }} />
-        </div>
       </div>
 
       {/* Responsive adjustments for mobile screens */}
