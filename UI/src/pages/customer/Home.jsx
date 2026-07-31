@@ -354,143 +354,118 @@ const Home = () => {
         />
       </div>
 
-      {/* 0.5 GENIUS PRODUCT HIGHLIGHTS & QUICK CATEGORIES BAR — Utilizes transition space efficiently */}
+      {/* 0.5 ULTRA-COMPACT SINGLE-LINE CATEGORY STRIP */}
       <div style={{
-        margin: '16px auto 8px',
+        margin: '6px auto 2px',
         maxWidth: '1200px',
         width: '100%',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
-        gap: '14px',
+        justifyContent: 'center',
+        gap: '8px',
+        flexWrap: 'nowrap',
+        overflowX: 'auto',
+        padding: '2px 16px',
         position: 'relative',
         zIndex: 10,
       }}>
-        {/* Subtle section label */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          gap: '10px',
-          color: '#64748b',
+        <span style={{
+          color: primaryColor,
           fontSize: '11px',
           fontWeight: 800,
-          letterSpacing: '1.8px',
+          letterSpacing: '0.8px',
           textTransform: 'uppercase',
+          whiteSpace: 'nowrap',
+          background: `${primaryColor}14`,
+          border: `1px solid ${primaryColor}28`,
+          borderRadius: '14px',
+          padding: '3px 10px',
+          flexShrink: 0,
         }}>
-          <span style={{ height: '1px', width: '28px', background: `${primaryColor}40` }} />
-          <span>✨ Popular Categories To Explore</span>
-          <span style={{ height: '1px', width: '28px', background: `${primaryColor}40` }} />
-        </div>
+          ✨ Quick Browse:
+        </span>
 
-        {/* Interactive Quick-Pills Row */}
-        <div style={{
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexWrap: 'wrap',
-          gap: '10px',
-          padding: '0 12px',
-        }}>
-          {categories.length > 0 ? (
-            categories.slice(0, 6).map((cat, idx) => {
-              const icons = ['🧸', '🧩', '🎀', '🎁', '🎮', '✨', '🌸'];
-              const catIcon = cat.icon || icons[idx % icons.length];
-              return (
-                <div
-                  key={cat.id}
-                  onClick={() => navigate(`/products?category=${cat.id}`)}
-                  style={{
-                    background: '#ffffffb8',
-                    backdropFilter: 'blur(12px)',
-                    border: `1.5px solid ${primaryColor}25`,
-                    borderRadius: '24px',
-                    padding: '8px 18px',
-                    display: 'inline-flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    cursor: 'pointer',
-                    boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
-                    transition: 'all 0.25s cubic-bezier(0.16, 1, 0.3, 1)',
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.transform = 'translateY(-3px) scale(1.04)';
-                    e.currentTarget.style.boxShadow = `0 8px 24px ${primaryColor}35`;
-                    e.currentTarget.style.borderColor = primaryColor;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = '';
-                    e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.03)';
-                    e.currentTarget.style.borderColor = `${primaryColor}25`;
-                  }}
-                >
-                  <span style={{ fontSize: '15px' }}>{catIcon}</span>
-                  <span style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>{cat.name}</span>
-                  <span style={{
-                    fontSize: '10px',
-                    fontWeight: 800,
-                    color: primaryColor,
-                    background: `${primaryColor}14`,
-                    padding: '2px 8px',
-                    borderRadius: '10px',
-                    letterSpacing: '0.3px',
-                  }}>
-                    Explore →
-                  </span>
-                </div>
-              );
-            })
-          ) : (
-            /* Fallback Default Badges if no API categories loaded yet */
-            [
-              { icon: '🧸', name: 'Plushies & Toys' },
-              { icon: '🧩', name: 'STEM & Educational' },
-              { icon: '🎀', name: 'Kawaii Stationery' },
-              { icon: '🎁', name: 'Surprise Mystery Boxes' },
-              { icon: '✨', name: 'Limited Editions' }
-            ].map((item, idx) => (
+        {categories.length > 0 ? (
+          categories.slice(0, 5).map((cat, idx) => {
+            const icons = ['🧸', '🧩', '🎀', '🎁', '🎮', '✨'];
+            const catIcon = cat.icon || icons[idx % icons.length];
+            return (
               <div
-                key={idx}
-                onClick={() => navigate('/products')}
+                key={cat.id}
+                onClick={() => navigate(`/products?category=${cat.id}`)}
                 style={{
-                  background: '#ffffffb8',
-                  backdropFilter: 'blur(12px)',
-                  border: `1.5px solid ${primaryColor}25`,
-                  borderRadius: '24px',
-                  padding: '8px 18px',
+                  background: '#ffffffd0',
+                  backdropFilter: 'blur(10px)',
+                  border: `1px solid ${primaryColor}20`,
+                  borderRadius: '16px',
+                  padding: '4px 12px',
                   display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '5px',
                   cursor: 'pointer',
-                  boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
-                  transition: 'all 0.25s ease',
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-3px) scale(1.04)';
-                  e.currentTarget.style.boxShadow = `0 8px 24px ${primaryColor}35`;
+                  e.currentTarget.style.transform = 'translateY(-1.5px)';
+                  e.currentTarget.style.boxShadow = `0 4px 14px ${primaryColor}30`;
                   e.currentTarget.style.borderColor = primaryColor;
                 }}
                 onMouseLeave={(e) => {
                   e.currentTarget.style.transform = '';
-                  e.currentTarget.style.boxShadow = '0 4px 16px rgba(0,0,0,0.03)';
-                  e.currentTarget.style.borderColor = `${primaryColor}25`;
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.03)';
+                  e.currentTarget.style.borderColor = `${primaryColor}20`;
                 }}
               >
-                <span style={{ fontSize: '15px' }}>{item.icon}</span>
-                <span style={{ fontSize: '13px', fontWeight: 700, color: '#334155' }}>{item.name}</span>
-                <span style={{
-                  fontSize: '10px',
-                  fontWeight: 800,
-                  color: primaryColor,
-                  background: `${primaryColor}14`,
-                  padding: '2px 8px',
-                  borderRadius: '10px',
-                }}>
-                  Shop →
-                </span>
+                <span style={{ fontSize: '13px' }}>{catIcon}</span>
+                <span style={{ fontSize: '12px', fontWeight: 700, color: '#334155' }}>{cat.name}</span>
               </div>
-            ))
-          )}
-        </div>
+            );
+          })
+        ) : (
+          [
+            { icon: '🧸', name: 'Plushies' },
+            { icon: '🧩', name: 'STEM Toys' },
+            { icon: '🎀', name: 'Kawaii Merch' },
+            { icon: '🎁', name: 'Surprise Boxes' },
+            { icon: '✨', name: 'Limited' }
+          ].map((item, idx) => (
+            <div
+              key={idx}
+              onClick={() => navigate('/products')}
+              style={{
+                background: '#ffffffd0',
+                backdropFilter: 'blur(10px)',
+                border: `1px solid ${primaryColor}20`,
+                borderRadius: '16px',
+                padding: '4px 12px',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '5px',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                flexShrink: 0,
+                boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
+                transition: 'all 0.2s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.transform = 'translateY(-1.5px)';
+                e.currentTarget.style.boxShadow = `0 4px 14px ${primaryColor}30`;
+                e.currentTarget.style.borderColor = primaryColor;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.transform = '';
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.03)';
+                e.currentTarget.style.borderColor = `${primaryColor}20`;
+              }}
+            >
+              <span style={{ fontSize: '13px' }}>{item.icon}</span>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: '#334155' }}>{item.name}</span>
+            </div>
+          ))
+        )}
       </div>
 
       {/* 1. SEAMLESS BLENDED HERO BANNER WITH ANIMATED FLOATING HEARTS */}
