@@ -133,6 +133,25 @@ const ProductDetails = () => {
     setShareModalOpen(true);
   };
 
+  const handleWhatsAppEnquiry = () => {
+    if (!product) return;
+    const rawNumber = shopSettings?.whatsAppNumber || shopSettings?.phone1 || '919876543210';
+    const cleanNumber = rawNumber.replace(/[^0-9]/g, '');
+
+    const productUrl = window.location.href;
+    const messageText = `Hello! 🌸 I am interested in inquiring about this product from your store:
+
+🛍️ *Product:* ${product.name}
+💰 *Price:* ₹${product.price?.toLocaleString('en-IN')}
+🔗 *Link:* ${productUrl}
+
+Could you please confirm availability and details? Thank you!`;
+
+    const encodedMsg = encodeURIComponent(messageText);
+    const waUrl = `https://wa.me/${cleanNumber}?text=${encodedMsg}`;
+    window.open(waUrl, '_blank', 'noopener,noreferrer');
+  };
+
   const handleCopyLink = () => {
     navigator.clipboard.writeText(currentUrl);
     setCopied(true);
@@ -286,14 +305,34 @@ const ProductDetails = () => {
                 <Tag style={{ borderRadius: '4px', fontSize: '13px', padding: '2px 10px', background: `${primaryColor}18`, color: primaryColor, border: `1px solid ${primaryColor}40` }}>
                   {product.categoryName}
                 </Tag>
-                <Button
-                  type="text"
-                  icon={<ShareAltOutlined style={{ fontSize: '18px', color: primaryColor }} />}
-                  onClick={handleShareProduct}
-                  style={{ borderRadius: '8px', color: primaryColor, fontWeight: 600 }}
-                >
-                  Share
-                </Button>
+                <Space size={8}>
+                  <Button
+                    type="text"
+                    icon={<WhatsAppOutlined style={{ fontSize: '18px', color: '#25D366' }} />}
+                    onClick={handleWhatsAppEnquiry}
+                    style={{
+                      borderRadius: '8px',
+                      color: '#25D366',
+                      fontWeight: 700,
+                      background: '#25D36615',
+                      border: '1px solid #25D36635',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '5px',
+                      fontSize: '13px'
+                    }}
+                  >
+                    Enquire
+                  </Button>
+                  <Button
+                    type="text"
+                    icon={<ShareAltOutlined style={{ fontSize: '18px', color: primaryColor }} />}
+                    onClick={handleShareProduct}
+                    style={{ borderRadius: '8px', color: primaryColor, fontWeight: 600 }}
+                  >
+                    Share
+                  </Button>
+                </Space>
               </div>
 
               <Title level={2} style={{ margin: '12px 0 8px', fontWeight: 800, color: textColor }}>
