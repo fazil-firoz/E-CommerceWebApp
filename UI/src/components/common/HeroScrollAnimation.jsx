@@ -132,12 +132,12 @@ export default function HeroScrollAnimation({
     if (canvasRatio > imgRatio) {
       drawH = h;
       drawW = h * imgRatio;
-      drawX = (w - drawW) / 2;
+      drawX = (w - drawW) / 2 - (drawW * 0.16); // Lean over to the left
     } else {
       drawW = w;
       drawH = w / imgRatio;
       drawY = (h - drawH) / 2;
-      drawX = 0;
+      drawX = - (drawW * 0.16); // Lean over to the left
     }
 
     // Draw cropped image cleanly with optical centering
