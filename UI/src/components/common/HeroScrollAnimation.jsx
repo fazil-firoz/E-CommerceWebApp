@@ -493,12 +493,6 @@ export default function HeroScrollAnimation({
             boxShadow: `0 0 8px ${primaryColor}70`,
           }} />
         </div>
-            fontFamily: 'monospace', letterSpacing: '0.5px',
-            pointerEvents: 'none', border: '1px solid rgba(255,255,255,0.60)',
-          }}>
-            {String(currentFrame + 1).padStart(3, '0')} / {TOTAL_FRAMES}
-          </div>
-        )}
       </div>
 
       {/* Responsive adjustments for mobile screens */}
