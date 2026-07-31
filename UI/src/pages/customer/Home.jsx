@@ -266,7 +266,7 @@ const Home = () => {
   };
 
   return (
-    <Space direction="vertical" size={0} style={{ width: '100%', paddingBottom: '32px' }}>
+    <Space direction="vertical" size={40} style={{ width: '100%', paddingBottom: '32px' }}>
       {/* Dynamic Shiny & Floating Heart Keyframe Animations */}
       <style>{`
         @keyframes kawaii-text-shine {
@@ -352,120 +352,6 @@ const Home = () => {
           backgroundColor={activeTheme?.backgroundColor || '#fad5d9'}
           onNavigateToProducts={() => navigate('/products')}
         />
-      </div>
-
-      {/* 0.5 ULTRA-COMPACT SINGLE-LINE CATEGORY STRIP */}
-      <div style={{
-        margin: '6px auto 2px',
-        maxWidth: '1200px',
-        width: '100%',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: '8px',
-        flexWrap: 'nowrap',
-        overflowX: 'auto',
-        padding: '2px 16px',
-        position: 'relative',
-        zIndex: 10,
-      }}>
-        <span style={{
-          color: primaryColor,
-          fontSize: '11px',
-          fontWeight: 800,
-          letterSpacing: '0.8px',
-          textTransform: 'uppercase',
-          whiteSpace: 'nowrap',
-          background: `${primaryColor}14`,
-          border: `1px solid ${primaryColor}28`,
-          borderRadius: '14px',
-          padding: '3px 10px',
-          flexShrink: 0,
-        }}>
-          ✨ Quick Browse:
-        </span>
-
-        {categories.length > 0 ? (
-          categories.slice(0, 5).map((cat, idx) => {
-            const icons = ['🧸', '🧩', '🎀', '🎁', '🎮', '✨'];
-            const catIcon = cat.icon || icons[idx % icons.length];
-            return (
-              <div
-                key={cat.id}
-                onClick={() => navigate(`/products?category=${cat.id}`)}
-                style={{
-                  background: '#ffffffd0',
-                  backdropFilter: 'blur(10px)',
-                  border: `1px solid ${primaryColor}20`,
-                  borderRadius: '16px',
-                  padding: '4px 12px',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '5px',
-                  cursor: 'pointer',
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                  transition: 'all 0.2s ease',
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'translateY(-1.5px)';
-                  e.currentTarget.style.boxShadow = `0 4px 14px ${primaryColor}30`;
-                  e.currentTarget.style.borderColor = primaryColor;
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = '';
-                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.03)';
-                  e.currentTarget.style.borderColor = `${primaryColor}20`;
-                }}
-              >
-                <span style={{ fontSize: '13px' }}>{catIcon}</span>
-                <span style={{ fontSize: '12px', fontWeight: 700, color: '#334155' }}>{cat.name}</span>
-              </div>
-            );
-          })
-        ) : (
-          [
-            { icon: '🧸', name: 'Plushies' },
-            { icon: '🧩', name: 'STEM Toys' },
-            { icon: '🎀', name: 'Kawaii Merch' },
-            { icon: '🎁', name: 'Surprise Boxes' },
-            { icon: '✨', name: 'Limited' }
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              onClick={() => navigate('/products')}
-              style={{
-                background: '#ffffffd0',
-                backdropFilter: 'blur(10px)',
-                border: `1px solid ${primaryColor}20`,
-                borderRadius: '16px',
-                padding: '4px 12px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                gap: '5px',
-                cursor: 'pointer',
-                whiteSpace: 'nowrap',
-                flexShrink: 0,
-                boxShadow: '0 2px 8px rgba(0,0,0,0.03)',
-                transition: 'all 0.2s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'translateY(-1.5px)';
-                e.currentTarget.style.boxShadow = `0 4px 14px ${primaryColor}30`;
-                e.currentTarget.style.borderColor = primaryColor;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.transform = '';
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.03)';
-                e.currentTarget.style.borderColor = `${primaryColor}20`;
-              }}
-            >
-              <span style={{ fontSize: '13px' }}>{item.icon}</span>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#334155' }}>{item.name}</span>
-            </div>
-          ))
-        )}
       </div>
 
       {/* 1. SEAMLESS BLENDED HERO BANNER WITH ANIMATED FLOATING HEARTS */}
