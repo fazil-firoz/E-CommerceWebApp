@@ -478,8 +478,8 @@ const Home = () => {
           <div style={{ position: 'absolute', top: '-10%', right: '5%', width: '320px', height: '320px', borderRadius: '50%', background: `radial-gradient(circle, ${primaryColor}18 0%, rgba(255, 255, 255, 0) 70%)`, filter: 'blur(40px)', pointerEvents: 'none' }} />
 
           <Row align="middle" gutter={[36, 32]}>
-            <Col xs={24} md={14}>
-              <span style={{
+            <Col xs={24} md={14} className="hero-text-col">
+              <span className="hero-animated-text" style={{
                 display: 'inline-block',
                 background: `${primaryColor}15`,
                 color: primaryColor,
@@ -489,32 +489,35 @@ const Home = () => {
                 fontWeight: 700,
                 fontSize: '12px',
                 marginBottom: '14px',
-                letterSpacing: '0.4px'
+                letterSpacing: '0.4px',
+                animationDelay: '0.1s'
               }}>
                 🌸 WELCOME TO KAWAII STORE
               </span>
 
-              <Title level={1} className="shiny-hero-title" style={{
-                fontSize: '42px',
+              <Title level={1} className="shiny-hero-title hero-animated-text" style={{
+                fontSize: '40px',
                 fontWeight: 900,
                 marginBottom: '14px',
                 lineHeight: '1.2',
-                letterSpacing: '-0.5px'
+                letterSpacing: '-0.5px',
+                animationDelay: '0.2s'
               }}>
                 {heroTitle}
               </Title>
 
-              <Paragraph style={{
+              <Paragraph className="hero-animated-text" style={{
                 color: '#475569',
                 fontSize: '16px',
-                marginBottom: '28px',
+                marginBottom: '26px',
                 lineHeight: '1.65',
-                maxWidth: '520px'
+                maxWidth: '520px',
+                animationDelay: '0.35s'
               }}>
                 {heroDescription}
               </Paragraph>
 
-              <Space size={14} wrap style={{ marginBottom: '28px' }}>
+              <Space size={14} wrap className="hero-animated-text" style={{ marginBottom: '28px', animationDelay: '0.5s' }}>
                 <Button
                   type="primary"
                   size="large"
@@ -533,27 +536,10 @@ const Home = () => {
                 >
                   Shop Collection <RightOutlined style={{ fontSize: '13px' }} />
                 </Button>
-
-                {/* <Button
-                  size="large"
-                  onClick={() => navigate('/products')}
-                  style={{
-                    color: textColor,
-                    borderColor: `${primaryColor}35`,
-                    background: '#ffffff',
-                    height: '48px',
-                    padding: '0 24px',
-                    borderRadius: '24px',
-                    fontWeight: 600,
-                    fontSize: '15px'
-                  }}
-                >
-                  Categories
-                </Button> */}
               </Space>
 
               {/* Minimal Stats Row */}
-              <div style={{ display: 'flex', gap: '28px', paddingTop: '20px', borderTop: `1px solid ${primaryColor}18` }}>
+              <div className="hero-stats-row hero-animated-text" style={{ display: 'flex', gap: '28px', paddingTop: '20px', borderTop: `1px solid ${primaryColor}18`, animationDelay: '0.65s' }}>
                 <div>
                   <Text strong style={{ display: 'block', color: textColor, fontSize: '18px', fontWeight: 800 }}>500+</Text>
                   <Text style={{ color: '#64748b', fontSize: '12px' }}>Kawaii Items</Text>
@@ -569,55 +555,67 @@ const Home = () => {
               </div>
             </Col>
 
-            {/* Cute Frameless Image Carousel Showcase with Pulsing Aura Ring & Glassmorphism Badge */}
+            {/* Centered Gift Box Showcase Container with Seamless Background Blending & Animated Crossfade */}
             <Col xs={24} md={10} style={{ textAlign: 'center', position: 'relative' }}>
-              <div style={{
-                position: 'relative',
-                maxWidth: '380px',
-                margin: '0 auto'
-              }}>
-                {/* Glowing Aura Ring behind Carousel */}
-                <div className="kawaii-aura-ring" />
-
-                {/* Floating Heart Badge */}
-                <div style={{
+              <div className="hero-giftbox-container">
+                {/* Floating Gift Ribbon Bow Badge */}
+                <div className="hero-giftbox-ribbon-badge" style={{
                   position: 'absolute',
-                  top: '-12px',
-                  right: '-10px',
-                  zIndex: 10,
-                  background: 'rgba(255, 255, 255, 0.92)',
+                  top: '-16px',
+                  right: '50%',
+                  transform: 'translateX(50%)',
+                  zIndex: 12,
+                  background: 'rgba(255, 255, 255, 0.95)',
                   backdropFilter: 'blur(8px)',
                   border: `1.5px solid ${primaryColor}40`,
-                  borderRadius: '20px',
-                  padding: '6px 14px',
-                  boxShadow: `0 8px 20px ${primaryColor}25`,
-                  display: 'flex',
+                  borderRadius: '24px',
+                  padding: '6px 18px',
+                  boxShadow: `0 8px 24px ${primaryColor}30`,
+                  display: 'inline-flex',
                   alignItems: 'center',
-                  gap: '6px'
+                  gap: '8px',
+                  whiteSpace: 'nowrap'
                 }}>
-                  <span style={{ fontSize: '14px' }}>💖</span>
-                  <Text strong style={{ fontSize: '11px', color: primaryColor }}>100% Cute Verified</Text>
+                  <span style={{ fontSize: '16px' }}>🎁</span>
+                  <Text strong style={{ fontSize: '12px', color: primaryColor, letterSpacing: '0.4px' }}>
+                    SPECIAL GIFT COLLECTION
+                  </Text>
+                  <span style={{ fontSize: '14px' }}>✨</span>
                 </div>
 
+                {/* Gift Box Container Frame */}
                 <div style={{
-                  borderRadius: '28px',
+                  borderRadius: '24px',
                   overflow: 'hidden',
-                  boxShadow: `0 16px 36px ${primaryColor}25`,
+                  background: 'transparent',
+                  border: `2px solid ${primaryColor}25`,
+                  boxShadow: `0 16px 40px ${primaryColor}20`,
                   position: 'relative',
-                  zIndex: 1
+                  zIndex: 1,
+                  padding: '10px'
                 }}>
-                  <Carousel autoplay autoplaySpeed={3500} fadeDots>
+                  <Carousel
+                    autoplay
+                    autoplaySpeed={2200}
+                    fade={true}
+                    dots={true}
+                    style={{ width: '100%', height: '340px' }}
+                  >
                     {heroImagesToDisplay.map((imgUrl, idx) => (
-                      <div key={idx} style={{ height: '320px', borderRadius: '28px', overflow: 'hidden' }}>
+                      <div key={idx} style={{ height: '340px', width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'transparent' }}>
                         <img
                           src={resolveProductImageUrl(imgUrl)}
                           alt={`Hero Slide ${idx + 1}`}
+                          loading="lazy"
+                          onError={(e) => { e.currentTarget.style.display = 'none'; }}
                           style={{
                             width: '100%',
-                            height: '320px',
-                            objectFit: 'cover',
+                            height: '340px',
+                            objectFit: 'contain',
                             display: 'block',
-                            borderRadius: '28px'
+                            margin: '0 auto',
+                            background: 'transparent',
+                            borderRadius: '18px'
                           }}
                         />
                       </div>

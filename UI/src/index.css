@@ -299,3 +299,67 @@ code {
     display: none !important;
   }
 }
+
+/* ── Animated Hero Section & Gift Box Showcase Keyframes ────────── */
+@keyframes heroTextSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroGlowPulse {
+  0%, 100% {
+    box-shadow: 0 12px 32px rgba(255, 101, 132, 0.15);
+    transform: translateY(0);
+  }
+  50% {
+    box-shadow: 0 22px 44px rgba(255, 101, 132, 0.32);
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes floatRibbon {
+  0%, 100% {
+    transform: translateX(50%) translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateX(50%) translateY(-6px) rotate(2deg);
+  }
+}
+
+.hero-animated-text {
+  animation: heroTextSlideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.hero-giftbox-container {
+  position: relative;
+  margin: 0 auto;
+  max-width: 440px;
+  width: 100%;
+  border-radius: 28px;
+  background: transparent;
+  padding: 12px;
+  box-sizing: border-box;
+  animation: heroGlowPulse 4s ease-in-out infinite;
+}
+
+.hero-giftbox-ribbon-badge {
+  animation: floatRibbon 3.5s ease-in-out infinite;
+}
+
+@media (max-width: 768px) {
+  .hero-text-col {
+    text-align: center !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+  .hero-stats-row {
+    justify-content: center !important;
+  }
+}
