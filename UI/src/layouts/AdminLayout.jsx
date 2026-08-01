@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
-import { Layout, Menu, Button, Typography, Modal, Form, Input, message, Dropdown, Avatar } from 'antd';
+import { Layout, Menu, Button, Typography, Modal, Form, Input, message, Dropdown, Avatar, Drawer, Grid } from 'antd';
 import {
   DashboardOutlined,
   FolderOutlined,
@@ -19,7 +19,9 @@ import {
   TruckOutlined,
   FileTextOutlined,
   PercentageOutlined,
-  TagOutlined
+  TagOutlined,
+  MenuOutlined,
+  CloseOutlined
 } from '@ant-design/icons';
 import { AdminAuthContext } from '../context/AdminAuthContext';
 import { shopApi } from '../api/shopApi';
@@ -27,11 +29,18 @@ import { adminApi } from '../api/adminApi';
 import { superAdminApi } from '../api/superAdminApi';
 
 const { Header, Content, Sider } = Layout;
+const { useBreakpoint } = Grid;
 
 const AdminLayout = () => {
   const { admin, logout, isAuthenticated } = useContext(AdminAuthContext);
   const navigate = useNavigate();
   const location = useLocation();
+  const screens = useBreakpoint();
+  
+  // Mobile breakpoint check (less than lg / 992px)
+  const isMobile = screens.lg === false || (screens.xs && !screens.lg);
+  
+  const [mobileDrawerOpen, setMobileDrawerOpen] = useState(false);
   const [shopSettings, setShopSettings] = useState(null);
   const [superAdminControl, setSuperAdminControl] = useState({
     isShopSettingsMenuEnabled: true,
@@ -81,8 +90,13 @@ const AdminLayout = () => {
     return () => window.removeEventListener('superAdminControlUpdated', fetchSuperAdminControls);
   }, []);
 
+  // Close mobile drawer when navigating to a new route
+  useEffect(() => {
+    setMobileDrawerOpen(false);
+  }, [location.pathname]);
+
   if (!isAuthenticated) {
-    return null; // Don't render anything while redirecting
+    return null;
   }
 
   const handleChangePassword = async (values) => {
@@ -119,62 +133,62 @@ const AdminLayout = () => {
     {
       key: '/admin',
       icon: <DashboardOutlined />,
-      label: <Link to="/admin">Dashboard</Link>,
+      label: <Link to="/admin" onClick={() => setMobileDrawerOpen(false)}>Dashboard</Link>,
     },
     {
       key: '/admin/categories',
       icon: <FolderOutlined />,
-      label: <Link to="/admin/categories">Categories</Link>,
+      label: <Link to="/admin/categories" onClick={() => setMobileDrawerOpen(false)}>Categories</Link>,
     },
     {
       key: '/admin/products',
       icon: <ShoppingOutlined />,
-      label: <Link to="/admin/products">Products</Link>,
+      label: <Link to="/admin/products" onClick={() => setMobileDrawerOpen(false)}>Products</Link>,
     },
     {
       key: '/admin/orders',
       icon: <SolutionOutlined />,
-      label: <Link to="/admin/orders">Orders</Link>,
+      label: <Link to="/admin/orders" onClick={() => setMobileDrawerOpen(false)}>Orders</Link>,
     },
     ...(superAdminControl.isReportsMenuEnabled !== false ? [{
       key: '/admin/reports',
       icon: <BarChartOutlined />,
-      label: <Link to="/admin/reports">Reports</Link>,
+      label: <Link to="/admin/reports" onClick={() => setMobileDrawerOpen(false)}>Reports</Link>,
     }] : []),
     ...(superAdminControl.isCouponMenuEnabled !== false ? [{
       key: '/admin/coupons',
       icon: <TagOutlined />,
-      label: <Link to="/admin/coupons">Coupons</Link>,
+      label: <Link to="/admin/coupons" onClick={() => setMobileDrawerOpen(false)}>Coupons</Link>,
     }] : []),
     ...(superAdminControl.isShipmentSettingsMenuEnabled !== false && superAdminControl.isAppControlMenuEnabled !== false ? [{
       key: '/admin/shipment-settings',
       icon: <TruckOutlined />,
-      label: <Link to="/admin/shipment-settings">Shipment Settings</Link>,
+      label: <Link to="/admin/shipment-settings" onClick={() => setMobileDrawerOpen(false)}>Shipment Settings</Link>,
     }] : []),
     ...(superAdminControl.isInvoiceSettingsMenuEnabled !== false ? [{
       key: '/admin/invoice-settings',
       icon: <FileTextOutlined />,
-      label: <Link to="/admin/invoice-settings">Invoice Settings</Link>,
+      label: <Link to="/admin/invoice-settings" onClick={() => setMobileDrawerOpen(false)}>Invoice Settings</Link>,
     }] : []),
     ...(superAdminControl.isTaxSettingsMenuEnabled !== false ? [{
       key: '/admin/tax-settings',
       icon: <PercentageOutlined />,
-      label: <Link to="/admin/tax-settings">Tax Settings</Link>,
+      label: <Link to="/admin/tax-settings" onClick={() => setMobileDrawerOpen(false)}>Tax Settings</Link>,
     }] : []),
     ...(superAdminControl.isShopSettingsMenuEnabled !== false ? [{
       key: '/admin/shop-settings',
       icon: <ShopOutlined />,
-      label: <Link to="/admin/shop-settings">Shop Settings</Link>,
+      label: <Link to="/admin/shop-settings" onClick={() => setMobileDrawerOpen(false)}>Shop Settings</Link>,
     }] : []),
     ...(superAdminControl.isUIControlMenuEnabled !== false ? [{
       key: '/admin/ui-control',
       icon: <ControlOutlined />,
-      label: <Link to="/admin/ui-control">UI Control</Link>,
+      label: <Link to="/admin/ui-control" onClick={() => setMobileDrawerOpen(false)}>UI Control</Link>,
     }] : []),
     {
       key: '/admin/super-admin',
       icon: <CrownOutlined style={{ color: '#722ed1' }} />,
-      label: <Link to="/admin/super-admin">Super Admin</Link>,
+      label: <Link to="/admin/super-admin" onClick={() => setMobileDrawerOpen(false)}>Super Admin</Link>,
     },
   ];
 
@@ -198,50 +212,101 @@ const AdminLayout = () => {
 
   const shopName = shopSettings?.shopName || 'Shop';
 
-  return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Sider
-        breakpoint="lg"
-        collapsedWidth="0"
-        style={{
-          boxShadow: '2px 0 8px rgba(0, 0, 0, 0.05)',
-          background: '#001529'
-        }}
-      >
-        <div style={{
-          height: '64px',
-          display: 'flex',
-          alignItems: 'center',
-          padding: '0 24px',
-          background: '#002140'
-        }}>
-          <Typography.Title level={4} style={{ color: '#fff', margin: 0, fontWeight: 700 }}>
-            {shopName} Admin
-          </Typography.Title>
-        </div>
-        <Menu
-          theme="dark"
-          mode="inline"
-          selectedKeys={[location.pathname]}
-          items={menuItems}
-          style={{ padding: '16px 0' }}
-        />
-      </Sider>
+  const sidebarContent = (
+    <div style={{ background: '#001529', minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
+      <div style={{
+        height: '64px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '0 20px',
+        background: '#002140',
+        borderBottom: '1px solid rgba(255,255,255,0.08)'
+      }}>
+        <Typography.Title level={4} style={{ color: '#fff', margin: 0, fontWeight: 800, fontSize: '16px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+          {shopName} Admin
+        </Typography.Title>
+        {isMobile && (
+          <Button
+            type="text"
+            icon={<CloseOutlined style={{ color: '#fff', fontSize: '16px' }} />}
+            onClick={() => setMobileDrawerOpen(false)}
+          />
+        )}
+      </div>
+      <Menu
+        theme="dark"
+        mode="inline"
+        selectedKeys={[location.pathname]}
+        items={menuItems}
+        style={{ padding: '12px 0', flex: 1, borderRight: 0 }}
+      />
+    </div>
+  );
 
-      <Layout>
+  return (
+    <Layout style={{ minHeight: '100vh', width: '100%', overflowX: 'hidden' }}>
+      {/* Desktop Sider */}
+      {!isMobile && (
+        <Sider
+          width={240}
+          style={{
+            boxShadow: '2px 0 8px rgba(0, 0, 0, 0.05)',
+            background: '#001529',
+            height: '100vh',
+            position: 'sticky',
+            top: 0,
+            left: 0
+          }}
+        >
+          {sidebarContent}
+        </Sider>
+      )}
+
+      {/* Mobile Menu Drawer */}
+      <Drawer
+        placement="left"
+        onClose={() => setMobileDrawerOpen(false)}
+        open={mobileDrawerOpen}
+        width={270}
+        styles={{ body: { padding: 0, background: '#001529' } }}
+        headerStyle={{ display: 'none' }}
+      >
+        {sidebarContent}
+      </Drawer>
+
+      <Layout style={{ flex: 1, width: '100%', minWidth: 0 }}>
         <Header style={{
           background: '#fff',
-          padding: '0 16px',
+          padding: isMobile ? '0 12px' : '0 24px',
           height: '64px',
           display: 'flex',
-          justifyContent: 'space-between',
+          justify: 'space-between',
           alignItems: 'center',
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
-          zIndex: 10
+          zIndex: 10,
+          position: 'sticky',
+          top: 0
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <Typography.Text strong style={{ fontSize: '15px', color: '#001529' }}>
-              ⚙️ <span className="mobile-hide-text">Admin Console</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            {isMobile && (
+              <Button
+                type="default"
+                icon={<MenuOutlined style={{ fontSize: '18px', color: '#001529' }} />}
+                onClick={() => setMobileDrawerOpen(true)}
+                style={{
+                  borderRadius: '8px',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '38px',
+                  height: '38px',
+                  borderColor: '#d9d9d9'
+                }}
+              />
+            )}
+            <Typography.Text strong style={{ fontSize: isMobile ? '14px' : '15px', color: '#001529' }}>
+              ⚙️ <span className={isMobile ? 'mobile-hide-text' : ''}>Admin Console</span>
             </Typography.Text>
           </div>
 
@@ -250,8 +315,9 @@ const AdminLayout = () => {
               icon={<HomeOutlined />}
               onClick={() => navigate('/')}
               style={{ borderRadius: '6px', display: 'flex', alignItems: 'center' }}
+              size={isMobile ? 'small' : 'default'}
             >
-              <span className="mobile-hide-text">View Storefront</span>
+              <span className={isMobile ? 'mobile-hide-text' : ''}>Storefront</span>
             </Button>
 
             <Dropdown menu={{ items: adminProfileDropdownItems }} trigger={['click']} placement="bottomRight">
@@ -270,7 +336,7 @@ const AdminLayout = () => {
                 }}
               >
                 <Avatar size="small" icon={<UserOutlined />} style={{ backgroundColor: '#1890ff' }} />
-                <Typography.Text strong style={{ fontSize: '13px', color: '#141414' }}>
+                <Typography.Text strong style={{ fontSize: '13px', color: '#141414', maxWidth: '80px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                   {admin?.username || 'Admin'}
                 </Typography.Text>
                 <DownOutlined style={{ fontSize: '10px', color: '#8c8c8c' }} />
@@ -280,13 +346,15 @@ const AdminLayout = () => {
         </Header>
 
         <Content style={{
-          margin: '12px',
-          padding: '16px',
+          margin: isMobile ? '8px' : '16px',
+          padding: isMobile ? '12px' : '20px',
           background: '#fff',
-          borderRadius: '8px',
+          borderRadius: '12px',
           minHeight: '280px',
           boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
-          overflowX: 'auto'
+          overflowX: 'auto',
+          maxWidth: '100%',
+          boxSizing: 'border-box'
         }}>
           <Outlet />
         </Content>
@@ -369,7 +437,7 @@ const AdminLayout = () => {
             />
           </Form.Item>
 
-          <div style={{ display: 'flex', justify: 'flex-end', gap: '8px', marginTop: '24px' }}>
+          <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '8px', marginTop: '24px' }}>
             <Button
               onClick={() => { setPasswordModalOpen(false); form.resetFields(); }}
               style={{ borderRadius: '6px' }}
