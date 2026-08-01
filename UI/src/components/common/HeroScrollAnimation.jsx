@@ -47,16 +47,16 @@ export default function HeroScrollAnimation({
   });
 
   const smooth = useSpring(scrollYProgress, {
-    stiffness: 45,
-    damping:   26,
-    restDelta: 0.0001,
+    stiffness: 85,
+    damping:   22,
+    restDelta: 0.0005,
   });
 
-  // ── Extended slow-motion frame mapping: Gentle start -> silky slomo motion -> smooth final completion
+  // ── Multi-stage frame mapping: Gentle opening start -> main explosion -> smooth final completion
   const frameIndex = useTransform(
     smooth,
-    [0, 0.18, 0.72, 0.90],
-    [0, 8, 68, TOTAL_FRAMES - 1]
+    [0, 0.12, 0.52, 0.72],
+    [0, 10, 64, TOTAL_FRAMES - 1]
   );
 
   // ── Side text emerging transforms (animate out from behind video and stay)
@@ -66,9 +66,9 @@ export default function HeroScrollAnimation({
   const rightOpacity = useTransform(smooth, [0.10, 0.38], [0, 1]);
   const rightX       = useTransform(smooth, [0.10, 0.38], [60, 0]);
 
-  // ── CTA button emerging below smoothly during slow-mo scroll
-  const ctaOpacity   = useTransform(smooth, [0.35, 0.65], [0, 1]);
-  const ctaY         = useTransform(smooth, [0.35, 0.65], [30, 0]);
+  // ── CTA button emerging below and staying
+  const ctaOpacity   = useTransform(smooth, [0.28, 0.52], [0, 1]);
+  const ctaY         = useTransform(smooth, [0.28, 0.52], [30, 0]);
 
   const progressWidth = useTransform(smooth, [0, 1], ['0%', '100%']);
   const hintOpacity   = useTransform(smooth, [0, 0.05], [1, 0]);
@@ -178,7 +178,7 @@ export default function HeroScrollAnimation({
   return (
     <div
       ref={containerRef}
-      style={{ height: '170vh', position: 'relative' }}
+      style={{ height: '105vh', position: 'relative' }}
     >
       {/* ── STICKY VIEWPORT — Raw Animated Image Display ─── */}
       <div style={{
