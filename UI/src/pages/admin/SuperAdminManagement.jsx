@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Switch, Divider, Spin, Alert, Tooltip, Modal, Tag } from 'antd';
+import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Switch, Divider, Spin, Alert, Tooltip, Modal, Tag, Grid } from 'antd';
 import {
   CrownOutlined, LockOutlined, UnlockOutlined, SaveOutlined,
   AppstoreOutlined, SettingOutlined, WhatsAppOutlined, SafetyCertificateOutlined, ControlOutlined,
@@ -10,8 +10,12 @@ import { superAdminApi } from '../../api/superAdminApi';
 import { themeApi } from '../../api/themeApi';
 
 const { Title, Text, Paragraph } = Typography;
+const { useBreakpoint } = Grid;
 
 const SuperAdminManagement = () => {
+  const screens = useBreakpoint();
+  const isMobile = screens.lg === false || (screens.xs && !screens.lg);
+
   const [authForm] = Form.useForm();
   const [isUnlocked, setIsUnlocked] = useState(() => {
     return sessionStorage.getItem('super_admin_verified') === 'true';
@@ -744,24 +748,26 @@ const SuperAdminManagement = () => {
                 ].map((sec) => (
                   <Col xs={24} sm={12} lg={8} key={sec.key}>
                     <div style={{
-                      padding: '16px',
+                      padding: '14px 16px',
                       borderRadius: '12px',
                       border: '1px solid #f0f0f0',
                       background: getCtrl(sec.key) ? '#f6ffed' : '#fff1f0',
                       display: 'flex',
                       justify: 'space-between',
                       alignItems: 'center',
+                      gap: '12px',
                       height: '100%'
                     }}>
-                      <div>
-                        <Text strong style={{ fontSize: '14px', display: 'block' }}>{sec.label}</Text>
-                        <Text type="secondary" style={{ fontSize: '12px' }}>{sec.desc}</Text>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <Text strong style={{ fontSize: '14px', display: 'block', wordBreak: 'break-word' }}>{sec.label}</Text>
+                        <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '2px' }}>{sec.desc}</Text>
                       </div>
                       <Switch
                         checkedChildren={<CheckCircleOutlined />}
                         unCheckedChildren={<StopOutlined />}
                         checked={getCtrl(sec.key)}
                         onChange={(checked) => setControls((prev) => ({ ...(prev || defaultControls), [sec.key]: checked }))}
+                        style={{ flexShrink: 0 }}
                       />
                     </div>
                   </Col>
