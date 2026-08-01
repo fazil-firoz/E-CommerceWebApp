@@ -162,11 +162,11 @@ const Home = () => {
               style={{
                 position: 'relative',
                 overflow: 'hidden',
-                borderTopLeftRadius: '16px',
-                borderTopRightRadius: '16px',
+                borderTopLeftRadius: '10px',
+                borderTopRightRadius: '10px',
                 cursor: 'pointer',
                 width: '100%',
-                aspectRatio: '1/1'
+                aspectRatio: '3/4'
               }}
               onClick={() => navigate(`/products/${prod.id}`)}
             >
@@ -234,7 +234,7 @@ const Home = () => {
           }
           onClick={() => navigate(`/products/${prod.id}`)}
           style={{
-            borderRadius: '16px',
+            borderRadius: '10px',
             boxShadow: `0 4px 16px ${primaryColor}14`,
             border: `1px solid ${primaryColor}22`,
             background: cardBgColor,

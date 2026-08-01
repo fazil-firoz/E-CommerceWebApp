@@ -276,9 +276,8 @@ const CustomerLayout = () => {
       {/* Dynamic theme style injection */}
       <style>{menuThemeStyle}</style>
       {/* =============================================== */}
-      {/* STICKY NAVBAR — shown on all pages EXCEPT home  */}
+      {/* UNIFIED STICKY NAVBAR — shown on ALL pages     */}
       {/* =============================================== */}
-      {!isHomePage && (
       <Header className="mobile-header-padding" style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -430,7 +429,6 @@ const CustomerLayout = () => {
           )}
         </Space>
       </Header>
-      )}
 
 
 
@@ -535,108 +533,6 @@ const CustomerLayout = () => {
         </div>
       </div>
       )}
-
-      {/* Clean Centered Simple Nav Row — shown on ALL pages for instant mobile & desktop navigation */}
-      <div style={{
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        gap: '20px',
-        padding: '10px 16px',
-        background: isHomePage ? (activeTheme?.backgroundColor || '#fff5f7') : '#ffffff',
-        borderBottom: `1px solid ${primaryColor}18`,
-        boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
-      }}>
-        <Link to="/" style={{
-          color: location.pathname === '/' ? primaryColor : '#475569',
-          fontWeight: location.pathname === '/' ? 800 : 600,
-          fontSize: '14px',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '5px',
-          borderBottom: location.pathname === '/' ? `2px solid ${primaryColor}` : '2px solid transparent',
-          paddingBottom: '2px'
-        }}>
-          <HomeOutlined style={{ color: primaryColor, fontSize: '15px' }} /> Home
-        </Link>
-
-        <Link to="/products" style={{
-          color: location.pathname.startsWith('/products') ? primaryColor : '#475569',
-          fontWeight: location.pathname.startsWith('/products') ? 800 : 600,
-          fontSize: '14px',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '5px',
-          borderBottom: location.pathname.startsWith('/products') ? `2px solid ${primaryColor}` : '2px solid transparent',
-          paddingBottom: '2px'
-        }}>
-          <ShopOutlined style={{ color: primaryColor, fontSize: '15px' }} /> Products
-        </Link>
-
-        <span style={{ color: '#cbd5e1', fontWeight: 300, fontSize: '14px' }}>|</span>
-
-        {/* Wishlist Link */}
-        {superAdminControl.isWishlistEnabled !== false && (
-          <Link to="/wishlist" style={{
-            color: location.pathname === '/wishlist' ? (activeTheme?.accentColor || '#ff4d4f') : '#475569',
-            fontWeight: location.pathname === '/wishlist' ? 800 : 600,
-            fontSize: '14px',
-            display: 'inline-flex',
-            alignItems: 'center',
-            gap: '5px',
-            borderBottom: location.pathname === '/wishlist' ? `2px solid ${activeTheme?.accentColor || '#ff4d4f'}` : '2px solid transparent',
-            paddingBottom: '2px'
-          }}>
-            <Badge count={wishlistCount} size="small" color={activeTheme?.accentColor || '#ff4d4f'}>
-              <HeartFilled style={{ fontSize: '16px', color: activeTheme?.accentColor || '#ff4d4f' }} />
-            </Badge>
-            Wishlist
-          </Link>
-        )}
-
-        {/* Cart Link */}
-        <Link to="/cart" style={{
-          color: location.pathname === '/cart' ? primaryColor : '#475569',
-          fontWeight: location.pathname === '/cart' ? 800 : 600,
-          fontSize: '14px',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '5px',
-          borderBottom: location.pathname === '/cart' ? `2px solid ${primaryColor}` : '2px solid transparent',
-          paddingBottom: '2px'
-        }}>
-          <Badge count={cartCount} size="small" color="#52c41a">
-            <ShoppingCartOutlined style={{ fontSize: '17px', color: primaryColor }} />
-          </Badge>
-          Cart
-        </Link>
-
-        {/* User Sign in / Profile Icon */}
-        <Tooltip title={isLoggedIn ? `Signed in as ${customer?.email}` : 'Sign in'}>
-          <div
-            onClick={() => setLoginDrawerOpen(true)}
-            style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', marginLeft: '4px' }}
-          >
-            {isLoggedIn ? (
-              <Avatar size={24} style={{ background: primaryColor, fontSize: '11px', fontWeight: 700 }}>
-                {customer?.name?.[0]?.toUpperCase()}
-              </Avatar>
-            ) : (
-              <UserOutlined style={{ fontSize: '17px', color: '#475569' }} />
-            )}
-          </div>
-        </Tooltip>
-
-        {/* Admin shortcut */}
-        {isAuthenticated && (
-          <Tooltip title="Admin Dashboard">
-            <DashboardOutlined
-              onClick={() => navigate('/admin')}
-              style={{ fontSize: '16px', color: '#64748b', cursor: 'pointer' }}
-            />
-          </Tooltip>
-        )}
-      </div>
 
       {/* Main Content View */}
       <Content style={{

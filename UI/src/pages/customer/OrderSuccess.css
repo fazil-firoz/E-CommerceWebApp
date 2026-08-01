@@ -2,10 +2,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
 
 .order-result-wrapper {
-  min-height: 100vh;
+  min-height: 55vh;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify: center;
   padding: 40px 20px;
   position: relative;
   overflow: hidden;

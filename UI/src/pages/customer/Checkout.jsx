@@ -73,6 +73,7 @@ const Checkout = () => {
   const [couponDiscountAmount, setCouponDiscountAmount] = useState(0);
   const [validatingCoupon, setValidatingCoupon] = useState(false);
   const [couponErrorMsg, setCouponErrorMsg] = useState('');
+  const [showCouponInput, setShowCouponInput] = useState(false);
 
   useEffect(() => {
     const fetchShipping = async () => {
@@ -389,12 +390,74 @@ const Checkout = () => {
 
         <Form form={form} layout="vertical" requiredMark={false}>
 
+          {/* ── DISCOUNT COUPON CODE SECTION (Expandable when clicked) ───── */}
+          <div style={{ marginBottom: '24px', background: '#f8fafc', border: '1.5px solid #e2e8f0', borderRadius: '6px', padding: '14px 16px' }}>
+            {!showCouponInput && !appliedCoupon ? (
+              <div
+                onClick={() => setShowCouponInput(true)}
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', cursor: 'pointer' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <TagOutlined style={{ color: primaryColor, fontSize: '16px' }} />
+                  <Text strong style={{ color: primaryColor, fontSize: '14px' }}>Have a discount coupon code?</Text>
+                </div>
+                <RightOutlined style={{ fontSize: '12px', color: primaryColor }} />
+              </div>
+            ) : (
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '10px' }}>
+                  <Text strong style={{ fontSize: '13px', color: '#334155' }}>Apply Discount Coupon</Text>
+                  {showCouponInput && !appliedCoupon && (
+                    <Text type="secondary" style={{ cursor: 'pointer', fontSize: '12px', fontWeight: 600 }} onClick={() => setShowCouponInput(false)}>Close</Text>
+                  )}
+                </div>
+                {!appliedCoupon ? (
+                  <Space.Compact style={{ width: '100%' }}>
+                    <Input
+                      placeholder="Enter Coupon Code (e.g. SAVE10)"
+                      value={couponCodeInput}
+                      onChange={e => setCouponCodeInput(e.target.value.toUpperCase())}
+                      size="large"
+                      style={{ borderRadius: '6px 0 0 6px', fontSize: '13px', fontWeight: 600, height: '44px' }}
+                    />
+                    <Button
+                      type="primary"
+                      onClick={handleApplyCoupon}
+                      loading={validatingCoupon}
+                      size="large"
+                      style={{ borderRadius: '0 6px 6px 0', background: primaryColor, borderColor: primaryColor, fontWeight: 700, height: '44px' }}
+                    >
+                      Apply
+                    </Button>
+                  </Space.Compact>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '10px 12px', borderRadius: '6px' }}>
+                    <div>
+                      <Text strong style={{ color: '#166534', fontSize: '13px' }}>Coupon Applied: {appliedCoupon.code}</Text>
+                      <Text style={{ display: 'block', fontSize: '12px', color: '#15803d' }}>
+                        Saved ₹{couponDiscountAmount.toLocaleString('en-IN')} ({appliedCoupon.discountPercentage}% OFF)
+                      </Text>
+                    </div>
+                    <Button type="text" danger size="small" onClick={handleRemoveCoupon} style={{ fontWeight: 700 }}>
+                      Remove
+                    </Button>
+                  </div>
+                )}
+                {couponErrorMsg && (
+                  <Text type="danger" style={{ fontSize: '12px', marginTop: '6px', display: 'block' }}>
+                    {couponErrorMsg}
+                  </Text>
+                )}
+              </div>
+            )}
+          </div>
+
           {/* ── CONTACT & AUTH ─────────────────────────────── */}
           <div className="checkout-section">
-            <div className="checkout-section-header" style={{ marginBottom: '14px' }}>
+            <div className="checkout-section-header" style={{ marginBottom: '16px' }}>
               <Title level={5} style={{ margin: 0, fontWeight: 700 }}>Contact Information</Title>
               {isLoggedIn ? (
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: `${primaryColor}12`, border: `1px solid ${primaryColor}40`, borderRadius: '20px', padding: '4px 12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', background: `${primaryColor}12`, border: `1px solid ${primaryColor}40`, borderRadius: '6px', padding: '4px 12px' }}>
                   <CheckCircleFilled style={{ color: primaryColor, fontSize: '13px' }} />
                   <Text style={{ fontSize: '12px', color: primaryColor, fontWeight: 600 }}>
                     Signed in as <strong>{customer?.email}</strong>
@@ -413,32 +476,32 @@ const Checkout = () => {
 
             <Form.Item
               name="email"
-              style={{ marginBottom: '12px' }}
+              style={{ marginBottom: '18px' }}
               rules={[{ type: 'email', message: 'Enter a valid email' }]}
             >
               <Input
                 prefix={<MailOutlined style={{ color: '#bfbfbf' }} />}
                 placeholder="Email address (optional, for order updates)"
                 size="large"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: '6px', height: '46px' }}
               />
             </Form.Item>
           </div>
 
           {/* ── SHIPPING ADDRESS ───────────────────────────── */}
           <div className="checkout-section">
-            <Title level={5} style={{ marginBottom: '14px', fontWeight: 700 }}>Shipping Address</Title>
+            <Title level={5} style={{ marginBottom: '16px', fontWeight: 700 }}>Shipping Address</Title>
 
             <Form.Item
               name="fullName"
               rules={[{ required: true, message: 'Please enter your full name' }]}
-              style={{ marginBottom: '12px' }}
+              style={{ marginBottom: '18px' }}
             >
               <Input
                 prefix={<UserOutlined style={{ color: '#bfbfbf' }} />}
                 placeholder="Full Name"
                 size="large"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: '6px', height: '46px' }}
               />
             </Form.Item>
 
@@ -448,45 +511,45 @@ const Checkout = () => {
                 { required: true, message: 'Mobile number is required' },
                 { pattern: /^[0-9]{10}$/, message: 'Enter a valid 10-digit mobile number' }
               ]}
-              style={{ marginBottom: '12px' }}
+              style={{ marginBottom: '18px' }}
             >
               <Input
                 prefix={<PhoneOutlined style={{ color: '#bfbfbf' }} />}
                 placeholder="10-digit Mobile Number"
                 size="large"
                 maxLength={10}
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: '6px', height: '46px' }}
               />
             </Form.Item>
 
             <Form.Item
               name="addressLine1"
               rules={[{ required: true, message: 'Address line 1 is required' }]}
-              style={{ marginBottom: '12px' }}
+              style={{ marginBottom: '18px' }}
             >
               <Input
                 prefix={<EnvironmentOutlined style={{ color: '#bfbfbf' }} />}
                 placeholder="House No., Building, Street Name"
                 size="large"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: '6px', height: '46px' }}
               />
             </Form.Item>
 
-            <Form.Item name="addressLine2" style={{ marginBottom: '12px' }}>
+            <Form.Item name="addressLine2" style={{ marginBottom: '18px' }}>
               <Input
                 placeholder="Apartment, Suite, Unit, Landmark (optional)"
                 size="large"
-                style={{ borderRadius: '8px' }}
+                style={{ borderRadius: '6px', height: '46px' }}
               />
             </Form.Item>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '12px', marginBottom: '16px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '14px', marginBottom: '20px' }}>
               <Form.Item
                 name="city"
                 rules={[{ required: true, message: 'City is required' }]}
                 style={{ margin: 0 }}
               >
-                <Input placeholder="City" size="large" style={{ borderRadius: '8px' }} />
+                <Input placeholder="City" size="large" style={{ borderRadius: '6px', height: '46px' }} />
               </Form.Item>
 
               <Form.Item
@@ -494,7 +557,7 @@ const Checkout = () => {
                 rules={[{ required: true, message: 'State is required' }]}
                 style={{ margin: 0 }}
               >
-                <Input placeholder="State" size="large" style={{ borderRadius: '8px' }} />
+                <Input placeholder="State" size="large" style={{ borderRadius: '6px', height: '46px' }} />
               </Form.Item>
 
               <Form.Item
@@ -505,7 +568,7 @@ const Checkout = () => {
                 ]}
                 style={{ margin: 0 }}
               >
-                <Input placeholder="Pincode" size="large" maxLength={6} style={{ borderRadius: '8px' }} />
+                <Input placeholder="Pincode" size="large" maxLength={6} style={{ borderRadius: '6px', height: '46px' }} />
               </Form.Item>
             </div>
           </div>
