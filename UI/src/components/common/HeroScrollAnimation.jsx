@@ -100,7 +100,7 @@ export default function HeroScrollAnimation({
     </span>
   );
 
-  // ── Aspect-ratio contain canvas draw (Clean Raw Image Draw) ─────────────────
+  // ── Aspect-ratio contain canvas draw (Clean Raw Image Draw with Border Cropping) ─
   const drawFrame = useCallback((index) => {
     const canvas = canvasRef.current;
     const img    = imagesRef.current[Math.round(index)];
@@ -113,10 +113,11 @@ export default function HeroScrollAnimation({
     // Clear canvas completely — NO background color splash or box
     ctx.clearRect(0, 0, w, h);
 
+    // Crop 14px off top and bottom to completely remove dark letterbox lines
     const sx = 0;
-    const sy = 0;
+    const sy = 14;
     const imgW = img.naturalWidth;
-    const imgH = img.naturalHeight;
+    const imgH = Math.max(10, img.naturalHeight - 28);
 
     const imgRatio = imgW / imgH;
     const canvasRatio = w / h;
@@ -136,7 +137,7 @@ export default function HeroScrollAnimation({
       drawX = (w - drawW) / 2;
     }
 
-    // Draw raw image frame cleanly
+    // Draw raw image frame cleanly without dark borders
     ctx.drawImage(img, sx, sy, imgW, imgH, drawX, drawY, drawW, drawH);
   }, []);
 
@@ -202,12 +203,12 @@ export default function HeroScrollAnimation({
           </div>
         )}
 
-        {/* ── RAW ANIMATED CANVAS DISPLAY (No Box, No Splash, No Text) ────── */}
+        {/* ── RAW ANIMATED CANVAS DISPLAY (No Dark Borders, No Color Splash) ────── */}
         <div style={{
           position: 'relative',
           width: '100%',
           maxWidth: '960px',
-          height: '80vh',
+          height: '75vh',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -220,6 +221,65 @@ export default function HeroScrollAnimation({
               display: 'block',
             }}
           />
+        </div>
+
+        {/* ── CTA BUTTON BELOW ANIMATION (Emerged smoothly & stays) ─────────── */}
+        <motion.div style={{
+          position: 'absolute',
+          bottom: '36px',
+          zIndex: 30,
+          opacity: ctaOpacity,
+          y: ctaY,
+          pointerEvents: 'auto',
+        }}>
+          <button
+            onClick={onNavigateToProducts}
+            style={{
+              background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
+              color: '#ffffff',
+              border: 'none',
+              borderRadius: '50px',
+              padding: '14px 42px',
+              fontSize: '15px',
+              fontWeight: 800,
+              letterSpacing: '0.4px',
+              cursor: 'pointer',
+              boxShadow: `0 10px 32px ${primaryColor}55, 0 0 0 4px rgba(255,255,255,0.70)`,
+              transition: 'transform 0.22s ease, box-shadow 0.22s ease',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px',
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.transform = 'scale(1.06) translateY(-2px)';
+              e.currentTarget.style.boxShadow = `0 16px 44px ${primaryColor}75, 0 0 0 5px rgba(255,255,255,0.85)`;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = '';
+              e.currentTarget.style.boxShadow = `0 10px 32px ${primaryColor}55, 0 0 0 4px rgba(255,255,255,0.70)`;
+            }}
+          >
+            🎁 Explore Products &nbsp;→
+          </button>
+        </motion.div>
+
+        {/* ── Scroll Progress Line Separator (Loads left-to-right on scroll) ── */}
+        <div style={{
+          position: 'absolute',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: '3.5px',
+          background: 'rgba(0,0,0,0.06)',
+          zIndex: 40,
+        }}>
+          <motion.div style={{
+            height: '100%',
+            background: `linear-gradient(90deg, ${primaryColor}, ${accentColor})`,
+            width: progressWidth,
+            boxShadow: `0 0 10px ${primaryColor}90`,
+            borderRadius: '0 4px 4px 0',
+          }} />
         </div>
       </div>
       <style>{`@keyframes hs-spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
