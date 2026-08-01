@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Table, Button, InputNumber, Space, Typography, Card, Row, Col, Empty, Popconfirm } from 'antd';
-import { DeleteOutlined, ShoppingCartOutlined, ArrowLeftOutlined, CreditCardOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ShoppingCartOutlined, ArrowLeftOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
 import { CartContext } from '../../context/CartContext';
 import { shipmentApi } from '../../api/shipmentApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
@@ -69,13 +69,27 @@ const Cart = () => {
       key: 'quantity',
       align: 'center',
       render: (qty, record) => (
-        <InputNumber
-          min={1}
-          max={record.stockQuantity}
-          value={qty}
-          onChange={(val) => updateQuantity(record.id, val || 1)}
-          style={{ width: '80px', borderRadius: '6px' }}
-        />
+        <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden', background: '#ffffff' }}>
+          <Button
+            type="text"
+            size="small"
+            icon={<MinusOutlined style={{ fontSize: '10px', color: qty <= 1 ? '#cbd5e1' : '#334155' }} />}
+            disabled={qty <= 1}
+            onClick={() => updateQuantity(record.id, qty - 1)}
+            style={{ width: '28px', height: '28px', padding: 0 }}
+          />
+          <span style={{ padding: '0 8px', fontSize: '13px', fontWeight: 700, color: '#0f172a', minWidth: '20px', textAlign: 'center' }}>
+            {qty}
+          </span>
+          <Button
+            type="text"
+            size="small"
+            icon={<PlusOutlined style={{ fontSize: '10px', color: (record.stockQuantity && qty >= record.stockQuantity) ? '#cbd5e1' : '#334155' }} />}
+            disabled={record.stockQuantity && qty >= record.stockQuantity}
+            onClick={() => updateQuantity(record.id, qty + 1)}
+            style={{ width: '28px', height: '28px', padding: 0 }}
+          />
+        </div>
       ),
     },
     {
@@ -214,14 +228,27 @@ const Cart = () => {
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed #f1f5f9' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                         <Text type="secondary" style={{ fontSize: '12px' }}>Qty:</Text>
-                        <InputNumber
-                          min={1}
-                          max={item.stockQuantity}
-                          value={item.quantity}
-                          onChange={(val) => updateQuantity(item.id, val || 1)}
-                          style={{ width: '70px', borderRadius: '6px' }}
-                          size="small"
-                        />
+                        <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid #cbd5e1', borderRadius: '6px', overflow: 'hidden', background: '#ffffff' }}>
+                          <Button
+                            type="text"
+                            size="small"
+                            icon={<MinusOutlined style={{ fontSize: '10px', color: item.quantity <= 1 ? '#cbd5e1' : '#334155' }} />}
+                            disabled={item.quantity <= 1}
+                            onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                            style={{ width: '28px', height: '28px', padding: 0 }}
+                          />
+                          <span style={{ padding: '0 8px', fontSize: '13px', fontWeight: 700, color: '#0f172a', minWidth: '20px', textAlign: 'center' }}>
+                            {item.quantity}
+                          </span>
+                          <Button
+                            type="text"
+                            size="small"
+                            icon={<PlusOutlined style={{ fontSize: '10px', color: (item.stockQuantity && item.quantity >= item.stockQuantity) ? '#cbd5e1' : '#334155' }} />}
+                            disabled={item.stockQuantity && item.quantity >= item.stockQuantity}
+                            onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                            style={{ width: '28px', height: '28px', padding: 0 }}
+                          />
+                        </div>
                       </div>
 
                       <Text strong style={{ fontSize: '15px', color: '#0f172a' }}>
