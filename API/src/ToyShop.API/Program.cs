@@ -107,6 +107,7 @@ using (var scope = app.Services.CreateScope())
             context.Database, 
             @"ALTER TABLE ""ProductImages"" ADD COLUMN IF NOT EXISTS ""IsMain"" BOOLEAN NOT NULL DEFAULT FALSE;
               ALTER TABLE ""ProductImages"" ADD COLUMN IF NOT EXISTS ""ZoomScale"" DOUBLE PRECISION NOT NULL DEFAULT 1.0;
+              ALTER TABLE ""Admins"" ADD COLUMN IF NOT EXISTS ""Email"" VARCHAR(255) NULL;
 
               CREATE TABLE IF NOT EXISTS ""Shops"" (
                   ""Id"" SERIAL PRIMARY KEY,
