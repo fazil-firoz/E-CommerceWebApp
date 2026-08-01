@@ -603,8 +603,8 @@ const CustomerLayout = () => {
       {/* Main Content View */}
       <Content style={{
         flex: 1,
-        padding: isHomePage ? '20px 24px 48px' : '24px 50px',
-        background: activeTheme?.backgroundColor || '#fff5f7',
+        padding: isHomePage ? '20px 24px 48px' : '20px 24px 48px',
+        background: isHomePage ? (activeTheme?.backgroundColor || '#fff5f7') : '#f8fafc',
         display: 'flex',
         flexDirection: 'column',
         transition: 'background 0.3s ease',

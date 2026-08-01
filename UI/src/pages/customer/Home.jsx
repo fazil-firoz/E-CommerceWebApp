@@ -166,7 +166,7 @@ const Home = () => {
                 borderTopRightRadius: '16px',
                 cursor: 'pointer',
                 width: '100%',
-                aspectRatio: '4/3'
+                aspectRatio: '1/1'
               }}
               onClick={() => navigate(`/products/${prod.id}`)}
             >

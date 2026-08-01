@@ -230,18 +230,18 @@ Could you please confirm availability and details? Thank you!`;
                     setSelectedImage(product.imageUrls[current]);
                   }
                 }}
-                style={{ height: '400px' }}
+                style={{ height: '460px' }}
               >
                 {(product.imageUrls && product.imageUrls.length > 0) ? (
                   product.imageUrls.map((url, index) => (
-                    <div key={index} style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
+                    <div key={index} style={{ height: '460px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
                       <img
                         src={resolveProductImageUrl(url, 'large')}
                         alt={`${product.name} - slide ${index}`}
                         loading="lazy"
                         style={{
                           maxWidth: '100%',
-                          maxHeight: '400px',
+                          maxHeight: '460px',
                           objectFit: 'contain',
                           margin: '0 auto',
                           display: 'block'
@@ -395,22 +395,24 @@ Could you please confirm availability and details? Thank you!`;
               </div>
             )}
 
-            {/* Action Buttons Row — 50/50 Side-by-Side Flex Layout */}
-            <div style={{ display: 'flex', gap: '12px', marginTop: '16px', width: '100%' }}>
+            {/* Action Buttons — Stacked Full-Width (Flipkart/Shopify style) */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '20px', width: '100%' }}>
               <Button
                 type="primary"
                 ghost
                 size="large"
-                icon={<ShoppingCartOutlined />}
+                icon={<ShoppingCartOutlined style={{ fontSize: '18px' }} />}
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
                 style={{
-                  flex: 1,
-                  height: '48px',
-                  borderRadius: '12px',
+                  width: '100%',
+                  height: '50px',
+                  borderRadius: '14px',
                   fontWeight: 700,
+                  fontSize: '16px',
                   borderColor: primaryColor,
-                  color: primaryColor
+                  color: primaryColor,
+                  boxShadow: `0 4px 12px ${primaryColor}15`
                 }}
               >
                 Add To Cart
@@ -418,17 +420,18 @@ Could you please confirm availability and details? Thank you!`;
               <Button
                 type="primary"
                 size="large"
-                icon={<ThunderboltOutlined />}
+                icon={<ThunderboltOutlined style={{ fontSize: '18px' }} />}
                 onClick={handleBuyNow}
                 disabled={isOutOfStock}
                 style={{
-                  flex: 1,
-                  height: '48px',
-                  borderRadius: '12px',
-                  fontWeight: 700,
+                  width: '100%',
+                  height: '50px',
+                  borderRadius: '14px',
+                  fontWeight: 800,
+                  fontSize: '16px',
                   background: isOutOfStock ? undefined : `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
                   border: 'none',
-                  boxShadow: isOutOfStock ? 'none' : `0 4px 15px ${primaryColor}40`
+                  boxShadow: isOutOfStock ? 'none' : `0 6px 20px ${primaryColor}35`
                 }}
               >
                 Buy Now
