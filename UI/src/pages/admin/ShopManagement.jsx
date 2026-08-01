@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Card, Tabs, Row, Col, Typography, Upload, message, Space, Divider, Spin } from 'antd';
+import { Form, Input, Button, Card, Tabs, Row, Col, Typography, Upload, message, Space, Divider, Spin, Grid } from 'antd';
 import { ShopOutlined, PhoneOutlined, EnvironmentOutlined, FileTextOutlined, ShareAltOutlined, UploadOutlined, SaveOutlined, ArrowLeftOutlined } from '@ant-design/icons';
 import { shopApi } from '../../api/shopApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const ShopManagement = () => {
   const [form] = Form.useForm();
@@ -15,6 +16,9 @@ const ShopManagement = () => {
   const [faviconUrl, setFaviconUrl] = useState('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [uploadingFavicon, setUploadingFavicon] = useState(false);
+
+  const screens = useBreakpoint();
+  const isMobile = screens.lg === false || (screens.xs && !screens.lg);
 
   const navigate = useNavigate();
 
@@ -65,7 +69,7 @@ const ShopManagement = () => {
       message.error('Image upload failed');
     } finally {
       if (isFavicon) setUploadingFavicon(false);
-      else setUploadingLogo(false);
+      else setUploadingFavicon(false);
     }
     return false;
   };
@@ -107,9 +111,9 @@ const ShopManagement = () => {
   const items = [
     {
       key: 'identity',
-      label: <span><ShopOutlined /> Store Identity & Branding</span>,
+      label: <span><ShopOutlined /> Store Identity</span>,
       children: (
-        <Row gutter={[24, 24]}>
+        <Row gutter={[20, 20]}>
           <Col xs={24} md={14}>
             <Form.Item name="shopName" label="Shop / Store Name" rules={[{ required: true, message: 'Please enter shop name' }]}>
               <Input size="large" placeholder="e.g. ToyShop Wonderland" />
@@ -122,16 +126,16 @@ const ShopManagement = () => {
           <Col xs={24} md={10}>
             <Card title="Store Logo & Favicon" size="small" style={{ background: '#fafafa', borderRadius: '12px' }}>
               <div style={{ marginBottom: '20px' }}>
-                <Text strong>Store Header Logo:</Text>
-                <div style={{ marginTop: '8px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <Text strong style={{ display: 'block' }}>Store Header Logo:</Text>
+                <div style={{ marginTop: '8px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                   {logoUrl ? (
                     <img 
                       src={resolveProductImageUrl(logoUrl)} 
                       alt="Shop Logo" 
-                      style={{ maxHeight: '60px', maxWidth: '160px', objectFit: 'contain', borderRadius: '6px', border: '1px solid #d9d9d9', padding: '4px', background: '#fff' }} 
+                      style={{ maxHeight: '50px', maxWidth: '140px', objectFit: 'contain', borderRadius: '6px', border: '1px solid #d9d9d9', padding: '4px', background: '#fff' }} 
                     />
                   ) : (
-                    <div style={{ width: '100px', height: '50px', border: '1px dashed #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px', fontSize: '11px', color: '#999' }}>No Logo</div>
+                    <div style={{ width: '90px', height: '44px', border: '1px dashed #ccc', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '6px', fontSize: '11px', color: '#999' }}>No Logo</div>
                   )}
                   <Upload beforeUpload={(file) => handleLogoUpload(file, false)} showUploadList={false}>
                     <Button icon={<UploadOutlined />} loading={uploadingLogo} size="small">
@@ -139,14 +143,14 @@ const ShopManagement = () => {
                     </Button>
                   </Upload>
                 </div>
-                <Text type="secondary" style={{ fontSize: '12px' }}>Saved to: <code>wwwroot/uploads/shopdata/</code></Text>
+                <Text type="secondary" style={{ fontSize: '11px', display: 'block', wordBreak: 'break-all' }}>Saved to: <code>wwwroot/uploads/shopdata/</code></Text>
               </div>
 
               <Divider style={{ margin: '12px 0' }} />
 
               <div>
-                <Text strong>Browser Favicon Icon:</Text>
-                <div style={{ marginTop: '8px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '16px' }}>
+                <Text strong style={{ display: 'block' }}>Browser Favicon Icon:</Text>
+                <div style={{ marginTop: '8px', marginBottom: '12px', display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
                   {faviconUrl ? (
                     <img 
                       src={resolveProductImageUrl(faviconUrl)} 
@@ -170,9 +174,9 @@ const ShopManagement = () => {
     },
     {
       key: 'contact',
-      label: <span><PhoneOutlined /> Contact Numbers & Emails</span>,
+      label: <span><PhoneOutlined /> Contact & Emails</span>,
       children: (
-        <Row gutter={[24, 16]}>
+        <Row gutter={[16, 16]}>
           <Col xs={24} sm={12}>
             <Form.Item name="email1" label="Primary Email" rules={[{ required: true, message: 'Please enter primary email' }]}>
               <Input placeholder="contact@toyshop.com" />
@@ -183,17 +187,17 @@ const ShopManagement = () => {
               <Input placeholder="sales@toyshop.com" />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={8}>
+          <Col xs={24} sm={12} md={8}>
             <Form.Item name="phone1" label="Primary Phone / Helpline" rules={[{ required: true, message: 'Please enter primary phone' }]}>
               <Input placeholder="+91 98765 43210" />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={8}>
+          <Col xs={24} sm={12} md={8}>
             <Form.Item name="phone2" label="Secondary Phone">
               <Input placeholder="+91 98765 43211" />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={8}>
+          <Col xs={24} sm={12} md={8}>
             <Form.Item name="phone3" label="Landline / Support Phone">
               <Input placeholder="+91 484 2345678" />
             </Form.Item>
@@ -210,7 +214,7 @@ const ShopManagement = () => {
       key: 'address',
       label: <span><EnvironmentOutlined /> Store Address</span>,
       children: (
-        <Row gutter={[24, 16]}>
+        <Row gutter={[16, 16]}>
           <Col xs={24} sm={12}>
             <Form.Item name="addressLine1" label="Address Line 1 (Building / Street)" rules={[{ required: true, message: 'Please enter address line 1' }]}>
               <Input placeholder="e.g. 123 Fun & Games Street" />
@@ -221,17 +225,17 @@ const ShopManagement = () => {
               <Input placeholder="e.g. Near Central Park, MG Road" />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={8}>
+          <Col xs={24} sm={12} md={8}>
             <Form.Item name="city" label="City" rules={[{ required: true, message: 'Please enter city' }]}>
               <Input placeholder="e.g. Kochi" />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={8}>
+          <Col xs={24} sm={12} md={8}>
             <Form.Item name="state" label="State" rules={[{ required: true, message: 'Please enter state' }]}>
               <Input placeholder="e.g. Kerala" />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={8}>
+          <Col xs={24} sm={12} md={8}>
             <Form.Item name="pincode" label="Pincode / ZIP" rules={[{ required: true, message: 'Please enter pincode' }]}>
               <Input placeholder="e.g. 682001" />
             </Form.Item>
@@ -246,20 +250,20 @@ const ShopManagement = () => {
     },
     {
       key: 'tax',
-      label: <span><FileTextOutlined /> Tax & Registration</span>,
+      label: <span><FileTextOutlined /> Tax & Reg.</span>,
       children: (
-        <Row gutter={[24, 16]}>
-          <Col xs={24} sm={8}>
+        <Row gutter={[16, 16]}>
+          <Col xs={24} sm={12} md={8}>
             <Form.Item name="gstNo" label="GSTIN / GST Number">
               <Input placeholder="32ABCDE1234F1Z5" style={{ textTransform: 'uppercase' }} />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={8}>
+          <Col xs={24} sm={12} md={8}>
             <Form.Item name="regNo" label="Business Reg. Number">
               <Input placeholder="REG-TOY-2026-99" />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={8}>
+          <Col xs={24} sm={12} md={8}>
             <Form.Item name="panNo" label="PAN Number">
               <Input placeholder="ABCDE1234F" style={{ textTransform: 'uppercase' }} />
             </Form.Item>
@@ -269,9 +273,9 @@ const ShopManagement = () => {
     },
     {
       key: 'social',
-      label: <span><ShareAltOutlined /> Social Links & Opening Hours</span>,
+      label: <span><ShareAltOutlined /> Social & Hours</span>,
       children: (
-        <Row gutter={[24, 16]}>
+        <Row gutter={[16, 16]}>
           <Col xs={24} sm={12}>
             <Form.Item name="facebookUrl" label="Facebook Profile URL">
               <Input placeholder="https://facebook.com/yourtoyshop" />
@@ -292,7 +296,7 @@ const ShopManagement = () => {
               <Input placeholder="https://youtube.com/c/yourtoyshop" />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24}>
+          <Col xs={24}>
             <Form.Item name="openingHours" label="Business Working Hours">
               <Input placeholder="Mon - Sat: 9:00 AM - 9:00 PM | Sun: Closed" />
             </Form.Item>
@@ -304,13 +308,17 @@ const ShopManagement = () => {
 
   return (
     <Space direction="vertical" size={20} style={{ width: '100%' }}>
-      {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      {/* Header Bar */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <Space align="center" size={12}>
           <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/admin/orders')} style={{ borderRadius: '6px' }} />
           <div>
-            <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Shop Details Master Screen</Title>
-            <Text type="secondary" style={{ fontSize: '13px' }}>Configure store branding, contact info, tax registration, and expanded address settings.</Text>
+            <Title level={3} style={{ margin: 0, fontWeight: 800, fontSize: isMobile ? '20px' : '24px' }}>
+              Shop Details Master Screen
+            </Title>
+            <Text type="secondary" style={{ fontSize: '13px' }}>
+              Configure store branding, contact info, tax registration, and expanded address settings.
+            </Text>
           </div>
         </Space>
 
@@ -319,13 +327,20 @@ const ShopManagement = () => {
           icon={<SaveOutlined />} 
           loading={saving}
           onClick={handleSave}
-          style={{ borderRadius: '8px', background: '#001529', borderColor: '#001529', height: '40px', padding: '0 24px' }}
+          style={{
+            borderRadius: '8px',
+            background: '#001529',
+            borderColor: '#001529',
+            height: '40px',
+            padding: '0 24px',
+            width: isMobile ? '100%' : 'auto'
+          }}
         >
           Save All Changes
         </Button>
       </div>
 
-      <Card style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+      <Card style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', padding: isMobile ? '4px' : '16px' }}>
         <Form form={form} layout="vertical">
           <Tabs defaultActiveKey="identity" items={items} />
         </Form>
