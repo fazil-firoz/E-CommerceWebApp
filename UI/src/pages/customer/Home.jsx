@@ -510,7 +510,7 @@ const Home = () => {
               </span>
 
               <Title level={1} className="shiny-hero-title hero-animated-text" style={{
-                fontSize: '40px',
+                fontSize: 'clamp(24px, 5.5vw, 40px)',
                 fontWeight: 900,
                 marginBottom: '14px',
                 lineHeight: '1.2',
@@ -777,23 +777,23 @@ const Home = () => {
             color: '#fff',
             overflow: 'hidden'
           }}
-          styles={{ body: { padding: '40px 48px' } }}
+          styles={{ body: { padding: '24px 20px' } }}
         >
-          <Row align="middle" justify="space-between" gutter={[24, 24]}>
+          <Row align="middle" justify="space-between" gutter={[20, 20]}>
             <Col xs={24} md={16} className="promo-banner-text-col">
-              <Space direction="vertical" size={8} style={{ width: '100%' }}>
-                <Tag className="shiny-coupon-badge" style={{ borderRadius: '20px', padding: '6px 16px', fontWeight: 800, fontSize: '13px', letterSpacing: '0.4px' }}>
+              <Space direction="vertical" size={10} style={{ width: '100%' }}>
+                <Tag className="shiny-coupon-badge" style={{ borderRadius: '20px', padding: '6px 14px', fontWeight: 800, fontSize: '12px', letterSpacing: '0.4px', maxWidth: '100%', whiteSpace: 'normal', wordBreak: 'break-word' }}>
                   🎉 SPECIAL OFFER: USE CODE {promoCouponCode}
                 </Tag>
-                <Title level={2} style={{ color: '#fff', margin: 0, fontWeight: 900, fontSize: '32px' }}>
+                <Title level={2} style={{ color: '#fff', margin: 0, fontWeight: 900, fontSize: 'clamp(20px, 4.5vw, 32px)', lineHeight: '1.25' }}>
                   {promoTitle}
                 </Title>
-                <Paragraph style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '16px', margin: 0 }}>
+                <Paragraph style={{ color: 'rgba(255, 255, 255, 0.9)', fontSize: '14px', margin: 0, lineHeight: '1.5' }}>
                   {promoDescription}
                 </Paragraph>
               </Space>
             </Col>
-            <Col xs={24} md={8} className="claim-offer-col">
+            <Col xs={24} md={8} className="claim-offer-col" style={{ textAlign: 'center' }}>
               <Button
                 size="large"
                 className="claim-offer-btn"
@@ -803,12 +803,14 @@ const Home = () => {
                   color: primaryColor,
                   border: 'none',
                   borderRadius: '50px',
-                  height: '52px',
-                  padding: '0 36px',
+                  height: '50px',
+                  padding: '0 32px',
                   fontWeight: 900,
-                  fontSize: '16px',
+                  fontSize: '15px',
                   letterSpacing: '0.3px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  width: '100%',
+                  maxWidth: '280px'
                 }}
               >
                 Claim Offer Now &nbsp;🎁

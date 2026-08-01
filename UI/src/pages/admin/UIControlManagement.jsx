@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Spin, Tag, Alert } from 'antd';
+import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Spin, Tag, Alert, Grid } from 'antd';
 import { ControlOutlined, SaveOutlined, ArrowLeftOutlined, PictureOutlined, MessageOutlined, TagOutlined, StopOutlined } from '@ant-design/icons';
 import { shopApi } from '../../api/shopApi';
 import { superAdminApi } from '../../api/superAdminApi';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
+const { useBreakpoint } = Grid;
 
 const UIControlManagement = () => {
   const [form] = Form.useForm();
@@ -18,6 +19,9 @@ const UIControlManagement = () => {
     isMarqueeEnabled: true,
     isPromoBannerEnabled: true
   });
+
+  const screens = useBreakpoint();
+  const isMobile = screens.lg === false || (screens.xs && !screens.lg);
 
   const navigate = useNavigate();
 
@@ -101,7 +105,7 @@ const UIControlManagement = () => {
         <Space align="center" size={12}>
           <Button icon={<ArrowLeftOutlined />} onClick={() => navigate('/admin/shop-settings')} style={{ borderRadius: '6px' }} />
           <div>
-            <Title level={3} style={{ margin: 0, fontWeight: 800, display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Title level={3} style={{ margin: 0, fontWeight: 800, fontSize: isMobile ? '20px' : '24px', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <ControlOutlined style={{ color: '#1890ff' }} /> UI Control & Homepage Banners
             </Title>
             <Text type="secondary" style={{ fontSize: '13px' }}>
@@ -115,22 +119,29 @@ const UIControlManagement = () => {
           icon={<SaveOutlined />}
           loading={saving}
           onClick={handleSave}
-          style={{ borderRadius: '8px', background: '#001529', borderColor: '#001529', height: '40px', padding: '0 24px' }}
+          style={{
+            borderRadius: '8px',
+            background: '#001529',
+            borderColor: '#001529',
+            height: '40px',
+            padding: '0 24px',
+            width: isMobile ? '100%' : 'auto'
+          }}
         >
           Save All UI Settings
         </Button>
       </div>
 
-      <Card style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
+      <Card style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)', padding: isMobile ? '4px' : '16px' }}>
         <Form form={form} layout="vertical">
           <Space direction="vertical" size={24} style={{ width: '100%' }}>
             
             {/* Hero Banner Controls */}
             <Card
               title={
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                   <Text strong style={{ color: isHeroBannerDisabled ? '#8c8c8c' : '#1890ff', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <PictureOutlined /> 🌟 Hero Banner Customization (Title, Subtitle & 4-Slide Auto Carousel)
+                    <PictureOutlined /> 🌟 Hero Banner Customization
                   </Text>
                   {isHeroBannerDisabled && (
                     <Tag color="red" icon={<StopOutlined />} style={{ borderRadius: '12px', padding: '2px 10px', fontWeight: 600 }}>
@@ -201,9 +212,9 @@ const UIControlManagement = () => {
             {/* Navbar Top Badge Ribbon Controls */}
             <Card
               title={
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                   <Text strong style={{ color: isBadgeRibbonDisabled ? '#8c8c8c' : '#52c41a', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <ControlOutlined /> 🏷️ Top Navbar Badge Ribbon (3-Second Auto-Rotating Messages)
+                    <ControlOutlined /> 🏷️ Top Navbar Badge Ribbon
                   </Text>
                   {isBadgeRibbonDisabled && (
                     <Tag color="red" icon={<StopOutlined />} style={{ borderRadius: '12px', padding: '2px 10px', fontWeight: 600 }}>
@@ -242,7 +253,7 @@ const UIControlManagement = () => {
             {/* Marquee Ticker Ribbon Controls */}
             <Card
               title={
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                   <Text strong style={{ color: isMarqueeDisabled ? '#8c8c8c' : '#722ed1', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <MessageOutlined /> 🎀 Infinite Marquee Ticker Customization
                   </Text>
@@ -283,7 +294,7 @@ const UIControlManagement = () => {
             {/* Promo Banner Controls */}
             <Card
               title={
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
                   <Text strong style={{ color: isPromoBannerDisabled ? '#8c8c8c' : '#ff4d4f', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
                     <TagOutlined /> 🎉 Promo Banner Customization
                   </Text>
