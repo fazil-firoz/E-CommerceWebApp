@@ -129,14 +129,14 @@ const Cart = () => {
       <Col xs={24} lg={16}>
         <Card
           style={{
-            borderRadius: '24px',
-            boxShadow: '0 8px 24px rgba(0,0,0,0.03)',
-            border: '1px solid rgba(0,0,0,0.06)'
+            borderRadius: '16px',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.03)',
+            border: '1px solid #e2e8f0'
           }}
           title={
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Title level={4} style={{ margin: 0, fontWeight: 700 }}>
-                Shopping Cart ({cartItems.length} items)
+              <Title level={4} style={{ margin: 0, fontWeight: 800, fontSize: '18px' }}>
+                Shopping Cart ({cartItems.length} {cartItems.length === 1 ? 'item' : 'items'})
               </Title>
               <Popconfirm
                 title="Are you sure you want to clear your cart?"
@@ -144,20 +144,95 @@ const Cart = () => {
                 okText="Yes"
                 cancelText="No"
               >
-                <Button type="link" danger style={{ fontWeight: 600 }}>
+                <Button type="link" danger style={{ fontWeight: 700, padding: 0 }}>
                   Clear Cart
                 </Button>
               </Popconfirm>
             </div>
           }
         >
-          <Table
-            dataSource={cartItems.map((item) => ({ ...item, key: item.id }))}
-            columns={columns}
-            pagination={false}
-            size="middle"
-            scroll={{ x: 600 }}
-          />
+          {/* Desktop Table View */}
+          <div className="desktop-cart-table">
+            <Table
+              dataSource={cartItems.map((item) => ({ ...item, key: item.id }))}
+              columns={columns}
+              pagination={false}
+              size="middle"
+            />
+          </div>
+
+          {/* Mobile Stacked Vertical Item Cards */}
+          <div className="mobile-cart-list" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {cartItems.map((item) => (
+              <div
+                key={item.id}
+                style={{
+                  background: '#ffffff',
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '12px',
+                  padding: '14px',
+                  boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
+                }}
+              >
+                <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-start' }}>
+                  <img
+                    src={resolveProductImageUrl(item.imageUrl || item.imageUrls?.[0], 'thumb')}
+                    alt={item.name}
+                    style={{
+                      width: '64px',
+                      height: '64px',
+                      borderRadius: '8px',
+                      objectFit: 'cover',
+                      border: '1px solid #f1f5f9',
+                      flexShrink: 0
+                    }}
+                  />
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
+                      <Text strong style={{ fontSize: '14px', color: '#0f172a', lineHeight: 1.3, display: 'block' }}>
+                        {item.name}
+                      </Text>
+                      <Popconfirm
+                        title="Remove item?"
+                        onConfirm={() => removeFromCart(item.id)}
+                        okText="Yes"
+                        cancelText="No"
+                      >
+                        <Button
+                          type="text"
+                          danger
+                          icon={<DeleteOutlined style={{ fontSize: '16px' }} />}
+                          style={{ padding: '0 4px', height: '24px' }}
+                        />
+                      </Popconfirm>
+                    </div>
+
+                    <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '2px' }}>
+                      Unit Price: ₹{item.price.toLocaleString('en-IN')}
+                    </Text>
+
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed #f1f5f9' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        <Text type="secondary" style={{ fontSize: '12px' }}>Qty:</Text>
+                        <InputNumber
+                          min={1}
+                          max={item.stockQuantity}
+                          value={item.quantity}
+                          onChange={(val) => updateQuantity(item.id, val || 1)}
+                          style={{ width: '70px', borderRadius: '6px' }}
+                          size="small"
+                        />
+                      </div>
+
+                      <Text strong style={{ fontSize: '15px', color: '#0f172a' }}>
+                        ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                      </Text>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </Card>
       </Col>
 

@@ -217,6 +217,10 @@ code {
   .ant-layout-content {
     padding: 8px 6px 32px !important;
   }
+
+  .desktop-cart-table {
+    display: none !important;
+  }
   
   .ant-modal {
     max-width: 95vw !important;
@@ -264,6 +268,12 @@ code {
   
   .mobile-product-mrp {
     font-size: 11px !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-cart-list {
+    display: none !important;
   }
 }
 
