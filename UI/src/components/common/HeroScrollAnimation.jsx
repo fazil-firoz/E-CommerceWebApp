@@ -202,7 +202,7 @@ export default function HeroScrollAnimation({
           }}>
             <div style={{ fontSize: '48px', animation: 'hs-spin 2s linear infinite' }}>🎁</div>
             <p style={{ color: '#64748b', fontWeight: 700, fontSize: '13px', margin: 0 }}>
-              Loading Animation… {Math.round(loadProgress * 100)}%
+              Welcome To EllaLumia… {Math.round(loadProgress * 100)}%
             </p>
           </div>
         )}

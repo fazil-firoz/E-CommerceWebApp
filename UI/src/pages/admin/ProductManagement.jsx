@@ -297,19 +297,19 @@ const ProductManagement = () => {
         </Tag>
       )
     },
-    {
-      title: 'Badge Label',
-      dataIndex: 'badgeLabel',
-      key: 'badgeLabel',
-      align: 'center',
-      render: (label) => label ? (
-        <Tag color={label === 'New' ? 'green' : label === 'Best Seller' ? 'orange' : label === 'Popular' ? 'purple' : 'volcano'} style={{ fontWeight: 700 }}>
-          {label}
-        </Tag>
-      ) : (
-        <Text type="secondary" style={{ fontSize: '12px' }}>—</Text>
-      )
-    },
+    // {
+    //   title: 'Badge Label',
+    //   dataIndex: 'badgeLabel',
+    //   key: 'badgeLabel',
+    //   align: 'center',
+    //   render: (label) => label ? (
+    //     <Tag color={label === 'New' ? 'green' : label === 'Best Seller' ? 'orange' : label === 'Popular' ? 'purple' : 'volcano'} style={{ fontWeight: 700 }}>
+    //       {label}
+    //     </Tag>
+    //   ) : (
+    //     <Text type="secondary" style={{ fontSize: '12px' }}>—</Text>
+    //   )
+    // },
     {
       title: 'Actions',
       key: 'actions',
@@ -346,7 +346,7 @@ const ProductManagement = () => {
 
   return (
     <Space direction="vertical" size={20} style={{ width: '100%' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div>
           <Title level={3} style={{ margin: 0, fontWeight: 800 }}>Product Management</Title>
         </div>
