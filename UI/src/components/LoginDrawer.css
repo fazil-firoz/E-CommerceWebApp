@@ -5,6 +5,13 @@
   border-radius: 0;
   font-family: 'Outfit', -apple-system, BlinkMacSystemFont, sans-serif;
   background: #ffffff;
+  overflow-x: hidden !important;
+}
+
+.login-drawer * {
+  box-sizing: border-box !important;
+  max-width: 100% !important;
+  overflow-wrap: anywhere;
 }
 
 .login-drawer .ant-drawer-header {

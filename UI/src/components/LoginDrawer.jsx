@@ -207,14 +207,14 @@ const LoginDrawer = ({ open, onClose }) => {
   const renderLoggedIn = () => (
     <div className="ld-logged-in" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '12px 6px', overflowX: 'hidden' }}>
       {/* Header Profile Info */}
-      <div style={{ textAlign: 'center', marginBottom: '20px' }}>
+      <div style={{ textAlign: 'center', marginBottom: '20px', overflowWrap: 'anywhere', wordBreak: 'break-word' }}>
         <div className="ld-avatar" style={{ margin: '0 auto 10px', background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`, boxShadow: `0 6px 18px ${primaryColor}40` }}>
           {customer?.name?.[0]?.toUpperCase() || '?'}
         </div>
-        <Title level={4} style={{ margin: '0 0 2px', fontWeight: 800, color: '#1f1f1f' }}>
+        <Title level={4} style={{ margin: '0 0 2px', fontWeight: 800, color: '#1f1f1f', wordBreak: 'break-word', overflowWrap: 'anywhere' }}>
           Hi, {customer?.name}! 👋
         </Title>
-        <Text type="secondary" style={{ fontSize: '13px' }}>{customer?.email}</Text>
+        <Text type="secondary" style={{ fontSize: '13px', wordBreak: 'break-all', overflowWrap: 'anywhere', display: 'block' }}>{customer?.email}</Text>
       </div>
 
       {/* 2 Tabs: Profile Details & My Orders */}
@@ -234,9 +234,9 @@ const LoginDrawer = ({ open, onClose }) => {
               <Space direction="vertical" size={16} style={{ width: '100%', paddingTop: '10px' }}>
                 <Card size="small" style={{ borderRadius: '14px', border: '1px solid #fce7f3', background: '#fff' }}>
                   <Space direction="vertical" size={12} style={{ width: '100%' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Text type="secondary" style={{ fontSize: '13px' }}>Account Email</Text>
-                      <Text strong style={{ fontSize: '13px' }}>{customer?.email}</Text>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '8px' }}>
+                      <Text type="secondary" style={{ fontSize: '13px', flexShrink: 0 }}>Account Email</Text>
+                      <Text strong style={{ fontSize: '12px', wordBreak: 'break-all', overflowWrap: 'anywhere', textAlign: 'right' }}>{customer?.email}</Text>
                     </div>
                     <Divider style={{ margin: '4px 0' }} />
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -261,8 +261,8 @@ const LoginDrawer = ({ open, onClose }) => {
                   <Text strong style={{ display: 'block', fontSize: '13px', color: primaryColor }}>
                     Linked Account History
                   </Text>
-                  <Text style={{ fontSize: '12px', color: '#6b7280' }}>
-                    All past guest purchases placed with <strong>{customer?.email}</strong> are automatically linked to your account.
+                  <Text style={{ fontSize: '12px', color: '#6b7280', wordBreak: 'break-word', overflowWrap: 'anywhere', display: 'block' }}>
+                    All past guest purchases placed with <strong style={{ wordBreak: 'break-all' }}>{customer?.email}</strong> are automatically linked to your account.
                   </Text>
                 </div>
 
