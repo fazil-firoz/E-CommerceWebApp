@@ -273,11 +273,20 @@ code {
   .mobile-product-mrp {
     font-size: 11px !important;
   }
+
+  .promo-banner-text-col,
+  .claim-offer-col {
+    text-align: center !important;
+  }
 }
 
 @media (min-width: 769px) {
   .mobile-cart-list {
     display: none !important;
+  }
+
+  .claim-offer-col {
+    text-align: right !important;
   }
 }
 

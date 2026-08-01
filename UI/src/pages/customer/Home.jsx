@@ -768,8 +768,8 @@ const Home = () => {
           styles={{ body: { padding: '40px 48px' } }}
         >
           <Row align="middle" justify="space-between" gutter={[24, 24]}>
-            <Col xs={24} md={16}>
-              <Space direction="vertical" size={8}>
+            <Col xs={24} md={16} className="promo-banner-text-col">
+              <Space direction="vertical" size={8} style={{ width: '100%' }}>
                 <Tag className="shiny-coupon-badge" style={{ borderRadius: '20px', padding: '6px 16px', fontWeight: 800, fontSize: '13px', letterSpacing: '0.4px' }}>
                   🎉 SPECIAL OFFER: USE CODE {promoCouponCode}
                 </Tag>
@@ -781,7 +781,7 @@ const Home = () => {
                 </Paragraph>
               </Space>
             </Col>
-            <Col xs={24} md={8} style={{ textAlign: 'right' }}>
+            <Col xs={24} md={8} className="claim-offer-col">
               <Button
                 size="large"
                 className="claim-offer-btn"
