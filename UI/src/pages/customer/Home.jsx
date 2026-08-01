@@ -195,19 +195,41 @@ const Home = () => {
                   }}
                 />
               )}
-              <img
-                alt={prod.name}
-                src={resolveProductImageUrl(mainImageUrl, 'thumb')}
-                loading="lazy"
+              {mainImageUrl ? (
+                <img
+                  alt={prod.name}
+                  src={resolveProductImageUrl(mainImageUrl, 'thumb')}
+                  loading="lazy"
+                  onError={(e) => {
+                    e.currentTarget.style.display = 'none';
+                    if (e.currentTarget.nextSibling) {
+                      e.currentTarget.nextSibling.style.display = 'flex';
+                    }
+                  }}
+                  style={{
+                    height: '100%',
+                    width: '100%',
+                    objectFit: 'cover',
+                    display: 'block',
+                    transform: `scale(${zoom})`,
+                    transition: 'transform 0.3s ease'
+                  }}
+                />
+              ) : null}
+              <div
                 style={{
+                  display: mainImageUrl ? 'none' : 'flex',
                   height: '100%',
                   width: '100%',
-                  objectFit: 'cover',
-                  display: 'block',
-                  transform: `scale(${zoom})`,
-                  transition: 'transform 0.3s ease'
+                  alignItems: 'center',
+                  justify: 'center',
+                  background: '#f1f5f9',
+                  color: '#94a3b8',
+                  fontSize: '32px'
                 }}
-              />
+              >
+                🧸
+              </div>
             </div>
           }
           onClick={() => navigate(`/products/${prod.id}`)}
@@ -218,48 +240,80 @@ const Home = () => {
             background: cardBgColor,
             transition: 'all 0.3s ease'
           }}
+          styles={{ body: { padding: '12px' } }}
         >
-          <Card.Meta
-            title={
-              <span style={{ fontSize: '15px', fontWeight: 700, color: textColor }}>
-                {prod.name}
-              </span>
-            }
-            description={
-              <Space direction="vertical" size={4} style={{ width: '100%', marginTop: '4px' }}>
-                <Text type="secondary" style={{ fontSize: '12px' }}>
-                  {prod.categoryName}
+          <div onClick={() => navigate(`/products/${prod.id}`)} style={{ cursor: 'pointer', marginBottom: '10px' }}>
+            <Text strong style={{ fontSize: '14px', color: textColor, display: 'block', marginBottom: '4px', lineHeight: 1.3, height: '36px', overflow: 'hidden' }}>
+              {prod.name}
+            </Text>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div>
+                <Text strong style={{ fontSize: '16px', color: primaryColor }}>
+                  ₹{prod.price.toLocaleString('en-IN')}
                 </Text>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
-                  <div>
-                    <Text strong style={{ fontSize: '17px', color: primaryColor }}>
-                      ₹{prod.price.toLocaleString('en-IN')}
-                    </Text>
-                    {prod.mrp > prod.price && (
-                      <Text delete style={{ fontSize: '12px', color: '#8c8c8c', marginLeft: '6px' }}>
-                        ₹{prod.mrp.toLocaleString('en-IN')}
-                      </Text>
-                    )}
-                  </div>
-                  <Button
-                    type="primary"
-                    size="small"
-                    icon={<ShoppingCartOutlined />}
-                    disabled={prod.stockQuantity === 0}
-                    onClick={(e) => handleAddToCart(e, prod)}
-                    style={{
-                      borderRadius: '8px',
-                      background: prod.stockQuantity > 0 ? primaryColor : '#bfbfbf',
-                      borderColor: prod.stockQuantity > 0 ? primaryColor : '#bfbfbf',
-                      fontWeight: 600
-                    }}
-                  >
-                    Add
-                  </Button>
-                </div>
-              </Space>
-            }
-          />
+                {prod.mrp > prod.price && (
+                  <Text delete style={{ fontSize: '11px', color: '#8c8c8c', marginLeft: '4px' }}>
+                    ₹{prod.mrp.toLocaleString('en-IN')}
+                  </Text>
+                )}
+              </div>
+              <Text
+                style={{
+                  fontSize: '10px',
+                  background: prod.stockQuantity > 0 ? `${primaryColor}15` : '#fff2f0',
+                  color: prod.stockQuantity > 0 ? primaryColor : '#ff4d4f',
+                  padding: '2px 6px',
+                  borderRadius: '4px',
+                  fontWeight: 600
+                }}
+              >
+                {prod.stockQuantity > 0 ? `${prod.stockQuantity} left` : 'Sold Out'}
+              </Text>
+            </div>
+          </div>
+
+          {/* Action buttons — Stacked Vertically & Full Width */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px', width: '100%' }}>
+            <Button
+              icon={<ShoppingCartOutlined />}
+              onClick={(e) => handleAddToCart(e, prod)}
+              disabled={prod.stockQuantity === 0}
+              style={{
+                width: '100%',
+                borderRadius: '8px',
+                height: '34px',
+                fontWeight: 700,
+                fontSize: '12px',
+                borderColor: primaryColor,
+                color: primaryColor
+              }}
+            >
+              Add to Cart
+            </Button>
+
+            <Button
+              type="primary"
+              icon={<ThunderboltOutlined />}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (prod.stockQuantity > 0) {
+                  navigate('/checkout', { state: { buyNowItem: { ...prod, quantity: 1 } } });
+                }
+              }}
+              disabled={prod.stockQuantity === 0}
+              style={{
+                width: '100%',
+                borderRadius: '8px',
+                height: '34px',
+                fontWeight: 700,
+                fontSize: '12px',
+                background: prod.stockQuantity > 0 ? `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)` : undefined,
+                border: 'none'
+              }}
+            >
+              Buy Now
+            </Button>
+          </div>
         </Card>
       </Col>
     );

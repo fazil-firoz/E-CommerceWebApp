@@ -274,22 +274,45 @@ const ProductListing = () => {
                         {(() => {
                           const mainImage = prod.images?.find(img => img.isMain) || { imageUrl: prod.imageUrls?.[0], zoomScale: 1.0 };
                           const zoom = mainImage?.zoomScale || 1.0;
+                          const imgUrl = mainImage?.imageUrl || prod.imageUrls?.[0];
                           return (
-                            <img
-                              alt={prod.name}
-                              src={resolveProductImageUrl(mainImage?.imageUrl, 'thumb')}
-                              loading="lazy"
-                              style={{
-                                height: '100%',
-                                width: '100%',
-                                objectFit: 'cover',
-                                display: 'block',
-                                transform: `scale(${zoom})`,
-                                transition: 'transform 0.3s ease'
-                              }}
-                              onMouseOver={e => e.currentTarget.style.transform = `scale(${zoom * 1.04})`}
-                              onMouseOut={e => e.currentTarget.style.transform = `scale(${zoom})`}
-                            />
+                            <>
+                              {imgUrl ? (
+                                <img
+                                  alt={prod.name}
+                                  src={resolveProductImageUrl(imgUrl, 'thumb')}
+                                  loading="lazy"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none';
+                                    if (e.currentTarget.nextSibling) {
+                                      e.currentTarget.nextSibling.style.display = 'flex';
+                                    }
+                                  }}
+                                  style={{
+                                    height: '100%',
+                                    width: '100%',
+                                    objectFit: 'cover',
+                                    display: 'block',
+                                    transform: `scale(${zoom})`,
+                                    transition: 'transform 0.3s ease'
+                                  }}
+                                />
+                              ) : null}
+                              <div
+                                style={{
+                                  display: imgUrl ? 'none' : 'flex',
+                                  height: '100%',
+                                  width: '100%',
+                                  alignItems: 'center',
+                                  justify: 'center',
+                                  background: '#f1f5f9',
+                                  color: '#94a3b8',
+                                  fontSize: '32px'
+                                }}
+                              >
+                                🧸
+                              </div>
+                            </>
                           );
                         })()}
                         {prod.stockQuantity === 0 && (
@@ -311,30 +334,30 @@ const ProductListing = () => {
                       background: cardBgColor,
                       transition: 'all 0.3s ease'
                     }}
-                    styles={{ body: { padding: '16px' } }}
+                    styles={{ body: { padding: '12px' } }}
                   >
                     {/* Product info - clickable */}
-                    <div onClick={() => navigate(`/products/${prod.id}`)} style={{ cursor: 'pointer', marginBottom: '14px' }}>
-                      <Text strong style={{ fontSize: '15px', color: textColor, display: 'block', marginBottom: '4px', lineHeight: 1.4 }}>
+                    <div onClick={() => navigate(`/products/${prod.id}`)} style={{ cursor: 'pointer', marginBottom: '10px' }}>
+                      <Text strong style={{ fontSize: '14px', color: textColor, display: 'block', marginBottom: '4px', lineHeight: 1.3, height: '36px', overflow: 'hidden' }}>
                         {prod.name}
                       </Text>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <div>
-                          <Text strong style={{ fontSize: '18px', color: primaryColor }}>
+                          <Text strong style={{ fontSize: '16px', color: primaryColor }}>
                             ₹{prod.price.toLocaleString('en-IN')}
                           </Text>
                           {prod.mrp > prod.price && (
-                            <Text delete style={{ fontSize: '12px', color: '#8c8c8c', marginLeft: '6px' }}>
+                            <Text delete style={{ fontSize: '11px', color: '#8c8c8c', marginLeft: '4px' }}>
                               ₹{prod.mrp.toLocaleString('en-IN')}
                             </Text>
                           )}
                         </div>
                         <Text
                           style={{
-                            fontSize: '11px',
+                            fontSize: '10px',
                             background: prod.stockQuantity > 0 ? `${primaryColor}15` : '#fff2f0',
                             color: prod.stockQuantity > 0 ? primaryColor : '#ff4d4f',
-                            padding: '2px 8px',
+                            padding: '2px 6px',
                             borderRadius: '4px',
                             fontWeight: 600
                           }}
@@ -344,47 +367,43 @@ const ProductListing = () => {
                       </div>
                     </div>
 
-                    {/* Action buttons */}
-                    <div style={{ display: 'flex', gap: '8px' }}>
-                      <Tooltip title={prod.stockQuantity === 0 ? 'Out of stock' : 'Add to cart'}>
-                        <Button
-                          icon={<ShoppingCartOutlined />}
-                          onClick={(e) => handleAddToCart(e, prod)}
-                          disabled={prod.stockQuantity === 0}
-                          loading={addingId === prod.id}
-                          style={{
-                            flex: 1,
-                            borderRadius: '8px',
-                            height: '36px',
-                            fontWeight: 600,
-                            fontSize: '13px',
-                            borderColor: primaryColor,
-                            color: primaryColor
-                          }}
-                        >
-                          Add to Cart
-                        </Button>
-                      </Tooltip>
+                    {/* Action buttons — Stacked Vertically & Full Width */}
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '8px', width: '100%' }}>
+                      <Button
+                        icon={<ShoppingCartOutlined />}
+                        onClick={(e) => handleAddToCart(e, prod)}
+                        disabled={prod.stockQuantity === 0}
+                        loading={addingId === prod.id}
+                        style={{
+                          width: '100%',
+                          borderRadius: '8px',
+                          height: '34px',
+                          fontWeight: 700,
+                          fontSize: '12px',
+                          borderColor: primaryColor,
+                          color: primaryColor
+                        }}
+                      >
+                        Add to Cart
+                      </Button>
 
-                      <Tooltip title={prod.stockQuantity === 0 ? 'Out of stock' : 'Buy now'}>
-                        <Button
-                          type="primary"
-                          icon={<ThunderboltOutlined />}
-                          onClick={(e) => handleBuyNow(e, prod)}
-                          disabled={prod.stockQuantity === 0}
-                          style={{
-                            flex: 1,
-                            borderRadius: '8px',
-                            height: '36px',
-                            fontWeight: 600,
-                            fontSize: '13px',
-                            background: prod.stockQuantity > 0 ? primaryColor : undefined,
-                            borderColor: prod.stockQuantity > 0 ? primaryColor : undefined
-                          }}
-                        >
-                          Buy Now
-                        </Button>
-                      </Tooltip>
+                      <Button
+                        type="primary"
+                        icon={<ThunderboltOutlined />}
+                        onClick={(e) => handleBuyNow(e, prod)}
+                        disabled={prod.stockQuantity === 0}
+                        style={{
+                          width: '100%',
+                          borderRadius: '8px',
+                          height: '34px',
+                          fontWeight: 700,
+                          fontSize: '12px',
+                          background: prod.stockQuantity > 0 ? `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)` : undefined,
+                          border: 'none'
+                        }}
+                      >
+                        Buy Now
+                      </Button>
                     </div>
                   </Card>
                 </Col>
