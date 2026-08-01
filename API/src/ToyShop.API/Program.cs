@@ -175,6 +175,7 @@ using (var scope = app.Services.CreateScope())
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsPrintInvoiceEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsProductBadgeEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsWishlistEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
+              ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsHeroScrollAnimationEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsHeroBannerEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsCategoriesSectionEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;
               ALTER TABLE ""SuperAdminControls"" ADD COLUMN IF NOT EXISTS ""IsFeaturedProductsEnabled"" BOOLEAN NOT NULL DEFAULT TRUE;

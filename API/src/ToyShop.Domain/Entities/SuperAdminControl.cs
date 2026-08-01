@@ -18,6 +18,7 @@ namespace ToyShop.Domain.Entities
         public bool IsWishlistEnabled { get; set; } = true;
 
         // Homepage Section UI Controls
+        public bool IsHeroScrollAnimationEnabled { get; set; } = true;
         public bool IsHeroBannerEnabled { get; set; } = true;
         public bool IsCategoriesSectionEnabled { get; set; } = true;
         public bool IsFeaturedProductsEnabled { get; set; } = true;

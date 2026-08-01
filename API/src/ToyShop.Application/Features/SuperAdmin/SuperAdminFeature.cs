@@ -25,6 +25,7 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsProductBadgeEnabled { get; set; } = true;
         public bool IsWishlistEnabled { get; set; } = true;
 
+        public bool IsHeroScrollAnimationEnabled { get; set; } = true;
         public bool IsHeroBannerEnabled { get; set; } = true;
         public bool IsCategoriesSectionEnabled { get; set; } = true;
         public bool IsFeaturedProductsEnabled { get; set; } = true;
@@ -52,6 +53,7 @@ namespace ToyShop.Application.Features.SuperAdmin
         public bool IsProductBadgeEnabled { get; set; }
         public bool IsWishlistEnabled { get; set; }
 
+        public bool IsHeroScrollAnimationEnabled { get; set; } = true;
         public bool IsHeroBannerEnabled { get; set; } = true;
         public bool IsCategoriesSectionEnabled { get; set; } = true;
         public bool IsFeaturedProductsEnabled { get; set; } = true;
@@ -161,6 +163,7 @@ namespace ToyShop.Application.Features.SuperAdmin
             control.IsProductBadgeEnabled = request.Request.IsProductBadgeEnabled;
             control.IsWishlistEnabled = request.Request.IsWishlistEnabled;
 
+            control.IsHeroScrollAnimationEnabled = request.Request.IsHeroScrollAnimationEnabled;
             control.IsHeroBannerEnabled = request.Request.IsHeroBannerEnabled;
             control.IsCategoriesSectionEnabled = request.Request.IsCategoriesSectionEnabled;
             control.IsFeaturedProductsEnabled = request.Request.IsFeaturedProductsEnabled;
@@ -216,6 +219,7 @@ namespace ToyShop.Application.Features.SuperAdmin
             IsPrintInvoiceEnabled = c.IsPrintInvoiceEnabled,
             IsProductBadgeEnabled = c.IsProductBadgeEnabled,
             IsWishlistEnabled = c.IsWishlistEnabled,
+            IsHeroScrollAnimationEnabled = c.IsHeroScrollAnimationEnabled,
             IsHeroBannerEnabled = c.IsHeroBannerEnabled,
             IsCategoriesSectionEnabled = c.IsCategoriesSectionEnabled,
             IsFeaturedProductsEnabled = c.IsFeaturedProductsEnabled,
