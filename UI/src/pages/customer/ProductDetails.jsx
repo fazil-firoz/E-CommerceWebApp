@@ -247,7 +247,7 @@ Could you please confirm availability and details? Thank you!`;
                     >
                       {allImages.length > 0 ? (
                         allImages.map((url, index) => (
-                          <div key={index} style={{ height: '380px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fafafa', position: 'relative' }}>
+                          <div key={index} style={{ height: '380px', width: '100%', borderRadius: '16px', overflow: 'hidden', background: '#fafafa', position: 'relative' }}>
                             <img
                               src={resolveProductImageUrl(url, 'large')}
                               alt={`${product.name} - slide ${index}`}
@@ -257,10 +257,10 @@ Could you please confirm availability and details? Thank you!`;
                                 if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'flex';
                               }}
                               style={{
-                                maxWidth: '100%',
-                                maxHeight: '380px',
-                                objectFit: 'contain',
-                                margin: '0 auto',
+                                width: '100%',
+                                height: '100%',
+                                objectFit: 'cover',
+                                objectPosition: 'center',
                                 display: 'block'
                               }}
                             />
