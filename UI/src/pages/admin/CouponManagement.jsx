@@ -350,6 +350,7 @@ const CouponManagement = () => {
           rowKey="id"
           loading={loading}
           pagination={{ pageSize: 8 }}
+          scroll={{ x: 750 }}
         />
       </Card>
 

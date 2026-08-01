@@ -1,67 +1,49 @@
+import apiClient from './api';
 import { URLS } from '../config/urlConfig';
 
 export const couponApi = {
   getAll: async () => {
     try {
-      const response = await fetch(URLS.COUPONS.GET_ALL);
-      return await response.json();
+      return await apiClient.get(URLS.COUPONS.GET_ALL);
     } catch (error) {
       console.error('Error fetching coupons:', error);
-      return { success: false, message: 'Network error fetching coupons' };
+      return { success: false, message: error.message || 'Error fetching coupons', data: [] };
     }
   },
 
   validate: async (code, purchaseAmount) => {
     try {
-      const response = await fetch(URLS.COUPONS.VALIDATE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ code, purchaseAmount })
-      });
-      return await response.json();
+      return await apiClient.post(URLS.COUPONS.VALIDATE, { code, purchaseAmount });
     } catch (error) {
       console.error('Error validating coupon:', error);
-      return { success: false, message: 'Network error validating coupon' };
+      return { success: false, message: error.message || 'Invalid coupon code' };
     }
   },
 
   create: async (data) => {
     try {
-      const response = await fetch(URLS.COUPONS.CREATE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      return await response.json();
+      return await apiClient.post(URLS.COUPONS.CREATE, data);
     } catch (error) {
       console.error('Error creating coupon:', error);
-      return { success: false, message: 'Network error creating coupon' };
+      return { success: false, message: error.message || 'Failed to create coupon' };
     }
   },
 
   update: async (id, data) => {
     try {
-      const response = await fetch(URLS.COUPONS.UPDATE(id), {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-      return await response.json();
+      return await apiClient.put(URLS.COUPONS.UPDATE(id), data);
     } catch (error) {
       console.error('Error updating coupon:', error);
-      return { success: false, message: 'Network error updating coupon' };
+      return { success: false, message: error.message || 'Failed to update coupon' };
     }
   },
 
   delete: async (id) => {
     try {
-      const response = await fetch(URLS.COUPONS.DELETE(id), {
-        method: 'DELETE'
-      });
-      return await response.json();
+      return await apiClient.delete(URLS.COUPONS.DELETE(id));
     } catch (error) {
       console.error('Error deleting coupon:', error);
-      return { success: false, message: 'Network error deleting coupon' };
+      return { success: false, message: error.message || 'Failed to delete coupon' };
     }
   }
 };
