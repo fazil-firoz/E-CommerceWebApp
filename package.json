@@ -1,0 +1,7 @@
+{
+  "name": "ecommerce-monorepo",
+  "private": true,
+  "scripts": {
+    "build": "cd UI && npm install && npm run build"
+  }
+}
