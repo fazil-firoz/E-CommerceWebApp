@@ -197,6 +197,10 @@ code {
 }
 
 @media (max-width: 768px) {
+  input, select, textarea, .ant-input, .ant-input-affix-wrapper input {
+    font-size: 16px !important;
+  }
+
   .customer-nav {
     display: none !important;
   }

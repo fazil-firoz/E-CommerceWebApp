@@ -419,7 +419,7 @@ const Checkout = () => {
                       value={couponCodeInput}
                       onChange={e => setCouponCodeInput(e.target.value.toUpperCase())}
                       size="large"
-                      style={{ borderRadius: '6px 0 0 6px', fontSize: '13px', fontWeight: 600, height: '44px' }}
+                      style={{ borderRadius: '6px 0 0 6px', fontSize: '16px', fontWeight: 600, height: '46px' }}
                     />
                     <Button
                       type="primary"
@@ -638,80 +638,7 @@ const Checkout = () => {
 
           <Divider style={{ margin: '16px 0' }} />
 
-          {/* Coupon Code Input & Tag */}
-          <div style={{ marginBottom: '16px' }}>
-            <Text type="secondary" style={{ fontSize: '13px', display: 'block', marginBottom: '6px' }}>
-              Have a promotional Coupon Code?
-            </Text>
-            {appliedCoupon ? (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                padding: '8px 12px',
-                background: '#f6ffed',
-                border: '1px solid #b7eb8f',
-                borderRadius: '8px'
-              }}>
-                <div>
-                  <Tag color="success" style={{ fontWeight: 800, fontSize: '13px' }}>
-                    🏷️ {appliedCoupon.code} ({appliedCoupon.discountPercentage}% OFF)
-                  </Tag>
-                  <Text style={{ fontSize: '12px', color: '#52c41a', display: 'block', marginTop: '2px' }}>
-                    Saved ₹{couponDiscountAmount.toLocaleString('en-IN')}!
-                  </Text>
-                </div>
-                <Button
-                  type="text"
-                  danger
-                  size="small"
-                  icon={<CloseOutlined />}
-                  onClick={handleRemoveCoupon}
-                >
-                  Remove
-                </Button>
-              </div>
-            ) : (
-              <div>
-                <Space.Compact style={{ width: '100%' }}>
-                  <Input
-                    prefix={<TagOutlined style={{ color: '#722ed1' }} />}
-                    placeholder={`Enter Coupon Code (e.g. ${shopPrefix}10)`}
-                    value={couponCodeInput}
-                    onChange={(e) => {
-                      setCouponCodeInput(e.target.value.toUpperCase());
-                      if (couponErrorMsg) setCouponErrorMsg('');
-                    }}
-                    onPressEnter={handleApplyCoupon}
-                    status={couponErrorMsg ? 'error' : ''}
-                    style={{ borderRadius: '8px 0 0 8px', textTransform: 'uppercase', fontWeight: 600 }}
-                  />
-                  <Button
-                    type="primary"
-                    loading={validatingCoupon}
-                    onClick={handleApplyCoupon}
-                    style={{ borderRadius: '0 8px 8px 0', background: primaryColor, borderColor: primaryColor, fontWeight: 700 }}
-                  >
-                    Apply
-                  </Button>
-                </Space.Compact>
 
-                {couponErrorMsg && (
-                  <div style={{
-                    marginTop: '6px',
-                    color: '#ff4d4f',
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '4px'
-                  }}>
-                    <span>⚠️</span> {couponErrorMsg}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
 
           <div className="checkout-summary-row">
             <Text type="secondary">Subtotal</Text>
