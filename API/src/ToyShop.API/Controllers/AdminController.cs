@@ -26,6 +26,22 @@ namespace ToyShop.API.Controllers
             return Ok(result);
         }
 
+        [HttpPost("forgot-password/request-otp")]
+        public async Task<ActionResult<BaseResponse<bool>>> RequestForgotPasswordOtp([FromBody] AdminSendForgotPasswordOtpCommand command)
+        {
+            var result = await Mediator.Send(command);
+            if (!result.Success) return BadRequest(result);
+            return Ok(result);
+        }
+
+        [HttpPost("forgot-password/reset")]
+        public async Task<ActionResult<BaseResponse<bool>>> ResetPasswordWithOtp([FromBody] AdminResetPasswordWithOtpCommand command)
+        {
+            var result = await Mediator.Send(command);
+            if (!result.Success) return BadRequest(result);
+            return Ok(result);
+        }
+
         [HttpGet("dashboard-stats")]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<BaseResponse<DashboardStatsDto>>> GetDashboardStats()

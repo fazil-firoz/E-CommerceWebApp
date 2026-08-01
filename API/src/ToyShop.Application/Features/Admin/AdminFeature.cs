@@ -1,6 +1,7 @@
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
+using ToyShop.Application.Common;
 using ToyShop.Application.Common.Interfaces;
 using ToyShop.Application.DTOs;
 using ToyShop.Domain.Entities;
@@ -29,34 +30,54 @@ namespace ToyShop.Application.Features.Admin
         string ConfirmPassword
     ) : IRequest<BaseResponse<bool>>;
 
+    public record AdminSendForgotPasswordOtpCommand(string Email) : IRequest<BaseResponse<bool>>;
+
+    public record AdminResetPasswordWithOtpCommand(
+        string Email,
+        string Otp,
+        string NewPassword,
+        string ConfirmPassword
+    ) : IRequest<BaseResponse<bool>>;
+
     public record GetDashboardStatsQuery : IRequest<BaseResponse<DashboardStatsDto>>;
 
     // Handlers
     public class AdminCommandHandler :
         IRequestHandler<AdminLoginCommand, BaseResponse<AdminLoginResponseDto>>,
         IRequestHandler<AdminChangePasswordCommand, BaseResponse<bool>>,
+        IRequestHandler<AdminSendForgotPasswordOtpCommand, BaseResponse<bool>>,
+        IRequestHandler<AdminResetPasswordWithOtpCommand, BaseResponse<bool>>,
         IRequestHandler<GetDashboardStatsQuery, BaseResponse<DashboardStatsDto>>
     {
         private readonly IRepository<ToyShop.Domain.Entities.Admin> _adminRepository;
         private readonly IRepository<Order> _orderRepository;
         private readonly IRepository<Product> _productRepository;
+        private readonly IRepository<ToyShop.Domain.Entities.Shop> _shopRepository;
         private readonly IJwtTokenService _jwtTokenService;
         private readonly ICurrentUserService _currentUserService;
+        private readonly IEmailService _emailService;
+        private readonly OtpStore _otpStore;
         private readonly IUnitOfWork _unitOfWork;
 
         public AdminCommandHandler(
             IRepository<ToyShop.Domain.Entities.Admin> adminRepository,
             IRepository<Order> orderRepository,
             IRepository<Product> productRepository,
+            IRepository<ToyShop.Domain.Entities.Shop> shopRepository,
             IJwtTokenService jwtTokenService,
             ICurrentUserService currentUserService,
+            IEmailService emailService,
+            OtpStore otpStore,
             IUnitOfWork unitOfWork)
         {
             _adminRepository = adminRepository;
             _orderRepository = orderRepository;
             _productRepository = productRepository;
+            _shopRepository = shopRepository;
             _jwtTokenService = jwtTokenService;
             _currentUserService = currentUserService;
+            _emailService = emailService;
+            _otpStore = otpStore;
             _unitOfWork = unitOfWork;
         }
 
@@ -197,6 +218,118 @@ namespace ToyShop.Application.Features.Admin
             };
 
             return BaseResponse<DashboardStatsDto>.Ok(stats, "Dashboard statistics retrieved successfully");
+        }
+
+        public async Task<BaseResponse<bool>> Handle(AdminSendForgotPasswordOtpCommand request, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email))
+                return BaseResponse<bool>.Fail("Email address or username is required");
+
+            var trimmedEmail = request.Email.Trim().ToLower();
+
+            // Find matching admin by Email or Username
+            var admin = await _adminRepository.Query()
+                .FirstOrDefaultAsync(a => (a.Email != null && a.Email.ToLower() == trimmedEmail) ||
+                                          a.Username.ToLower() == trimmedEmail, cancellationToken);
+
+            if (admin == null)
+            {
+                var shopInfo = await _shopRepository.Query().FirstOrDefaultAsync(cancellationToken);
+                var isDefaultAdmin = (trimmedEmail == "admin" || trimmedEmail == "admin@store.com" ||
+                                      (shopInfo != null && !string.IsNullOrEmpty(shopInfo.Email1) && shopInfo.Email1.ToLower() == trimmedEmail));
+                if (isDefaultAdmin)
+                {
+                    admin = await _adminRepository.Query().FirstOrDefaultAsync(cancellationToken);
+                }
+            }
+
+            if (admin == null)
+            {
+                return BaseResponse<bool>.Fail("No admin account found matching this email or username");
+            }
+
+            // Destination email address
+            var targetEmail = !string.IsNullOrWhiteSpace(admin.Email)
+                ? admin.Email.Trim()
+                : (trimmedEmail.Contains('@') ? trimmedEmail : "admin@store.com");
+
+            // Generate 6-digit OTP
+            var bytes = new byte[4];
+            using var rng = System.Security.Cryptography.RandomNumberGenerator.Create();
+            rng.GetBytes(bytes);
+            var otpValue = Math.Abs(BitConverter.ToInt32(bytes, 0)) % 1000000;
+            var otp = otpValue.ToString("D6");
+
+            // Store in memory OTP store
+            var storeKey = "admin_reset:" + trimmedEmail;
+            _otpStore.Store(storeKey, otp);
+
+            // Send OTP email
+            try
+            {
+                await _emailService.SendOtpEmailAsync(targetEmail, otp, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                return BaseResponse<bool>.Fail($"Failed to send OTP email: {ex.Message}");
+            }
+
+            return BaseResponse<bool>.Ok(true, $"Reset OTP sent to {targetEmail}. Valid for 10 minutes.");
+        }
+
+        public async Task<BaseResponse<bool>> Handle(AdminResetPasswordWithOtpCommand request, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Otp))
+                return BaseResponse<bool>.Fail("Email/Username and OTP are required");
+
+            if (string.IsNullOrWhiteSpace(request.NewPassword) || string.IsNullOrWhiteSpace(request.ConfirmPassword))
+                return BaseResponse<bool>.Fail("New password and confirm password are required");
+
+            if (request.NewPassword != request.ConfirmPassword)
+                return BaseResponse<bool>.Fail("New password and confirm password do not match");
+
+            if (request.NewPassword.Length < 6)
+                return BaseResponse<bool>.Fail("New password must be at least 6 characters long");
+
+            var trimmedEmail = request.Email.Trim().ToLower();
+            var storeKey = "admin_reset:" + trimmedEmail;
+
+            var verifyResult = _otpStore.Verify(storeKey, request.Otp.Trim());
+            if (verifyResult != OtpVerifyResult.Success)
+            {
+                return verifyResult switch
+                {
+                    OtpVerifyResult.Expired => BaseResponse<bool>.Fail("OTP has expired. Please request a new one."),
+                    OtpVerifyResult.TooManyAttempts => BaseResponse<bool>.Fail("Too many failed attempts. Please request a new OTP."),
+                    OtpVerifyResult.NotFound => BaseResponse<bool>.Fail("No OTP found for this account. Please request a new OTP."),
+                    _ => BaseResponse<bool>.Fail("Invalid OTP code. Please try again.")
+                };
+            }
+
+            // Find matching admin
+            var admin = await _adminRepository.Query()
+                .FirstOrDefaultAsync(a => (a.Email != null && a.Email.ToLower() == trimmedEmail) ||
+                                          a.Username.ToLower() == trimmedEmail, cancellationToken);
+
+            if (admin == null)
+            {
+                admin = await _adminRepository.Query().FirstOrDefaultAsync(cancellationToken);
+            }
+
+            if (admin == null)
+            {
+                return BaseResponse<bool>.Fail("Admin account not found");
+            }
+
+            // Hash new password using BCrypt
+            string newHash = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
+            admin.PasswordHash = newHash;
+            admin.UpdatedDate = DateTimeOffset.UtcNow;
+
+            _adminRepository.Update(admin);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return BaseResponse<bool>.Ok(true, "Password reset successfully! Please sign in with your new password.");
         }
     }
 }

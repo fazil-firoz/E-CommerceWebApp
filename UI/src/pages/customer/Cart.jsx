@@ -116,7 +116,7 @@ const Cart = () => {
           }
         >
           <Button type="primary" size="large" onClick={() => navigate('/products')} style={{ borderRadius: '8px' }}>
-            <ArrowLeftOutlined /> Explore Toys
+            <ArrowLeftOutlined /> Explore Products
           </Button>
         </Empty>
       </Card>

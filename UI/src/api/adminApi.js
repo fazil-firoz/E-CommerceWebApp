@@ -5,4 +5,6 @@ export const adminApi = {
   login: (data) => apiClient.post(URLS.ADMIN.LOGIN, data),
   changePassword: (data) => apiClient.post(URLS.ADMIN.CHANGE_PASSWORD, data),
   getDashboardStats: () => apiClient.get(URLS.ADMIN.DASHBOARD_STATS),
+  requestForgotPasswordOtp: (data) => apiClient.post(URLS.ADMIN.REQUEST_FORGOT_PASSWORD_OTP, data),
+  resetPasswordWithOtp: (data) => apiClient.post(URLS.ADMIN.RESET_PASSWORD_OTP, data),
 };

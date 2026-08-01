@@ -31,6 +31,8 @@ export const URLS = {
     LOGIN: `${API_BASE_URL}/admin/login`,
     CHANGE_PASSWORD: `${API_BASE_URL}/admin/change-password`,
     DASHBOARD_STATS: `${API_BASE_URL}/admin/dashboard-stats`,
+    REQUEST_FORGOT_PASSWORD_OTP: `${API_BASE_URL}/admin/forgot-password/request-otp`,
+    RESET_PASSWORD_OTP: `${API_BASE_URL}/admin/forgot-password/reset`,
   },
   AUTH: {
     SEND_OTP: `${API_BASE_URL}/auth/send-otp`,
