@@ -58,7 +58,7 @@ const Cart = () => {
             style={{ width: '60px', height: '60px', borderRadius: '8px', objectFit: 'cover', border: '1px solid #f0f0f0' }}
           />
           <div>
-            <Text strong style={{ fontSize: '15px', color: '#262626', display: 'block' }}>
+            <Text strong style={{ fontSize: '15px', color: '#262626', display: 'block', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
               {text}
             </Text>
             <Text type="secondary" style={{ fontSize: '12px' }}>
