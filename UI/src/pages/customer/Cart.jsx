@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { Table, Button, InputNumber, Space, Typography, Card, Row, Col, Empty, Popconfirm } from 'antd';
 import { DeleteOutlined, ShoppingCartOutlined, ArrowLeftOutlined, PlusOutlined, MinusOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { CartContext } from '../../context/CartContext';
+import { ThemeContext } from '../../context/ThemeContext';
 import { shipmentApi } from '../../api/shipmentApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
 
@@ -10,6 +11,10 @@ const { Title, Text } = Typography;
 
 const Cart = () => {
   const { cartItems, updateQuantity, removeFromCart, clearCart, cartTotal } = useContext(CartContext);
+  const { activeTheme } = useContext(ThemeContext);
+  const primaryColor = activeTheme?.primaryColor || '#ff6584';
+  const secondaryColor = activeTheme?.secondaryColor || '#ff85c0';
+  const accentColor = activeTheme?.accentColor || '#ff2a6d';
   const navigate = useNavigate();
 
   const [shippingMethod, setShippingMethod] = useState(null);
@@ -300,16 +305,18 @@ const Cart = () => {
             <Button
               type="primary"
               size="large"
-              icon={<CreditCardOutlined />}
+              icon={<CreditCardOutlined style={{ fontSize: '18px' }} />}
               onClick={() => navigate('/checkout')}
               style={{
                 width: '100%',
-                height: '48px',
+                height: '50px',
                 borderRadius: '12px',
-                fontWeight: 600,
-                background: 'linear-gradient(135deg, #1890ff 0%, #52c41a 100%)',
+                fontWeight: 800,
+                fontSize: '16px',
+                background: `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
                 border: 'none',
-                boxShadow: '0 4px 15px rgba(82, 196, 26, 0.3)'
+                boxShadow: `0 6px 20px ${primaryColor}35`,
+                color: '#ffffff'
               }}
             >
               Proceed to Checkout
