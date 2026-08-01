@@ -83,6 +83,7 @@ const SuperAdminManagement = () => {
     isPrintInvoiceEnabled: true,
     isProductBadgeEnabled: true,
     isWishlistEnabled: true,
+    isHeroScrollAnimationEnabled: true,
     isHeroBannerEnabled: true,
     isCategoriesSectionEnabled: true,
     isFeaturedProductsEnabled: true,
@@ -729,6 +730,7 @@ const SuperAdminManagement = () => {
 
               <Row gutter={[16, 16]}>
                 {[
+                  { key: 'isHeroScrollAnimationEnabled', label: '🎁 3D Unboxing Scroll Animation', desc: 'Interactive 3D unboxing scroll animation at top of customer Homepage' },
                   { key: 'isHeroBannerEnabled', label: 'Hero Banner Section', desc: 'Main interactive hero showcase with glowing call-to-action' },
                   { key: 'isMarqueeEnabled', label: 'Infinite Marquee Ticker Ribbon', desc: 'Scrolling ticker ribbon below Hero Banner with promo text & emojis' },
                   { key: 'isCategoriesSectionEnabled', label: 'Categories Section', desc: 'Grid of toy categories with icon cards and item counts' },

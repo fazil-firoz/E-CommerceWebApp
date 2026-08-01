@@ -31,6 +31,7 @@ const Home = () => {
   const [loading, setLoading] = useState(true);
   const [superAdminControl, setSuperAdminControl] = useState({
     isWishlistEnabled: true,
+    isHeroScrollAnimationEnabled: true,
     isHeroBannerEnabled: true,
     isCategoriesSectionEnabled: true,
     isFeaturedProductsEnabled: true,
@@ -457,15 +458,17 @@ const Home = () => {
         }
       `}</style>
 
-      {/* 0. 3D SCROLL UNBOXING ANIMATION — Blended seamlessly into page background */}
-      <div style={{ width: '100%', margin: '0 auto' }}>
-        <HeroScrollAnimation
-          primaryColor={primaryColor}
-          accentColor={accentColor}
-          backgroundColor={activeTheme?.backgroundColor || '#fad5d9'}
-          onNavigateToProducts={() => navigate('/products')}
-        />
-      </div>
+      {/* 0. 3D SCROLL UNBOXING ANIMATION — Controlled by Super Admin */}
+      {superAdminControl.isHeroScrollAnimationEnabled !== false && (
+        <div style={{ width: '100%', margin: '0 auto' }}>
+          <HeroScrollAnimation
+            primaryColor={primaryColor}
+            accentColor={accentColor}
+            backgroundColor={activeTheme?.backgroundColor || '#fad5d9'}
+            onNavigateToProducts={() => navigate('/products')}
+          />
+        </div>
+      )}
 
       {/* 1. SEAMLESS BLENDED HERO BANNER WITH ANIMATED FLOATING HEARTS */}
       {superAdminControl.isHeroBannerEnabled !== false && (
