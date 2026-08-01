@@ -551,8 +551,9 @@ const CustomerLayout = () => {
             padding: '0 24px',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'flex-start',
+            justifyContent: 'center',
             gap: '20px',
+            flexWrap: 'wrap',
             boxSizing: 'border-box'
           }}>
             <Link to="/" style={{
