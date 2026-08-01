@@ -302,38 +302,85 @@ const SuperAdminManagement = () => {
   return (
     <Space direction="vertical" size={24} style={{ width: '100%' }}>
       {/* Header */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
-        <div>
-          <Title level={3} style={{ margin: 0, fontWeight: 800, display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <CrownOutlined style={{ color: '#722ed1' }} /> Super Admin Control Console
-          </Title>
-          <Text type="secondary" style={{ fontSize: '13px' }}>
-            Manage core system menu visibilities and feature access switches.
-          </Text>
+      <div style={{
+        display: 'flex',
+        justify: 'space-between',
+        alignItems: isMobile ? 'flex-start' : 'center',
+        flexDirection: isMobile ? 'column' : 'row',
+        gap: '16px',
+        background: '#ffffff',
+        padding: isMobile ? '14px' : '20px',
+        borderRadius: '16px',
+        border: '1px solid #f0f0f0',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.03)'
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{
+            width: '44px',
+            height: '44px',
+            borderRadius: '12px',
+            background: 'linear-gradient(135deg, #722ed1 0%, #1890ff 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            boxShadow: '0 4px 12px rgba(114, 46, 209, 0.25)',
+            flexShrink: 0
+          }}>
+            <CrownOutlined style={{ fontSize: '22px', color: '#fff' }} />
+          </div>
+          <div>
+            <Title level={4} style={{ margin: 0, fontWeight: 800, fontSize: isMobile ? '17px' : '20px', color: '#1f1f1f' }}>
+              Super Admin Control Console
+            </Title>
+            <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '2px' }}>
+              Manage core system menu visibilities and feature access switches.
+            </Text>
+          </div>
         </div>
 
-        <Space size={12}>
-          <Button icon={<ReloadOutlined />} onClick={fetchControls} loading={loadingControls}>
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '8px',
+          flexWrap: 'wrap',
+          width: isMobile ? '100%' : 'auto',
+          justifyContent: isMobile ? 'flex-start' : 'flex-end'
+        }}>
+          <Button
+            icon={<ReloadOutlined />}
+            onClick={fetchControls}
+            loading={loadingControls}
+            size={isMobile ? 'small' : 'default'}
+            style={{ borderRadius: '8px' }}
+          >
             Refresh
           </Button>
-          <Button icon={<LockOutlined />} onClick={handleLock} danger style={{ borderRadius: '8px' }}>
-            Lock Session
+          <Button
+            icon={<LockOutlined />}
+            onClick={handleLock}
+            danger
+            size={isMobile ? 'small' : 'default'}
+            style={{ borderRadius: '8px' }}
+          >
+            Lock
           </Button>
           <Button
             type="primary"
             icon={<SaveOutlined />}
             loading={savingControls}
             onClick={handleSaveControls}
+            size={isMobile ? 'small' : 'default'}
             style={{
               borderRadius: '8px',
               background: 'linear-gradient(135deg, #722ed1, #1890ff)',
               borderColor: 'transparent',
-              fontWeight: 700
+              fontWeight: 700,
+              flex: isMobile ? 1 : 'none'
             }}
           >
             Save Control Flags
           </Button>
-        </Space>
+        </div>
       </div>
 
       {loadingControls ? (
