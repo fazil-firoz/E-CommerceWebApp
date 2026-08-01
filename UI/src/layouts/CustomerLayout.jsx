@@ -276,8 +276,9 @@ const CustomerLayout = () => {
       {/* Dynamic theme style injection */}
       <style>{menuThemeStyle}</style>
       {/* =============================================== */}
-      {/* UNIFIED STICKY NAVBAR — shown on ALL pages     */}
+      {/* STICKY NAVBAR — shown on all pages EXCEPT home  */}
       {/* =============================================== */}
+      {!isHomePage && (
       <Header className="mobile-header-padding" style={{
         display: 'flex',
         justifyContent: 'space-between',
@@ -429,6 +430,7 @@ const CustomerLayout = () => {
           )}
         </Space>
       </Header>
+      )}
 
 
 
