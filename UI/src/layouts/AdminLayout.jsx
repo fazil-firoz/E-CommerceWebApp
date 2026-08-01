@@ -231,27 +231,27 @@ const AdminLayout = () => {
       <Layout>
         <Header style={{
           background: '#fff',
-          padding: '0 24px',
+          padding: '0 16px',
           height: '64px',
           display: 'flex',
-          justify: 'space-between',
+          justifyContent: 'space-between',
           alignItems: 'center',
           boxShadow: '0 1px 4px rgba(0, 0, 0, 0.08)',
           zIndex: 10
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Typography.Text strong style={{ fontSize: '15px', color: '#001529' }}>
-              ⚙️ Admin Console
+              ⚙️ <span className="mobile-hide-text">Admin Console</span>
             </Typography.Text>
           </div>
 
-          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '16px' }}>
+          <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Button
               icon={<HomeOutlined />}
               onClick={() => navigate('/')}
               style={{ borderRadius: '6px', display: 'flex', alignItems: 'center' }}
             >
-              View Storefront
+              <span className="mobile-hide-text">View Storefront</span>
             </Button>
 
             <Dropdown menu={{ items: adminProfileDropdownItems }} trigger={['click']} placement="bottomRight">
@@ -259,9 +259,9 @@ const AdminLayout = () => {
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  gap: '8px',
+                  gap: '6px',
                   background: '#f5f5f5',
-                  padding: '6px 14px',
+                  padding: '4px 10px',
                   borderRadius: '20px',
                   cursor: 'pointer',
                   border: '1px solid #e8e8e8',
@@ -280,12 +280,13 @@ const AdminLayout = () => {
         </Header>
 
         <Content style={{
-          margin: '24px',
-          padding: '24px',
+          margin: '12px',
+          padding: '16px',
           background: '#fff',
           borderRadius: '8px',
           minHeight: '280px',
-          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)'
+          boxShadow: '0 1px 3px rgba(0, 0, 0, 0.05)',
+          overflowX: 'auto'
         }}>
           <Outlet />
         </Content>

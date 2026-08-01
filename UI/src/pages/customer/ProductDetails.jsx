@@ -263,7 +263,7 @@ Could you please confirm availability and details? Thank you!`;
 
             {/* Thumbnails Row */}
             {product.imageUrls?.length > 1 && (
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', gap: '12px', flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: '4px', WebkitOverflowScrolling: 'touch' }}>
                 {product.imageUrls.map((url, index) => (
                   <div
                     key={index}

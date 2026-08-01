@@ -429,6 +429,7 @@ const ProductManagement = () => {
         rowKey="id"
         loading={loading}
         pagination={{ pageSize: 8 }}
+        scroll={{ x: 850 }}
       />
 
       <Modal
@@ -439,7 +440,7 @@ const ProductManagement = () => {
         confirmLoading={loading}
         destroyOnClose
         width={650}
-        style={{ borderRadius: '16px' }}
+        style={{ borderRadius: '16px', maxWidth: '95vw' }}
       >
         <Form
           form={form}

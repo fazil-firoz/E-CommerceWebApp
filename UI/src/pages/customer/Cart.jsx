@@ -128,7 +128,11 @@ const Cart = () => {
       {/* Table Side */}
       <Col xs={24} lg={16}>
         <Card
-          style={{ borderRadius: '24px', boxShadow: '0 8px 24px rgba(0,0,0,0.02)', border: '1px solid #f0f0f0' }}
+          style={{
+            borderRadius: '24px',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.03)',
+            border: '1px solid rgba(0,0,0,0.06)'
+          }}
           title={
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Title level={4} style={{ margin: 0, fontWeight: 700 }}>
@@ -140,7 +144,7 @@ const Cart = () => {
                 okText="Yes"
                 cancelText="No"
               >
-                <Button type="link" danger>
+                <Button type="link" danger style={{ fontWeight: 600 }}>
                   Clear Cart
                 </Button>
               </Popconfirm>
@@ -152,6 +156,7 @@ const Cart = () => {
             columns={columns}
             pagination={false}
             size="middle"
+            scroll={{ x: 600 }}
           />
         </Card>
       </Col>
@@ -161,8 +166,8 @@ const Cart = () => {
         <Card
           style={{ 
             borderRadius: '24px', 
-            boxShadow: '0 8px 24px rgba(0,0,0,0.02)', 
-            border: '1px solid #f0f0f0',
+            boxShadow: '0 8px 24px rgba(0,0,0,0.03)', 
+            border: '1px solid rgba(0,0,0,0.06)',
             position: 'sticky',
             top: '84px'
           }}

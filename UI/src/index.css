@@ -183,3 +183,79 @@ code {
   color: #ff4d4f !important;
   animation: heartPopScale 0.45s ease-in-out;
 }
+
+/* Mobile Responsiveness & Polish Utilities */
+.table-responsive-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 1rem;
+}
+
+.table-responsive-wrapper table {
+  white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+  .ant-layout-content {
+    padding: 12px !important;
+  }
+  
+  .ant-modal {
+    max-width: 95vw !important;
+    margin: 10px auto !important;
+  }
+
+  .ant-modal-body {
+    padding: 16px !important;
+  }
+
+  .admin-card-header-actions {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 8px !important;
+  }
+  
+  .admin-card-header-actions > * {
+    width: 100% !important;
+  }
+
+  .mobile-grid-2-col {
+    display: grid !important;
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 10px !important;
+  }
+  
+  .mobile-compact-card .ant-card-body {
+    padding: 10px !important;
+  }
+
+  .mobile-product-title {
+    font-size: 13px !important;
+    line-height: 1.3 !important;
+    height: 34px !important;
+    overflow: hidden !important;
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+  }
+
+  .mobile-product-price {
+    font-size: 14px !important;
+    font-weight: 700 !important;
+  }
+  
+  .mobile-product-mrp {
+    font-size: 11px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .ant-btn {
+    font-size: 13px !important;
+  }
+  
+  .mobile-hide-text {
+    display: none !important;
+  }
+}

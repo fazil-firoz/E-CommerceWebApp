@@ -154,7 +154,7 @@ const Home = () => {
     const zoom = mainImage?.zoomScale || 1.0;
 
     return (
-      <Col xs={24} sm={12} md={8} lg={6} key={prod.id}>
+      <Col xs={12} sm={12} md={8} lg={6} key={prod.id}>
         <Card
           hoverable
           cover={

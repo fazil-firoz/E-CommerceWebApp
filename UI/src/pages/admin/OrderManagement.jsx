@@ -758,7 +758,7 @@ const OrderManagement = () => {
         </Row>
       </Card>
 
-      <Table dataSource={orders} columns={columns} rowKey="id" loading={loading} pagination={{ pageSize: 10 }} />
+      <Table dataSource={orders} columns={columns} rowKey="id" loading={loading} pagination={{ pageSize: 10 }} scroll={{ x: 900 }} />
 
       {/* Discrete Super Admin Master Settings Button */}
       <div style={{ display: 'flex', justifyContent: 'flex-start', marginTop: '4px' }}>
@@ -803,6 +803,7 @@ const OrderManagement = () => {
         onCancel={() => setModalOpen(false)}
         footer={null}
         width={780}
+        style={{ maxWidth: '95vw' }}
       >
         {selectedOrder && (
           <Space direction="vertical" size={20} style={{ width: '100%', marginTop: '16px' }}>

@@ -102,10 +102,11 @@
 
 /* Payment box */
 .checkout-payment-box {
-  border: 2px solid var(--checkout-primary, #0066cc);
-  border-radius: 10px;
-  padding: 16px;
-  background: color-mix(in srgb, var(--checkout-primary, #0066cc) 8%, white);
+  border: 1.5px solid var(--checkout-primary, #0066cc);
+  border-radius: 12px;
+  padding: 18px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
 }
 
 /* Billing */
@@ -113,15 +114,18 @@
   display: flex;
   align-items: center;
   gap: 12px;
-  border: 1px solid #d9d9d9;
-  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
   padding: 14px 16px;
   cursor: pointer;
+  background: #ffffff;
+  transition: all 0.2s ease;
 }
 
 .checkout-billing-selected {
   border-color: var(--checkout-primary, #0066cc);
-  background: color-mix(in srgb, var(--checkout-primary, #0066cc) 8%, white);
+  background: #f8fafc;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
 .checkout-radio-dot {
