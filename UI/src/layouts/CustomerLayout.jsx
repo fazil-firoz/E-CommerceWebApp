@@ -32,6 +32,7 @@ const CustomerLayout = () => {
   const location = useLocation();
 
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const [shopSettings, setShopSettings] = useState(null);
   const [superAdminControl, setSuperAdminControl] = useState({
     isWhatsAppFloatingWidgetEnabled: true
@@ -294,19 +295,24 @@ const CustomerLayout = () => {
         transition: 'all 0.3s ease'
       }}>
         {/* Brand Logo & Name (Styled matching ELLA LUMIA signboard) */}
-        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '12px' }} onClick={() => navigate('/')}>
-          {logoUrl ? (
-            <img src={logoUrl} alt={shopName} style={{ maxHeight: '44px', maxWidth: '140px', objectFit: 'contain' }} />
+        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '10px' }} onClick={() => navigate('/')}>
+          {logoUrl && !logoError ? (
+            <img
+              src={logoUrl}
+              alt={shopName}
+              onError={() => setLogoError(true)}
+              style={{ maxHeight: '40px', maxWidth: '120px', objectFit: 'contain' }}
+            />
           ) : (
             <div style={{
               background: `linear-gradient(135deg, ${activeTheme?.primaryColor || '#ff6584'} 0%, ${activeTheme?.secondaryColor || '#ff85c0'} 100%)`,
-              width: '42px', height: '42px',
-              borderRadius: '12px',
+              width: '38px', height: '38px',
+              borderRadius: '10px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: `0 4px 12px ${activeTheme?.primaryColor || '#ff6584'}40`,
               flexShrink: 0
             }}>
-              <ShopOutlined style={{ color: '#fff', fontSize: '22px' }} />
+              <ShopOutlined style={{ color: '#fff', fontSize: '20px' }} />
             </div>
           )}
           <Typography.Title level={4} className="store-brand-title" style={{

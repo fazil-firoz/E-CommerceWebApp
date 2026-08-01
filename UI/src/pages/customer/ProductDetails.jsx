@@ -250,12 +250,9 @@ Could you please confirm availability and details? Thank you!`;
                     </div>
                   ))
                 ) : (
-                  <div style={{ height: '400px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
-                    <img
-                      src="https://via.placeholder.com/400?text=No+Image"
-                      alt="placeholder"
-                      style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', margin: '0 auto' }}
-                    />
+                  <div style={{ height: '350px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', borderRadius: '16px', color: '#94a3b8' }}>
+                    <ShopOutlined style={{ fontSize: '48px', color: primaryColor, opacity: 0.6, marginBottom: '12px' }} />
+                    <Text style={{ fontSize: '14px', color: '#64748b', fontWeight: 600 }}>No Product Image Available</Text>
                   </div>
                 )}
               </Carousel>
@@ -281,6 +278,7 @@ Could you please confirm availability and details? Thank you!`;
                       background: '#fff',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                       padding: '4px',
+                      flexShrink: 0,
                       transition: 'border-color 0.2s'
                     }}
                   >
@@ -288,6 +286,7 @@ Could you please confirm availability and details? Thank you!`;
                       src={resolveProductImageUrl(url, 'thumb')}
                       alt={`preview ${index}`}
                       loading="lazy"
+                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
                       style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
                     />
                   </div>
@@ -302,23 +301,23 @@ Could you please confirm availability and details? Thank you!`;
           <Space direction="vertical" size={20} style={{ width: '100%' }}>
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Tag style={{ borderRadius: '4px', fontSize: '13px', padding: '2px 10px', background: `${primaryColor}18`, color: primaryColor, border: `1px solid ${primaryColor}40` }}>
+                <Tag style={{ borderRadius: '20px', fontSize: '12px', padding: '4px 12px', background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', fontWeight: 600 }}>
                   {product.categoryName}
                 </Tag>
                 <Space size={8}>
                   <Button
                     type="text"
-                    icon={<WhatsAppOutlined style={{ fontSize: '18px', color: '#25D366' }} />}
+                    icon={<WhatsAppOutlined style={{ fontSize: '16px', color: '#25D366' }} />}
                     onClick={handleWhatsAppEnquiry}
                     style={{
-                      borderRadius: '8px',
-                      color: '#25D366',
+                      borderRadius: '20px',
+                      color: '#15803d',
                       fontWeight: 700,
-                      background: '#25D36615',
-                      border: '1px solid #25D36635',
+                      background: '#f0fdf4',
+                      border: '1px solid #bbf7d0',
                       display: 'inline-flex',
                       alignItems: 'center',
-                      gap: '5px',
+                      gap: '4px',
                       fontSize: '13px'
                     }}
                   >
@@ -326,9 +325,9 @@ Could you please confirm availability and details? Thank you!`;
                   </Button>
                   <Button
                     type="text"
-                    icon={<ShareAltOutlined style={{ fontSize: '18px', color: primaryColor }} />}
+                    icon={<ShareAltOutlined style={{ fontSize: '16px', color: primaryColor }} />}
                     onClick={handleShareProduct}
-                    style={{ borderRadius: '8px', color: primaryColor, fontWeight: 600 }}
+                    style={{ borderRadius: '20px', color: primaryColor, fontWeight: 600, background: `${primaryColor}10` }}
                   >
                     Share
                   </Button>
@@ -345,24 +344,24 @@ Could you please confirm availability and details? Thank you!`;
                 </Text>
                 {product.mrp > product.price && (
                   <>
-                    <Text delete style={{ color: '#bfbfbf', fontSize: '18px', marginLeft: '8px' }}>
+                    <Text delete style={{ color: '#94a3b8', fontSize: '18px', marginLeft: '8px' }}>
                       ₹{product.mrp.toLocaleString('en-IN')}
                     </Text>
-                    <Text style={{ color: '#52c41a', fontWeight: 600, marginLeft: '8px', fontSize: '15px' }}>
+                    <Text style={{ color: '#16a34a', fontWeight: 700, marginLeft: '8px', fontSize: '15px' }}>
                       ({Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF)
                     </Text>
                   </>
                 )}
               </Space>
-              <Text type="secondary" style={{ fontSize: '12px', display: 'block', color: '#8c8c8c', marginTop: '2px' }}>
+              <Text type="secondary" style={{ fontSize: '12px', display: 'block', color: '#64748b', marginTop: '2px' }}>
                 Inclusive of all taxes
               </Text>
             </div>
 
-            <Card style={{ background: `${primaryColor}08`, borderRadius: '12px', border: `1px dashed ${primaryColor}40` }} styles={{ body: { padding: '16px' } }}>
+            <Card style={{ background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }} styles={{ body: { padding: '14px 16px' } }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text strong style={{ color: '#595959' }}>Availability Status:</Text>
-                <Tag color={isOutOfStock ? 'red' : product.stockQuantity < 5 ? 'orange' : 'green'} style={{ fontWeight: 'bold' }}>
+                <Text strong style={{ color: '#475569' }}>Availability Status:</Text>
+                <Tag color={isOutOfStock ? 'red' : product.stockQuantity < 5 ? 'orange' : 'green'} style={{ fontWeight: 'bold', borderRadius: '12px', padding: '2px 10px' }}>
                   {isOutOfStock
                     ? 'Out of Stock'
                     : product.stockQuantity < 5
@@ -374,15 +373,15 @@ Could you please confirm availability and details? Thank you!`;
             </Card>
 
             <div>
-              <Text strong style={{ color: '#262626', fontSize: '15px' }}>Description:</Text>
-              <Paragraph style={{ color: '#595959', marginTop: '6px', fontSize: '15px', lineHeight: '1.6' }}>
+              <Text strong style={{ color: '#1e293b', fontSize: '15px' }}>Description:</Text>
+              <Paragraph style={{ color: '#475569', marginTop: '6px', fontSize: '15px', lineHeight: '1.6' }}>
                 {product.description || 'No description provided for this toy. Let your imagination discover its features!'}
               </Paragraph>
             </div>
 
             {!isOutOfStock && (
               <div>
-                <Text strong style={{ color: '#262626', fontSize: '15px', display: 'block', marginBottom: '8px' }}>
+                <Text strong style={{ color: '#1e293b', fontSize: '15px', display: 'block', marginBottom: '8px' }}>
                   Select Quantity:
                 </Text>
                 <InputNumber
@@ -396,8 +395,8 @@ Could you please confirm availability and details? Thank you!`;
               </div>
             )}
 
-            {/* Action Buttons Row */}
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', marginTop: '16px' }}>
+            {/* Action Buttons Row — 50/50 Side-by-Side Flex Layout */}
+            <div style={{ display: 'flex', gap: '12px', marginTop: '16px', width: '100%' }}>
               <Button
                 type="primary"
                 ghost
@@ -406,8 +405,12 @@ Could you please confirm availability and details? Thank you!`;
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
                 style={{
-                  height: '48px', minWidth: '150px', borderRadius: '12px', fontWeight: 600,
-                  borderColor: primaryColor, color: primaryColor
+                  flex: 1,
+                  height: '48px',
+                  borderRadius: '12px',
+                  fontWeight: 700,
+                  borderColor: primaryColor,
+                  color: primaryColor
                 }}
               >
                 Add To Cart
@@ -419,7 +422,10 @@ Could you please confirm availability and details? Thank you!`;
                 onClick={handleBuyNow}
                 disabled={isOutOfStock}
                 style={{
-                  height: '48px', minWidth: '150px', borderRadius: '12px', fontWeight: 600,
+                  flex: 1,
+                  height: '48px',
+                  borderRadius: '12px',
+                  fontWeight: 700,
                   background: isOutOfStock ? undefined : `linear-gradient(135deg, ${primaryColor} 0%, ${accentColor} 100%)`,
                   border: 'none',
                   boxShadow: isOutOfStock ? 'none' : `0 4px 15px ${primaryColor}40`
