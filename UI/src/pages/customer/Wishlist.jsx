@@ -97,7 +97,7 @@ const Wishlist = () => {
                     <Tag color="blue" style={{ fontSize: '11px', borderRadius: '4px', marginBottom: '6px' }}>
                       {prod.categoryName || 'Toy'}
                     </Tag>
-                    <Text strong style={{ fontSize: '15px', display: 'block', height: '42px', overflow: 'hidden' }}>
+                    <Text strong style={{ fontSize: '15px', display: 'block', height: '42px', overflow: 'hidden', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
                       {prod.name}
                     </Text>
 

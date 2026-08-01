@@ -255,7 +255,7 @@ const Home = () => {
           styles={{ body: { padding: '12px' } }}
         >
           <div onClick={() => navigate(`/products/${prod.id}`)} style={{ cursor: 'pointer', marginBottom: '10px' }}>
-            <Text strong style={{ fontSize: '14px', color: textColor, display: 'block', marginBottom: '4px', lineHeight: 1.3, height: '36px', overflow: 'hidden' }}>
+            <Text strong style={{ fontSize: '14px', color: textColor, display: 'block', marginBottom: '4px', lineHeight: 1.3, height: '36px', overflow: 'hidden', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
               {prod.name}
             </Text>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>

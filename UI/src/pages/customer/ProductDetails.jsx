@@ -526,7 +526,7 @@ Could you please confirm availability and details? Thank you!`;
             style={{ width: '60px', height: '60px', objectFit: 'contain', borderRadius: '8px', background: '#fff', border: '1px solid #eee' }}
           />
           <div style={{ marginBottom: '16px' }}>
-            <Text strong style={{ fontSize: '15px', display: 'block' }}>{product.name}</Text>
+            <Text strong style={{ fontSize: '15px', display: 'block', textTransform: 'uppercase', letterSpacing: '0.3px' }}>{product.name}</Text>
             <Text strong style={{ color: primaryColor, fontSize: '16px' }}>₹{product.price.toLocaleString('en-IN')}</Text>
           </div>
         </div>

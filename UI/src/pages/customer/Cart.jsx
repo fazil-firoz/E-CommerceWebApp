@@ -208,7 +208,7 @@ const Cart = () => {
                   />
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '8px' }}>
-                      <Text strong style={{ fontSize: '14px', color: '#0f172a', lineHeight: 1.3, display: 'block' }}>
+                      <Text strong style={{ fontSize: '14px', color: '#0f172a', lineHeight: 1.3, display: 'block', textTransform: 'uppercase', letterSpacing: '0.3px' }}>
                         {item.name}
                       </Text>
                       <Popconfirm
