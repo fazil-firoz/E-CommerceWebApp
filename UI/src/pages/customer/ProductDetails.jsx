@@ -337,7 +337,7 @@ Could you please confirm availability and details? Thank you!`;
                 </Tag>
               </div>
 
-              <Title level={2} style={{ margin: '12px 0 8px', fontWeight: 800, color: textColor, fontSize: '24px', lineHeight: 1.3 }}>
+              <Title level={2} style={{ margin: '12px 0 8px', fontWeight: 800, color: textColor, fontSize: '24px', lineHeight: 1.3, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
                 {product.name}
               </Title>
 

@@ -317,7 +317,7 @@ const Checkout = () => {
             <div>
               <Text strong style={{ color: primaryColor, fontSize: '14px' }}>Express Buy Now Checkout</Text>
               <Text type="secondary" style={{ display: 'block', fontSize: '12px' }}>
-                Purchasing <strong>{buyNowItem.name}</strong>. You can adjust quantity below. Main cart items are kept safe.
+                Purchasing <strong style={{ textTransform: 'uppercase' }}>{buyNowItem.name}</strong>. You can adjust quantity below. Main cart items are kept safe.
               </Text>
             </div>
           </div>
@@ -344,7 +344,7 @@ const Checkout = () => {
                   <span className="checkout-item-qty">{item.quantity}</span>
                 </div>
                 <div style={{ flex: 1, paddingRight: '8px' }}>
-                  <Text style={{ fontSize: '14px', display: 'block' }}>{item.name}</Text>
+                  <Text style={{ fontSize: '14px', display: 'block', textTransform: 'uppercase', fontWeight: 600 }}>{item.name}</Text>
                   <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid #d9d9d9', borderRadius: '6px', marginTop: '4px' }}>
                     <Button
                       type="text"
@@ -611,7 +611,7 @@ const Checkout = () => {
                 <span className="checkout-item-qty">{item.quantity}</span>
               </div>
               <div style={{ flex: 1, paddingRight: '8px' }}>
-                <Text strong style={{ fontSize: '14px', display: 'block' }}>{item.name}</Text>
+                <Text strong style={{ fontSize: '14px', display: 'block', textTransform: 'uppercase' }}>{item.name}</Text>
                 <div style={{ display: 'inline-flex', alignItems: 'center', border: '1px solid #d9d9d9', borderRadius: '6px', marginTop: '4px' }}>
                   <Button
                     type="text"

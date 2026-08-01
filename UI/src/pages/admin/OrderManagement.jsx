@@ -234,7 +234,7 @@ const OrderManagement = () => {
       itemRowsHtml += `
         <tr>
           <td style="text-align: center;">${index + 1}</td>
-          <td><strong>${item.productName || 'Toy Item'}</strong></td>
+          <td><strong style="text-transform: uppercase;">${(item.productName || 'Toy Item').toUpperCase()}</strong></td>
           <td style="text-align: center;"><strong>${qty}</strong></td>
           <td style="text-align: right;">₹${unitPrice.toLocaleString('en-IN')}</td>
           <td style="text-align: right; font-weight: 700; color: #111827;">₹${lineTotal.toLocaleString('en-IN')}</td>
@@ -904,7 +904,7 @@ const OrderManagement = () => {
                 rowKey="productId"
                 size="small"
                 columns={[
-                  { title: 'Toy Product', dataIndex: 'productName', key: 'productName' },
+                  { title: 'Toy Product', dataIndex: 'productName', key: 'productName', render: (val) => <Text strong style={{ textTransform: 'uppercase' }}>{val}</Text> },
                   { title: 'Qty', dataIndex: 'quantity', key: 'quantity', align: 'center', render: (val) => <Text strong>{val}</Text> },
                   { title: 'Unit Price', dataIndex: 'unitPrice', key: 'unitPrice', align: 'right', render: (val) => `₹${val.toLocaleString('en-IN')}` },
                   { title: 'Total', dataIndex: 'totalPrice', key: 'totalPrice', align: 'right', render: (val) => <Text strong>₹{val.toLocaleString('en-IN')}</Text> },
