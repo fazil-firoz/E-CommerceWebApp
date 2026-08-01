@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { useScroll, useTransform, motion, useSpring, useMotionValueEvent, AnimatePresence } from 'framer-motion';
 
 // ─── Exact PNG file list present in UI/public/Images/Animation ───────────────
-const FRAME_FILES = Array.from({ length: 54 }, (_, i) => `frame_${String(i + 1).padStart(3, '0')}.png`).concat(['frame_056.png']);
+const FRAME_FILES = Array.from({ length: 79 }, (_, i) => `frame_${String(i + 1).padStart(3, '0')}.png`).concat(['frame_081.png']);
 const TOTAL_FRAMES = FRAME_FILES.length;
 const framePaths   = FRAME_FILES.map(f => `/Images/Animation/${f}`);
 
@@ -132,22 +132,22 @@ export default function HeroScrollAnimation({
     if (canvasRatio > imgRatio) {
       drawH = h;
       drawW = h * imgRatio;
-      drawX = (w - drawW) / 2 - (drawW * 0.16); // Lean over to the left
+      drawX = (w - drawW) / 2; // Centered
     } else {
       drawW = w;
       drawH = w / imgRatio;
       drawY = (h - drawH) / 2;
-      drawX = - (drawW * 0.16); // Lean over to the left
+      drawX = (w - drawW) / 2; // Centered
     }
 
     // Draw cropped image cleanly with optical centering
     ctx.drawImage(img, sx, sy, imgW, imgH, drawX, drawY, drawW, drawH);
 
     // 3. Radial edge-feathering centered on the gift box position
-    const centerX = drawX + drawW * 0.61; // Center feathering on the 3D gift box location
+    const centerX = drawX + drawW * 0.5; // Center feathering
     const centerY = drawY + drawH / 2;
-    const innerRadius = Math.min(drawW, drawH) * 0.26;
-    const outerRadius = Math.max(drawW, drawH) * 0.48;
+    const innerRadius = Math.min(drawW, drawH) * 0.28;
+    const outerRadius = Math.max(drawW, drawH) * 0.50;
 
     const gradient = ctx.createRadialGradient(centerX, centerY, innerRadius, centerX, centerY, outerRadius);
     gradient.addColorStop(0, 'rgba(250, 213, 217, 0)');
