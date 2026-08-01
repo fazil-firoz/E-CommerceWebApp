@@ -227,7 +227,7 @@ const ProductListing = () => {
               </Empty>
             </Card>
           ) : (
-            <Row gutter={[20, 20]}>
+            <Row gutter={[{ xs: 8, sm: 12, md: 16, lg: 20 }, { xs: 10, sm: 14, md: 18, lg: 20 }]}>
               {products.map((prod) => (
                 <Col xs={12} sm={12} lg={8} key={prod.id}>
                   <Card

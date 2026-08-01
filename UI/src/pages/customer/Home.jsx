@@ -712,7 +712,7 @@ const Home = () => {
             </Link>
           </div>
 
-          <Row gutter={[20, 20]}>
+          <Row gutter={[{ xs: 8, sm: 12, md: 16, lg: 20 }, { xs: 10, sm: 14, md: 18, lg: 20 }]}>
             {featuredProducts.map(renderProductCard)}
           </Row>
         </div>
@@ -730,7 +730,7 @@ const Home = () => {
             </Link>
           </div>
 
-          <Row gutter={[20, 20]}>
+          <Row gutter={[{ xs: 8, sm: 12, md: 16, lg: 20 }, { xs: 10, sm: 14, md: 18, lg: 20 }]}>
             {displayNewArrivals.map(renderProductCard)}
           </Row>
         </div>
@@ -748,7 +748,7 @@ const Home = () => {
             </Link>
           </div>
 
-          <Row gutter={[20, 20]}>
+          <Row gutter={[{ xs: 8, sm: 12, md: 16, lg: 20 }, { xs: 10, sm: 14, md: 18, lg: 20 }]}>
             {displayBestSellers.map(renderProductCard)}
           </Row>
         </div>

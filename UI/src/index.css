@@ -215,7 +215,7 @@ code {
   }
 
   .ant-layout-content {
-    padding: 12px !important;
+    padding: 8px 6px 32px !important;
   }
   
   .ant-modal {
