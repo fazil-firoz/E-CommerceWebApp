@@ -279,48 +279,48 @@ const CustomerLayout = () => {
       {/* STICKY NAVBAR — shown on all pages EXCEPT home  */}
       {/* =============================================== */}
       {!isHomePage && (
-      <Header style={{
+      <Header className="mobile-header-padding" style={{
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
-        height: '72px',
-        lineHeight: '72px',
+        height: '64px',
+        lineHeight: '64px',
         background: '#ffffff',
         boxShadow: '0 2px 10px rgba(0, 0, 0, 0.04)',
         borderBottom: '1px solid #f0f0f0',
-        padding: '0 32px',
+        padding: '0 20px',
         position: 'sticky',
         top: 0,
         zIndex: 1000,
         transition: 'all 0.3s ease'
       }}>
         {/* Brand Logo & Name (Styled matching ELLA LUMIA signboard) */}
-        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '10px' }} onClick={() => navigate('/')}>
+        <div style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '8px' }} onClick={() => navigate('/')}>
           {logoUrl && !logoError ? (
             <img
               src={logoUrl}
               alt={shopName}
               onError={() => setLogoError(true)}
-              style={{ maxHeight: '40px', maxWidth: '120px', objectFit: 'contain' }}
+              style={{ maxHeight: '36px', maxWidth: '100px', objectFit: 'contain' }}
             />
           ) : (
             <div style={{
               background: `linear-gradient(135deg, ${activeTheme?.primaryColor || '#ff6584'} 0%, ${activeTheme?.secondaryColor || '#ff85c0'} 100%)`,
-              width: '38px', height: '38px',
+              width: '34px', height: '34px',
               borderRadius: '10px',
               display: 'flex', alignItems: 'center', justifyContent: 'center',
               boxShadow: `0 4px 12px ${activeTheme?.primaryColor || '#ff6584'}40`,
               flexShrink: 0
             }}>
-              <ShopOutlined style={{ color: '#fff', fontSize: '20px' }} />
+              <ShopOutlined style={{ color: '#fff', fontSize: '18px' }} />
             </div>
           )}
-          <Typography.Title level={4} className="store-brand-title" style={{
+          <Typography.Title level={4} className="store-brand-title mobile-brand-title" style={{
             margin: 0,
             color: '#2d3748',
-            fontSize: '22px',
+            fontSize: '18px',
             fontWeight: 800,
-            letterSpacing: '2.5px',
+            letterSpacing: '1.5px',
             textTransform: 'uppercase',
             whiteSpace: 'nowrap',
             transition: 'color 0.3s ease'
@@ -346,27 +346,27 @@ const CustomerLayout = () => {
         />
 
         {/* Right actions (Perfectly Aligned) */}
-        <Space size={12} align="center">
+        <Space size={8} align="center">
           {/* Customer Login / Avatar */}
           <Tooltip title={isLoggedIn ? `Signed in as ${customer?.email}` : 'Sign in'} placement="bottom">
             <Button
               type="text"
               onClick={() => setLoginDrawerOpen(true)}
               style={{
-                height: '42px',
+                height: '38px',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px',
+                gap: '4px',
                 borderRadius: '10px',
-                padding: '0 12px'
+                padding: '0 6px'
               }}
             >
               {isLoggedIn ? (
                 <Avatar
-                  size={34}
+                  size={30}
                   style={{
                     background: `linear-gradient(135deg, ${activeTheme?.primaryColor || '#ff6584'}, ${activeTheme?.secondaryColor || '#ff85c0'})`,
-                    fontSize: '14px',
+                    fontSize: '13px',
                     fontWeight: 700,
                     cursor: 'pointer'
                   }}
@@ -375,13 +375,13 @@ const CustomerLayout = () => {
                 </Avatar>
               ) : (
                 <div style={{
-                  width: '34px', height: '34px',
+                  width: '30px', height: '30px',
                   border: '2px solid #e0e0e0',
                   borderRadius: '50%',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   color: '#595959'
                 }}>
-                  <UserOutlined style={{ fontSize: '16px' }} />
+                  <UserOutlined style={{ fontSize: '15px' }} />
                 </div>
               )}
             </Button>
@@ -393,10 +393,10 @@ const CustomerLayout = () => {
               <Badge count={wishlistCount} offset={[2, 0]} color={activeTheme?.accentColor || '#ff4d4f'}>
                 <Button
                   type="text"
-                  icon={<HeartFilled style={{ fontSize: '20px', color: activeTheme?.accentColor || '#ff4d4f' }} />}
-                  style={{ height: '42px', display: 'flex', alignItems: 'center', borderRadius: '10px', padding: '0 12px' }}
+                  icon={<HeartFilled style={{ fontSize: '19px', color: activeTheme?.accentColor || '#ff4d4f' }} />}
+                  style={{ height: '38px', display: 'flex', alignItems: 'center', borderRadius: '10px', padding: '0 6px' }}
                 >
-                  <span style={{ marginLeft: '6px', fontWeight: 700, fontSize: '14px', color: activeTheme?.accentColor || '#ff4d4f' }}>Wishlist</span>
+                  <span className="mobile-hide-label" style={{ marginLeft: '4px', fontWeight: 700, fontSize: '13px', color: activeTheme?.accentColor || '#ff4d4f' }}>Wishlist</span>
                 </Button>
               </Badge>
             </Link>
@@ -407,10 +407,10 @@ const CustomerLayout = () => {
             <Badge count={cartCount} offset={[2, 0]} color="#52c41a">
               <Button
                 type="text"
-                icon={<ShoppingCartOutlined style={{ fontSize: '22px', color: activeTheme?.primaryColor || '#1890ff' }} />}
-                style={{ height: '40px', display: 'flex', alignItems: 'center', borderRadius: '8px', padding: '0 10px' }}
+                icon={<ShoppingCartOutlined style={{ fontSize: '21px', color: activeTheme?.primaryColor || '#1890ff' }} />}
+                style={{ height: '38px', display: 'flex', alignItems: 'center', borderRadius: '8px', padding: '0 6px' }}
               >
-                <span style={{ marginLeft: '4px', fontWeight: 600, color: activeTheme?.primaryColor || '#1890ff' }}>Cart</span>
+                <span className="mobile-hide-label" style={{ marginLeft: '4px', fontWeight: 600, color: activeTheme?.primaryColor || '#1890ff' }}>Cart</span>
               </Button>
             </Badge>
           </Link>
@@ -420,11 +420,12 @@ const CustomerLayout = () => {
             <Button
               type="primary"
               ghost
+              size="small"
               icon={<DashboardOutlined />}
               onClick={() => navigate('/admin')}
-              style={{ borderRadius: '8px' }}
+              style={{ borderRadius: '6px' }}
             >
-              Dashboard
+              <span className="mobile-hide-label">Dashboard</span>
             </Button>
           )}
         </Space>
@@ -535,70 +536,107 @@ const CustomerLayout = () => {
       </div>
       )}
 
-      {/* Clean Centered Simple Nav Row — home page only, matching page background */}
-      {isHomePage && (
-        <div style={{
-          display: 'flex',
-          justifyContent: 'center',
+      {/* Clean Centered Simple Nav Row — shown on ALL pages for instant mobile & desktop navigation */}
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        gap: '20px',
+        padding: '10px 16px',
+        background: isHomePage ? (activeTheme?.backgroundColor || '#fff5f7') : '#ffffff',
+        borderBottom: `1px solid ${primaryColor}18`,
+        boxShadow: '0 2px 6px rgba(0,0,0,0.02)'
+      }}>
+        <Link to="/" style={{
+          color: location.pathname === '/' ? primaryColor : '#475569',
+          fontWeight: location.pathname === '/' ? 800 : 600,
+          fontSize: '14px',
+          display: 'inline-flex',
           alignItems: 'center',
-          gap: '24px',
-          padding: '10px 16px 8px',
-          background: activeTheme?.backgroundColor || '#fff5f7',
-          borderBottom: `1px solid ${primaryColor}12`,
+          gap: '5px',
+          borderBottom: location.pathname === '/' ? `2px solid ${primaryColor}` : '2px solid transparent',
+          paddingBottom: '2px'
         }}>
-          <Link to="/" style={{ color: '#2d3748', fontWeight: 700, fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <HomeOutlined style={{ color: primaryColor, fontSize: '16px' }} /> Home
-          </Link>
+          <HomeOutlined style={{ color: primaryColor, fontSize: '15px' }} /> Home
+        </Link>
 
-          <Link to="/products" style={{ color: '#2d3748', fontWeight: 700, fontSize: '14px', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
-            <ShopOutlined style={{ color: primaryColor, fontSize: '16px' }} /> Products
-          </Link>
+        <Link to="/products" style={{
+          color: location.pathname.startsWith('/products') ? primaryColor : '#475569',
+          fontWeight: location.pathname.startsWith('/products') ? 800 : 600,
+          fontSize: '14px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '5px',
+          borderBottom: location.pathname.startsWith('/products') ? `2px solid ${primaryColor}` : '2px solid transparent',
+          paddingBottom: '2px'
+        }}>
+          <ShopOutlined style={{ color: primaryColor, fontSize: '15px' }} /> Products
+        </Link>
 
-          <span style={{ color: '#cbd5e1', fontWeight: 300, fontSize: '14px' }}>|</span>
+        <span style={{ color: '#cbd5e1', fontWeight: 300, fontSize: '14px' }}>|</span>
 
-          {/* User Sign in / Profile Icon */}
-          <Tooltip title={isLoggedIn ? `Signed in as ${customer?.email}` : 'Sign in'}>
-            <div
-              onClick={() => setLoginDrawerOpen(true)}
-              style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center' }}
-            >
-              {isLoggedIn ? (
-                <Avatar size={26} style={{ background: primaryColor, fontSize: '12px', fontWeight: 700 }}>
-                  {customer?.name?.[0]?.toUpperCase()}
-                </Avatar>
-              ) : (
-                <UserOutlined style={{ fontSize: '18px', color: '#475569' }} />
-              )}
-            </div>
-          </Tooltip>
-
-          {/* Wishlist Icon */}
-          {superAdminControl.isWishlistEnabled !== false && (
-            <Link to="/wishlist" style={{ display: 'inline-flex', alignItems: 'center' }}>
-              <Badge count={wishlistCount} size="small" color={activeTheme?.accentColor || '#ff4d4f'}>
-                <HeartFilled style={{ fontSize: '18px', color: activeTheme?.accentColor || '#ff4d4f' }} />
-              </Badge>
-            </Link>
-          )}
-
-          {/* Cart Icon */}
-          <Link to="/cart" style={{ display: 'inline-flex', alignItems: 'center' }}>
-            <Badge count={cartCount} size="small" color={primaryColor}>
-              <ShoppingCartOutlined style={{ fontSize: '20px', color: primaryColor }} />
+        {/* Wishlist Link */}
+        {superAdminControl.isWishlistEnabled !== false && (
+          <Link to="/wishlist" style={{
+            color: location.pathname === '/wishlist' ? (activeTheme?.accentColor || '#ff4d4f') : '#475569',
+            fontWeight: location.pathname === '/wishlist' ? 800 : 600,
+            fontSize: '14px',
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: '5px',
+            borderBottom: location.pathname === '/wishlist' ? `2px solid ${activeTheme?.accentColor || '#ff4d4f'}` : '2px solid transparent',
+            paddingBottom: '2px'
+          }}>
+            <Badge count={wishlistCount} size="small" color={activeTheme?.accentColor || '#ff4d4f'}>
+              <HeartFilled style={{ fontSize: '16px', color: activeTheme?.accentColor || '#ff4d4f' }} />
             </Badge>
+            Wishlist
           </Link>
+        )}
 
-          {/* Admin shortcut */}
-          {isAuthenticated && (
-            <Tooltip title="Admin Dashboard">
-              <DashboardOutlined
-                onClick={() => navigate('/admin')}
-                style={{ fontSize: '17px', color: '#64748b', cursor: 'pointer' }}
-              />
-            </Tooltip>
-          )}
-        </div>
-      )}
+        {/* Cart Link */}
+        <Link to="/cart" style={{
+          color: location.pathname === '/cart' ? primaryColor : '#475569',
+          fontWeight: location.pathname === '/cart' ? 800 : 600,
+          fontSize: '14px',
+          display: 'inline-flex',
+          alignItems: 'center',
+          gap: '5px',
+          borderBottom: location.pathname === '/cart' ? `2px solid ${primaryColor}` : '2px solid transparent',
+          paddingBottom: '2px'
+        }}>
+          <Badge count={cartCount} size="small" color="#52c41a">
+            <ShoppingCartOutlined style={{ fontSize: '17px', color: primaryColor }} />
+          </Badge>
+          Cart
+        </Link>
+
+        {/* User Sign in / Profile Icon */}
+        <Tooltip title={isLoggedIn ? `Signed in as ${customer?.email}` : 'Sign in'}>
+          <div
+            onClick={() => setLoginDrawerOpen(true)}
+            style={{ cursor: 'pointer', display: 'inline-flex', alignItems: 'center', marginLeft: '4px' }}
+          >
+            {isLoggedIn ? (
+              <Avatar size={24} style={{ background: primaryColor, fontSize: '11px', fontWeight: 700 }}>
+                {customer?.name?.[0]?.toUpperCase()}
+              </Avatar>
+            ) : (
+              <UserOutlined style={{ fontSize: '17px', color: '#475569' }} />
+            )}
+          </div>
+        </Tooltip>
+
+        {/* Admin shortcut */}
+        {isAuthenticated && (
+          <Tooltip title="Admin Dashboard">
+            <DashboardOutlined
+              onClick={() => navigate('/admin')}
+              style={{ fontSize: '16px', color: '#64748b', cursor: 'pointer' }}
+            />
+          </Tooltip>
+        )}
+      </div>
 
       {/* Main Content View */}
       <Content style={{

@@ -197,6 +197,23 @@ code {
 }
 
 @media (max-width: 768px) {
+  .customer-nav {
+    display: none !important;
+  }
+
+  .mobile-header-padding {
+    padding: 0 12px !important;
+  }
+
+  .mobile-brand-title {
+    font-size: 16px !important;
+    letter-spacing: 1px !important;
+  }
+
+  .mobile-hide-label {
+    display: none !important;
+  }
+
   .ant-layout-content {
     padding: 12px !important;
   }
