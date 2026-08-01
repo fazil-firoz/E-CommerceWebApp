@@ -46,6 +46,7 @@ const ProductDetails = () => {
   const carouselRef = useRef(null);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchProduct = async () => {
       try {
         const response = await productApi.getById(id);

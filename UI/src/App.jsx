@@ -1,10 +1,21 @@
-import React from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
 import { CartProvider } from './context/CartContext';
 import { WishlistProvider } from './context/WishlistContext';
 import { AdminAuthProvider as AuthProvider } from './context/AdminAuthContext';
 import { CustomerAuthProvider } from './context/CustomerAuthContext';
 import { ThemeProvider } from './context/ThemeContext';
+
+// Scroll to top automatically on route navigation
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+};
 
 // Layouts
 import CustomerLayout from './layouts/CustomerLayout';
@@ -44,6 +55,7 @@ import SuperAdminManagement from './pages/admin/SuperAdminManagement';
 function App() {
   return (
     <Router>
+      <ScrollToTop />
       <AuthProvider>
         <CustomerAuthProvider>
         <ThemeProvider>

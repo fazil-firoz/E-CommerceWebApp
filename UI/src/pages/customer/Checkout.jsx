@@ -42,6 +42,7 @@ const Checkout = () => {
   const [loginDrawerOpen, setLoginDrawerOpen] = useState(false);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
     const fetchShop = async () => {
       try {
         const res = await shopApi.getSettings();
