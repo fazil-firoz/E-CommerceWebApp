@@ -47,13 +47,17 @@ export default function HeroScrollAnimation({
   });
 
   const smooth = useSpring(scrollYProgress, {
-    stiffness: 130,
-    damping:   26,
+    stiffness: 85,
+    damping:   22,
     restDelta: 0.0005,
   });
 
-  // ── Frame sequence maps over [0, 0.65] scroll so animation finishes early and stays completed
-  const frameIndex   = useTransform(smooth, [0, 0.65], [0, TOTAL_FRAMES - 1]);
+  // ── Multi-stage frame mapping: Gentle opening start -> main explosion -> smooth final completion
+  const frameIndex = useTransform(
+    smooth,
+    [0, 0.12, 0.52, 0.72],
+    [0, 10, 64, TOTAL_FRAMES - 1]
+  );
 
   // ── Side text emerging transforms (animate out from behind video and stay)
   const leftOpacity  = useTransform(smooth, [0.10, 0.38], [0, 1]);
