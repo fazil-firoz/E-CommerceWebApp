@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Table, Button, InputNumber, Space, Typography, Card, Row, Col, Empty, Popconfirm } from 'antd';
-import { DeleteOutlined, ShoppingCartOutlined, ArrowLeftOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons';
+import { DeleteOutlined, ShoppingCartOutlined, ArrowLeftOutlined, PlusOutlined, MinusOutlined, CreditCardOutlined } from '@ant-design/icons';
 import { CartContext } from '../../context/CartContext';
 import { shipmentApi } from '../../api/shipmentApi';
 import { resolveProductImageUrl } from '../../utils/imageHelper';
@@ -222,7 +222,7 @@ const Cart = () => {
                     </div>
 
                     <Text type="secondary" style={{ fontSize: '12px', display: 'block', marginTop: '2px' }}>
-                      Unit Price: ₹{item.price.toLocaleString('en-IN')}
+                      Unit Price: ₹{(item.price || 0).toLocaleString('en-IN')}
                     </Text>
 
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '10px', paddingTop: '8px', borderTop: '1px dashed #f1f5f9' }}>
@@ -252,7 +252,7 @@ const Cart = () => {
                       </div>
 
                       <Text strong style={{ fontSize: '15px', color: '#0f172a' }}>
-                        ₹{(item.price * item.quantity).toLocaleString('en-IN')}
+                        ₹{((item.price || 0) * (item.quantity || 1)).toLocaleString('en-IN')}
                       </Text>
                     </div>
                   </div>
@@ -278,7 +278,7 @@ const Cart = () => {
           <Space direction="vertical" size={16} style={{ width: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
               <Text type="secondary">Subtotal:</Text>
-              <Text strong>₹{cartTotal.toLocaleString('en-IN')}</Text>
+              <Text strong>₹{(cartTotal || 0).toLocaleString('en-IN')}</Text>
             </div>
             
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -286,14 +286,14 @@ const Cart = () => {
               {shippingCharge === 0 ? (
                 <Text type="success" strong>FREE</Text>
               ) : (
-                <Text strong>₹{shippingCharge.toLocaleString('en-IN')}</Text>
+                <Text strong>₹{(shippingCharge || 0).toLocaleString('en-IN')}</Text>
               )}
             </div>
             
             <div style={{ borderTop: '1px solid #f0f0f0', paddingTop: '16px', display: 'flex', justifyContent: 'space-between' }}>
               <Text strong style={{ fontSize: '16px' }}>Grand Total:</Text>
               <Text strong style={{ fontSize: '20px', color: '#ff4d4f' }}>
-                ₹{grandTotal.toLocaleString('en-IN')}
+                ₹{(grandTotal || 0).toLocaleString('en-IN')}
               </Text>
             </div>
 
