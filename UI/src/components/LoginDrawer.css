@@ -298,33 +298,60 @@
 }
 
 /* Responsive Media Queries */
+.login-drawer .ant-drawer-content-wrapper,
+.login-drawer .ant-drawer-content,
+.login-drawer .ant-drawer-body {
+  max-width: 100vw !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+}
+
 @media (max-width: 480px) {
   .login-drawer .ant-drawer-content-wrapper {
     width: 100% !important;
+    max-width: 100vw !important;
+  }
+
+  .login-drawer .ant-drawer-body {
+    padding: 0 !important;
+    overflow-x: hidden !important;
   }
 
   .ld-header {
-    padding: 14px 16px;
+    padding: 12px 14px;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
   }
 
   .ld-body {
-    padding: 16px 14px;
+    padding: 12px 8px;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
+  }
+
+  .ld-logged-in {
+    padding: 10px 4px !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    overflow-x: hidden !important;
   }
 
   .ld-otp-row {
     gap: 6px;
+    max-width: 100% !important;
   }
 
   .ld-otp-box {
-    width: 36px;
+    width: 34px;
     height: 44px;
     font-size: 18px;
-    border-radius: 10px;
+    border-radius: 8px;
   }
 
   .ld-avatar {
-    width: 56px;
-    height: 56px;
+    width: 52px;
+    height: 52px;
     font-size: 20px;
   }
 }

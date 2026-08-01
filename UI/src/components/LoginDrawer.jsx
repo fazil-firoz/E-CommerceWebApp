@@ -205,7 +205,7 @@ const LoginDrawer = ({ open, onClose }) => {
 
   // ── LOGGED IN VIEW WITH 2 TABS ──────────────────────────────────────────
   const renderLoggedIn = () => (
-    <div className="ld-logged-in" style={{ width: '100%', padding: '16px 20px' }}>
+    <div className="ld-logged-in" style={{ width: '100%', maxWidth: '100%', boxSizing: 'border-box', padding: '12px 6px', overflowX: 'hidden' }}>
       {/* Header Profile Info */}
       <div style={{ textAlign: 'center', marginBottom: '20px' }}>
         <div className="ld-avatar" style={{ margin: '0 auto 10px', background: `linear-gradient(135deg, ${primaryColor}, ${secondaryColor})`, boxShadow: `0 6px 18px ${primaryColor}40` }}>
