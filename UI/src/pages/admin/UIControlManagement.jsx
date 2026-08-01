@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Spin } from 'antd';
-import { ControlOutlined, SaveOutlined, ArrowLeftOutlined, PictureOutlined, MessageOutlined, TagOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Card, Row, Col, Typography, message, Space, Spin, Tag, Alert } from 'antd';
+import { ControlOutlined, SaveOutlined, ArrowLeftOutlined, PictureOutlined, MessageOutlined, TagOutlined, StopOutlined } from '@ant-design/icons';
 import { shopApi } from '../../api/shopApi';
+import { superAdminApi } from '../../api/superAdminApi';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
@@ -11,8 +12,25 @@ const UIControlManagement = () => {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [shopData, setShopData] = useState(null);
+  const [superAdminControl, setSuperAdminControl] = useState({
+    isHeroBannerEnabled: true,
+    isBadgeRibbonEnabled: true,
+    isMarqueeEnabled: true,
+    isPromoBannerEnabled: true
+  });
 
   const navigate = useNavigate();
+
+  const fetchSuperAdminControls = async () => {
+    try {
+      const res = await superAdminApi.getControlFlags();
+      if (res.success && res.data) {
+        setSuperAdminControl(res.data);
+      }
+    } catch (err) {
+      console.error('Failed to load Super Admin controls', err);
+    }
+  };
 
   const fetchShopDetails = async () => {
     setLoading(true);
@@ -30,7 +48,11 @@ const UIControlManagement = () => {
   };
 
   useEffect(() => {
+    fetchSuperAdminControls();
     fetchShopDetails();
+
+    window.addEventListener('superAdminControlUpdated', fetchSuperAdminControls);
+    return () => window.removeEventListener('superAdminControlUpdated', fetchSuperAdminControls);
   }, []);
 
   const handleSave = async () => {
@@ -67,6 +89,11 @@ const UIControlManagement = () => {
     );
   }
 
+  const isHeroBannerDisabled = superAdminControl.isHeroBannerEnabled === false;
+  const isBadgeRibbonDisabled = superAdminControl.isBadgeRibbonEnabled === false;
+  const isMarqueeDisabled = superAdminControl.isMarqueeEnabled === false;
+  const isPromoBannerDisabled = superAdminControl.isPromoBannerEnabled === false;
+
   return (
     <Space direction="vertical" size={20} style={{ width: '100%' }}>
       {/* Header */}
@@ -97,52 +124,75 @@ const UIControlManagement = () => {
       <Card style={{ borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.06)' }}>
         <Form form={form} layout="vertical">
           <Space direction="vertical" size={24} style={{ width: '100%' }}>
+            
             {/* Hero Banner Controls */}
             <Card
               title={
-                <Text strong style={{ color: '#1890ff', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <PictureOutlined /> 🌟 Hero Banner Customization (Title, Subtitle & 4-Slide Auto Carousel)
-                </Text>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text strong style={{ color: isHeroBannerDisabled ? '#8c8c8c' : '#1890ff', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <PictureOutlined /> 🌟 Hero Banner Customization (Title, Subtitle & 4-Slide Auto Carousel)
+                  </Text>
+                  {isHeroBannerDisabled && (
+                    <Tag color="red" icon={<StopOutlined />} style={{ borderRadius: '12px', padding: '2px 10px', fontWeight: 600 }}>
+                      Disabled by Super Admin
+                    </Tag>
+                  )}
+                </div>
               }
               size="small"
-              style={{ background: '#fafafa', borderRadius: '10px' }}
+              style={{
+                background: isHeroBannerDisabled ? '#f5f5f5' : '#fafafa',
+                borderRadius: '10px',
+                border: isHeroBannerDisabled ? '1px dashed #d9d9d9' : '1px solid #f0f0f0',
+                opacity: isHeroBannerDisabled ? 0.75 : 1,
+                transition: 'all 0.3s ease'
+              }}
             >
+              {isHeroBannerDisabled && (
+                <Alert
+                  type="warning"
+                  showIcon
+                  message="Hero Banner Section Disabled"
+                  description="This layout section has been disabled by Super Admin. Enable 'Hero Banner Section' in Super Admin Control to unlock these inputs."
+                  style={{ marginBottom: '16px', borderRadius: '8px' }}
+                />
+              )}
               <Row gutter={[16, 16]}>
                 <Col xs={24} md={12}>
                   <Form.Item name="heroTitle" label="Hero Main Title">
-                    <Input placeholder="Where Joy & Imagination Come Alive!" size="large" />
+                    <Input placeholder="Where Joy & Imagination Come Alive!" size="large" disabled={isHeroBannerDisabled} />
                   </Form.Item>
                 </Col>
                 <Col xs={24} md={12}>
                   <Form.Item name="heroDescription" label="Hero Subtitle / Description">
-                    <Input.TextArea rows={2} placeholder="Explore our handpicked collection of certified safe STEM toys..." />
+                    <Input.TextArea rows={2} placeholder="Explore our handpicked collection of certified safe STEM toys..." disabled={isHeroBannerDisabled} />
                   </Form.Item>
                 </Col>
 
                 <Col span={24}>
-                  <Text strong style={{ fontSize: '13px', color: '#595959', display: 'block', marginBottom: '8px' }}>
+                  <Text strong style={{ fontSize: '13px', color: isHeroBannerDisabled ? '#8c8c8c' : '#595959', display: 'block', marginBottom: '8px' }}>
                     Auto-Sliding Hero Carousel Images (Set up to 4 Image URLs / Links):
                   </Text>
                 </Col>
 
                 <Col xs={24} sm={12} md={6}>
                   <Form.Item name="heroImageUrl1" label="Hero Slide Image #1 URL">
-                    <Input placeholder="https://images.unsplash.com/photo-..." />
+                    <Input placeholder="https://images.unsplash.com/photo-..." disabled={isHeroBannerDisabled} />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={12} md={6}>
                   <Form.Item name="heroImageUrl2" label="Hero Slide Image #2 URL">
-                    <Input placeholder="https://images.unsplash.com/photo-..." />
+                    <Input placeholder="https://images.unsplash.com/photo-..." disabled={isHeroBannerDisabled} />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={12} md={6}>
                   <Form.Item name="heroImageUrl3" label="Hero Slide Image #3 URL">
-                    <Input placeholder="https://images.unsplash.com/photo-..." />
+                    <Input placeholder="https://images.unsplash.com/photo-..." disabled={isHeroBannerDisabled} />
                   </Form.Item>
                 </Col>
                 <Col xs={24} sm={12} md={6}>
                   <Form.Item name="heroImageUrl4" label="Hero Slide Image #4 URL">
-                    <Input placeholder="https://images.unsplash.com/photo-..." />
+                    <Input placeholder="https://images.unsplash.com/photo-..." disabled={isHeroBannerDisabled} />
                   </Form.Item>
                 </Col>
               </Row>
@@ -151,17 +201,39 @@ const UIControlManagement = () => {
             {/* Navbar Top Badge Ribbon Controls */}
             <Card
               title={
-                <Text strong style={{ color: '#52c41a', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <ControlOutlined /> 🏷️ Top Navbar Badge Ribbon (3-Second Auto-Rotating Messages)
-                </Text>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text strong style={{ color: isBadgeRibbonDisabled ? '#8c8c8c' : '#52c41a', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <ControlOutlined /> 🏷️ Top Navbar Badge Ribbon (3-Second Auto-Rotating Messages)
+                  </Text>
+                  {isBadgeRibbonDisabled && (
+                    <Tag color="red" icon={<StopOutlined />} style={{ borderRadius: '12px', padding: '2px 10px', fontWeight: 600 }}>
+                      Disabled by Super Admin
+                    </Tag>
+                  )}
+                </div>
               }
               size="small"
-              style={{ background: '#f6ffed', borderRadius: '10px', border: '1px solid #b7eb8f' }}
+              style={{
+                background: isBadgeRibbonDisabled ? '#f5f5f5' : '#f6ffed',
+                borderRadius: '10px',
+                border: isBadgeRibbonDisabled ? '1px dashed #d9d9d9' : '1px solid #b7eb8f',
+                opacity: isBadgeRibbonDisabled ? 0.75 : 1,
+                transition: 'all 0.3s ease'
+              }}
             >
+              {isBadgeRibbonDisabled && (
+                <Alert
+                  type="warning"
+                  showIcon
+                  message="Badge Ribbon Ticker Disabled"
+                  description="Top Navbar Badge Ribbon has been disabled by Super Admin. Enable 'Badge Ribbon Ticker' in Super Admin Control to unlock these inputs."
+                  style={{ marginBottom: '16px', borderRadius: '8px' }}
+                />
+              )}
               <Row gutter={[16, 16]}>
                 <Col span={24}>
                   <Form.Item name="badgeRibbonText" label="Navbar Top Badge Ribbon Messages (Use bullet • or commas to separate rotating messages)">
-                    <Input.TextArea rows={2} placeholder="✨ Surprisingly Affordable • 💖 100% Genuine & Certified Products • 🚀 Fast Express Doorstep Delivery • ⭐ 50,000+ Happy Smiles Delivered • 🎁 Free Gift Wrapping On All Orders" />
+                    <Input.TextArea rows={2} placeholder="✨ Surprisingly Affordable • 💖 100% Genuine & Certified Products..." disabled={isBadgeRibbonDisabled} />
                   </Form.Item>
                 </Col>
               </Row>
@@ -170,17 +242,39 @@ const UIControlManagement = () => {
             {/* Marquee Ticker Ribbon Controls */}
             <Card
               title={
-                <Text strong style={{ color: '#722ed1', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <MessageOutlined /> 🎀 Infinite Marquee Ticker Customization
-                </Text>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text strong style={{ color: isMarqueeDisabled ? '#8c8c8c' : '#722ed1', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <MessageOutlined /> 🎀 Infinite Marquee Ticker Customization
+                  </Text>
+                  {isMarqueeDisabled && (
+                    <Tag color="red" icon={<StopOutlined />} style={{ borderRadius: '12px', padding: '2px 10px', fontWeight: 600 }}>
+                      Disabled by Super Admin
+                    </Tag>
+                  )}
+                </div>
               }
               size="small"
-              style={{ background: '#f9f0ff', borderRadius: '10px', border: '1px solid #d3adf7' }}
+              style={{
+                background: isMarqueeDisabled ? '#f5f5f5' : '#f9f0ff',
+                borderRadius: '10px',
+                border: isMarqueeDisabled ? '1px dashed #d9d9d9' : '1px solid #d3adf7',
+                opacity: isMarqueeDisabled ? 0.75 : 1,
+                transition: 'all 0.3s ease'
+              }}
             >
+              {isMarqueeDisabled && (
+                <Alert
+                  type="warning"
+                  showIcon
+                  message="Infinite Marquee Ticker Disabled"
+                  description="Marquee Ticker Ribbon has been disabled by Super Admin. Enable 'Infinite Marquee Ticker Ribbon' in Super Admin Control to unlock these inputs."
+                  style={{ marginBottom: '16px', borderRadius: '8px' }}
+                />
+              )}
               <Row gutter={[16, 16]}>
                 <Col span={24}>
                   <Form.Item name="marqueeText" label="Infinite Marquee Scrolling Text (Use bullet • or emojis to separate messages)">
-                    <Input.TextArea rows={2} placeholder="💖 FREE EXPRESS GIFT WRAPPING • ✨ 100% AUTHENTIC KAWAII MERCH • 🔥 TRENDING ON TIKTOK & INSTAGRAM • 🏷️ USE CODE KAWAII30 FOR EXTRA 30% OFF • ⭐ 50,000+ HAPPY SMILES" />
+                    <Input.TextArea rows={2} placeholder="💖 FREE EXPRESS GIFT WRAPPING • ✨ 100% AUTHENTIC KAWAII MERCH..." disabled={isMarqueeDisabled} />
                   </Form.Item>
                 </Col>
               </Row>
@@ -189,31 +283,54 @@ const UIControlManagement = () => {
             {/* Promo Banner Controls */}
             <Card
               title={
-                <Text strong style={{ color: '#ff4d4f', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
-                  <TagOutlined /> 🎉 Promo Banner Customization
-                </Text>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Text strong style={{ color: isPromoBannerDisabled ? '#8c8c8c' : '#ff4d4f', fontSize: '15px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    <TagOutlined /> 🎉 Promo Banner Customization
+                  </Text>
+                  {isPromoBannerDisabled && (
+                    <Tag color="red" icon={<StopOutlined />} style={{ borderRadius: '12px', padding: '2px 10px', fontWeight: 600 }}>
+                      Disabled by Super Admin
+                    </Tag>
+                  )}
+                </div>
               }
               size="small"
-              style={{ background: '#fff2f0', borderRadius: '10px', border: '1px solid #ffccc7' }}
+              style={{
+                background: isPromoBannerDisabled ? '#f5f5f5' : '#fff2f0',
+                borderRadius: '10px',
+                border: isPromoBannerDisabled ? '1px dashed #d9d9d9' : '1px solid #ffccc7',
+                opacity: isPromoBannerDisabled ? 0.75 : 1,
+                transition: 'all 0.3s ease'
+              }}
             >
+              {isPromoBannerDisabled && (
+                <Alert
+                  type="warning"
+                  showIcon
+                  message="Promo Banner Section Disabled"
+                  description="Promo Banner Section has been disabled by Super Admin. Enable 'Promo Banner Section' in Super Admin Control to unlock these inputs."
+                  style={{ marginBottom: '16px', borderRadius: '8px' }}
+                />
+              )}
               <Row gutter={[16, 16]}>
                 <Col xs={24} md={10}>
                   <Form.Item name="promoTitle" label="Promo Banner Heading">
-                    <Input placeholder="Summer Carnival Sale — Enjoy Up to 30% OFF!" size="large" />
+                    <Input placeholder="Summer Carnival Sale — Enjoy Up to 30% OFF!" size="large" disabled={isPromoBannerDisabled} />
                   </Form.Item>
                 </Col>
                 <Col xs={24} md={10}>
                   <Form.Item name="promoDescription" label="Promo Banner Subtitle">
-                    <Input.TextArea rows={2} placeholder="Apply coupon codes at checkout to unlock instant extra savings..." />
+                    <Input.TextArea rows={2} placeholder="Apply coupon codes at checkout to unlock instant extra savings..." disabled={isPromoBannerDisabled} />
                   </Form.Item>
                 </Col>
                 <Col xs={24} md={4}>
                   <Form.Item name="promoCouponCode" label="Coupon Code Display">
-                    <Input placeholder="TOY30" style={{ textTransform: 'uppercase', fontWeight: 700 }} />
+                    <Input placeholder="TOY30" style={{ textTransform: 'uppercase', fontWeight: 700 }} disabled={isPromoBannerDisabled} />
                   </Form.Item>
                 </Col>
               </Row>
             </Card>
+
           </Space>
         </Form>
       </Card>
