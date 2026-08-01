@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Card, Row, Col, Typography, Table, Select, Input, Button, DatePicker, 
-  Tag, Space, Statistic, Divider, Alert, Spin, message, Tabs, Tooltip 
+  Tag, Space, Statistic, Divider, Alert, Spin, message, Tabs, Tooltip, Grid 
 } from 'antd';
 import { 
   BarChartOutlined, BoxPlotOutlined, DollarOutlined, ShoppingCartOutlined, 
@@ -18,8 +18,12 @@ import { resolveProductImageUrl } from '../../utils/imageHelper';
 const { Title, Text, Paragraph } = Typography;
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+const { useBreakpoint } = Grid;
 
 const ReportManagement = () => {
+  const screens = useBreakpoint();
+  const isMobile = screens.lg === false || (screens.xs && !screens.lg);
+
   const [activeTab, setActiveTab] = useState('stock');
   const [categories, setCategories] = useState([]);
   const [shopSettings, setShopSettings] = useState(null);
@@ -170,7 +174,7 @@ const ReportManagement = () => {
     });
 
     // Summary Row
-    csv += `\n"TOTAL SUMMARY (${salesData.items.length} Orders)","","","",${totalItemsSum},"Sum of Total Revenue",${totalRevenueSum}\n`;
+    csv += `\n"TOTAL SUMMARY (${salesData.items.length} Orders)","","","","${totalItemsSum}","Sum of Total Revenue",${totalRevenueSum}\n`;
 
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -191,12 +195,10 @@ const ReportManagement = () => {
       return item.totalAmount;
     }
     
-    // If order subtotal >= 500, shipping is FREE!
     if (itemsSubtotal >= 500) {
       return item.totalAmount;
     }
     
-    // Only add 55 fallback for small legacy orders < 500 where shipping charge was omitted from DB
     if (itemsSubtotal < 500 && Math.abs(item.totalAmount - (itemsSubtotal - discountAmt)) < 0.01) {
       return item.totalAmount + 55;
     }
@@ -204,7 +206,7 @@ const ReportManagement = () => {
     return item.totalAmount;
   };
 
-  // PDF Export Function with Header, Logo, Sum of Total Revenue, and Footer
+  // PDF Export Function
   const exportPDF = (type) => {
     const isStock = type === 'stock';
     const reportTitle = isStock ? 'Stock & Inventory Valuation Report' : 'Sales & Financial Revenue Analytics Report';
@@ -350,7 +352,7 @@ const ReportManagement = () => {
         <title>${reportTitle} - ${shopName}</title>
         <style>
           body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 24px; color: #262626; background: #fff; }
-          .header { display: flex; justify: space-between; align-items: center; border-bottom: 2px solid #1890ff; padding-bottom: 16px; margin-bottom: 20px; }
+          .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #1890ff; padding-bottom: 16px; margin-bottom: 20px; }
           .shop-info { display: flex; align-items: center; gap: 16px; }
           .shop-logo { width: 64px; height: 64px; object-fit: contain; border-radius: 8px; border: 1px solid #e8e8e8; }
           .shop-details h1 { margin: 0; font-size: 24px; color: #001529; font-weight: 800; }
@@ -457,7 +459,7 @@ const ReportManagement = () => {
             style={{ width: 44, height: 44, objectFit: 'cover', borderRadius: '8px', border: '1px solid #f0f0f0' }}
           />
           <div>
-            <Text strong style={{ display: 'block', fontSize: '14px' }}>{name}</Text>
+            <Text strong style={{ display: 'block', fontSize: '14px', textTransform: 'uppercase' }}>{name}</Text>
             <Tag color="blue" style={{ fontSize: '11px', marginTop: '2px' }}>{record.categoryName}</Tag>
           </div>
         </Space>
@@ -594,9 +596,9 @@ const ReportManagement = () => {
     if (record.shippingCharge !== undefined && record.shippingCharge !== null && record.shippingCharge > 0) {
       shippingCharge = record.shippingCharge;
     } else if (itemsSubtotal < 500 && Math.abs(record.totalAmount - (itemsSubtotal - discountAmt)) < 0.01) {
-      shippingCharge = 55; // Legacy small order < 500 fallback
+      shippingCharge = 55;
     } else {
-      shippingCharge = 0; // Free shipping for orders >= 500
+      shippingCharge = 0;
     }
     const computedNetTotal = Math.max(record.totalAmount, itemsSubtotal + shippingCharge - discountAmt);
 
@@ -605,12 +607,12 @@ const ReportManagement = () => {
         title: 'Item Thumbnail',
         dataIndex: 'primaryImageUrl',
         key: 'primaryImageUrl',
-        width: '100px',
+        width: '80px',
         render: (url, item) => (
           <img
             src={resolveProductImageUrl(url, 'thumb')}
             alt={item.productName}
-            style={{ width: 40, height: 40, objectFit: 'cover', borderRadius: '6px', border: '1px solid #f0f0f0' }}
+            style={{ width: 36, height: 36, objectFit: 'cover', borderRadius: '6px', border: '1px solid #f0f0f0' }}
           />
         )
       },
@@ -618,7 +620,7 @@ const ReportManagement = () => {
         title: 'Toy Name',
         dataIndex: 'productName',
         key: 'productName',
-        render: (name) => <Text strong>{name}</Text>
+        render: (name) => <Text strong style={{ textTransform: 'uppercase' }}>{name}</Text>
       },
       {
         title: 'Unit Price (₹)',
@@ -647,7 +649,7 @@ const ReportManagement = () => {
       <Card
         size="small"
         title={<Text strong style={{ fontSize: '13px', color: '#0066cc' }}>📦 Order Items Breakdown ({record.orderNumber})</Text>}
-        style={{ borderRadius: '12px', background: '#fafafa', margin: '8px 0' }}
+        style={{ borderRadius: '12px', background: '#fafafa', margin: '8px 0', overflowX: 'auto' }}
       >
         <Table
           dataSource={record.orderItems || []}
@@ -655,6 +657,7 @@ const ReportManagement = () => {
           rowKey="productId"
           pagination={false}
           size="small"
+          scroll={{ x: 500 }}
         />
 
         <div style={{
@@ -666,20 +669,22 @@ const ReportManagement = () => {
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'flex-end',
-          gap: '6px'
+          gap: '6px',
+          width: '100%',
+          boxSizing: 'border-box'
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '320px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: '320px' }}>
             <Text type="secondary">Items Subtotal:</Text>
             <Text strong>₹{itemsSubtotal.toLocaleString('en-IN')}</Text>
           </div>
-          <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '320px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: '320px' }}>
             <Text type="secondary">Shipping Charge:</Text>
             <Text strong style={{ color: shippingCharge === 0 ? '#52c41a' : '#262626' }}>
               {shippingCharge === 0 ? '₹0 (FREE)' : `+ ₹${shippingCharge.toLocaleString('en-IN')}`}
             </Text>
           </div>
           {discountAmt > 0 && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '320px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: '320px' }}>
               <Text style={{ color: '#52c41a', fontWeight: 600 }}>
                 Less: Coupon Discount ({couponCode || 'COUPON'}):
               </Text>
@@ -688,7 +693,7 @@ const ReportManagement = () => {
               </Text>
             </div>
           )}
-          <div style={{ display: 'flex', justifyContent: 'space-between', minWidth: '320px', borderTop: '1px solid #f0f0f0', paddingTop: '6px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', maxWidth: '320px', borderTop: '1px solid #f0f0f0', paddingTop: '6px' }}>
             <Text strong style={{ fontSize: '15px' }}>Net Total Revenue:</Text>
             <Text strong style={{ fontSize: '16px', color: '#ff4d4f' }}>
               ₹{computedNetTotal.toLocaleString('en-IN')}
@@ -706,8 +711,8 @@ const ReportManagement = () => {
       children: (
         <Space direction="vertical" size={16} style={{ width: '100%' }}>
           {/* Stock KPI Summary Cards */}
-          <Row gutter={[16, 16]}>
-            <Col xs={12} sm={6}>
+          <Row gutter={[12, 12]}>
+            <Col xs={24} sm={12} md={6}>
               <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
                 <Statistic
                   title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Products</Text>}
@@ -716,7 +721,7 @@ const ReportManagement = () => {
                 />
               </Card>
             </Col>
-            <Col xs={12} sm={6}>
+            <Col xs={24} sm={12} md={6}>
               <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
                 <Statistic
                   title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Stock Units</Text>}
@@ -725,7 +730,7 @@ const ReportManagement = () => {
                 />
               </Card>
             </Col>
-            <Col xs={12} sm={6}>
+            <Col xs={24} sm={12} md={6}>
               <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
                 <Statistic
                   title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Inventory Valuation</Text>}
@@ -736,7 +741,7 @@ const ReportManagement = () => {
                 />
               </Card>
             </Col>
-            <Col xs={12} sm={6}>
+            <Col xs={24} sm={12} md={6}>
               <Card style={{ borderRadius: '14px', background: '#fff2f0' }}>
                 <Statistic
                   title={<Text type="secondary" style={{ fontSize: '12px' }}>Low / Out of Stock Alert</Text>}
@@ -751,7 +756,7 @@ const ReportManagement = () => {
           {/* Stock Filters Bar */}
           <Card style={{ borderRadius: '14px' }}>
             <Row gutter={[12, 12]} align="middle">
-              <Col xs={24} sm={8}>
+              <Col xs={24} sm={12} lg={8}>
                 <Input
                   placeholder="Search toy name or category..."
                   prefix={<SearchOutlined />}
@@ -762,7 +767,7 @@ const ReportManagement = () => {
                   style={{ borderRadius: '8px' }}
                 />
               </Col>
-              <Col xs={12} sm={6}>
+              <Col xs={24} sm={12} lg={6}>
                 <Select
                   value={stockFilterCategory}
                   onChange={(val) => setStockFilterCategory(val)}
@@ -774,7 +779,7 @@ const ReportManagement = () => {
                   ))}
                 </Select>
               </Col>
-              <Col xs={12} sm={6}>
+              <Col xs={24} sm={12} lg={6}>
                 <Select
                   value={stockFilterStatus}
                   onChange={(val) => setStockFilterStatus(val)}
@@ -786,7 +791,7 @@ const ReportManagement = () => {
                   <Option value="OutOfStock">Out of Stock</Option>
                 </Select>
               </Col>
-              <Col xs={24} sm={4}>
+              <Col xs={24} sm={12} lg={4}>
                 <Button type="primary" icon={<FilterOutlined />} onClick={fetchStockReport} block style={{ borderRadius: '8px' }}>
                   Apply Filter
                 </Button>
@@ -795,13 +800,14 @@ const ReportManagement = () => {
           </Card>
 
           {/* Stock Table */}
-          <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+          <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflowX: 'auto' }}>
             <Table
               dataSource={stockData.items}
               columns={stockColumns}
               rowKey="id"
               loading={stockLoading}
               pagination={{ pageSize: 10 }}
+              scroll={{ x: 750 }}
             />
           </Card>
         </Space>
@@ -813,19 +819,19 @@ const ReportManagement = () => {
       children: (
         <Space direction="vertical" size={16} style={{ width: '100%' }}>
           {/* Sales KPI Summary Cards */}
-          <Row gutter={[16, 16]}>
-            <Col xs={12} sm={6}>
+          <Row gutter={[12, 12]}>
+            <Col xs={24} sm={12} md={6}>
               <Card style={{ borderRadius: '14px', background: '#f6ffed', border: '1px solid #b7eb8f' }}>
                 <Statistic
                   title={<Text type="secondary" style={{ fontSize: '12px' }}>Sum of Total Revenue</Text>}
                   value={salesData.items.reduce((sum, item) => sum + getEffectiveOrderRevenue(item), 0)}
                   precision={2}
                   prefix="₹"
-                  valueStyle={{ color: '#2e7d32', fontWeight: 800, fontSize: '22px' }}
+                  valueStyle={{ color: '#2e7d32', fontWeight: 800, fontSize: '20px' }}
                 />
               </Card>
             </Col>
-            <Col xs={12} sm={6}>
+            <Col xs={24} sm={12} md={6}>
               <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
                 <Statistic
                   title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Orders Placed</Text>}
@@ -834,7 +840,7 @@ const ReportManagement = () => {
                 />
               </Card>
             </Col>
-            <Col xs={12} sm={6}>
+            <Col xs={24} sm={12} md={6}>
               <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
                 <Statistic
                   title={<Text type="secondary" style={{ fontSize: '12px' }}>Avg Order Value (AOV)</Text>}
@@ -844,7 +850,7 @@ const ReportManagement = () => {
                 />
               </Card>
             </Col>
-            <Col xs={12} sm={6}>
+            <Col xs={24} sm={12} md={6}>
               <Card style={{ borderRadius: '14px', background: '#fafafa' }}>
                 <Statistic
                   title={<Text type="secondary" style={{ fontSize: '12px' }}>Total Items Sold</Text>}
@@ -860,10 +866,10 @@ const ReportManagement = () => {
             <Space direction="vertical" style={{ width: '100%' }} size={12}>
               {/* Time Presets Row */}
               <Row gutter={[8, 8]} align="middle">
-                <Col>
+                <Col xs={24} sm="auto">
                   <Text strong style={{ fontSize: '13px', marginRight: '8px' }}>Period Preset:</Text>
                 </Col>
-                <Col>
+                <Col xs={24} sm="auto">
                   <Space wrap>
                     <Button
                       type={salesPeriod === 'all' ? 'primary' : 'default'}
@@ -912,7 +918,7 @@ const ReportManagement = () => {
               {/* Explicit Filter Inputs Row */}
               <Row gutter={[12, 12]} align="middle">
                 {salesPeriod === 'custom' && (
-                  <Col xs={24} sm={8}>
+                  <Col xs={24} sm={12} lg={8}>
                     <RangePicker
                       value={salesDateRange}
                       onChange={(dates) => setSalesDateRange(dates)}
@@ -920,7 +926,7 @@ const ReportManagement = () => {
                     />
                   </Col>
                 )}
-                <Col xs={24} sm={salesPeriod === 'custom' ? 6 : 6}>
+                <Col xs={24} sm={12} lg={salesPeriod === 'custom' ? 5 : 6}>
                   <Input
                     placeholder="Customer Name..."
                     prefix={<UserOutlined />}
@@ -931,7 +937,7 @@ const ReportManagement = () => {
                     style={{ borderRadius: '8px' }}
                   />
                 </Col>
-                <Col xs={24} sm={salesPeriod === 'custom' ? 5 : 5}>
+                <Col xs={24} sm={12} lg={salesPeriod === 'custom' ? 5 : 6}>
                   <Input
                     placeholder="Mobile Number..."
                     prefix={<PhoneOutlined />}
@@ -942,7 +948,7 @@ const ReportManagement = () => {
                     style={{ borderRadius: '8px' }}
                   />
                 </Col>
-                <Col xs={12} sm={salesPeriod === 'custom' ? 3 : 4}>
+                <Col xs={24} sm={12} lg={salesPeriod === 'custom' ? 3 : 4}>
                   <Select
                     value={salesOrderStatus}
                     onChange={(val) => setSalesOrderStatus(val)}
@@ -956,7 +962,7 @@ const ReportManagement = () => {
                     <Option value="Cancelled">Cancelled</Option>
                   </Select>
                 </Col>
-                <Col xs={12} sm={salesPeriod === 'custom' ? 2 : 3}>
+                <Col xs={24} sm={12} lg={salesPeriod === 'custom' ? 3 : 4}>
                   <Button type="primary" icon={<FilterOutlined />} onClick={fetchSalesReport} block style={{ borderRadius: '8px' }}>
                     Apply
                   </Button>
@@ -965,14 +971,15 @@ const ReportManagement = () => {
             </Space>
           </Card>
 
-          {/* Sales Table with Expandable Order Items Breakdown & Sum of Total Revenue Summary Row */}
-          <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+          {/* Sales Table with Expandable Order Items Breakdown */}
+          <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', overflowX: 'auto' }}>
             <Table
               dataSource={salesData.items}
               columns={salesColumns}
               rowKey="orderId"
               loading={salesLoading}
               pagination={{ pageSize: 10 }}
+              scroll={{ x: 850 }}
               expandable={{
                 expandedRowRender: expandedOrderItemsRender,
                 expandRowByClick: false
@@ -990,20 +997,20 @@ const ReportManagement = () => {
                   <Table.Summary fixed>
                     <Table.Summary.Row style={{ background: '#f6ffed', fontWeight: 'bold', borderTop: '2px solid #52c41a' }}>
                       <Table.Summary.Cell index={0} colSpan={4}>
-                        <Text strong style={{ fontSize: '15px', color: '#1b5e20' }}>
+                        <Text strong style={{ fontSize: '14px', color: '#1b5e20' }}>
                           📊 TOTAL REVENUE SUMMARY ({salesData.items.length} Orders)
                         </Text>
                       </Table.Summary.Cell>
                       <Table.Summary.Cell index={1} align="center">
-                        <Tag color="green" style={{ fontSize: '13px', padding: '2px 8px', fontWeight: 700 }}>
+                        <Tag color="green" style={{ fontSize: '12px', padding: '2px 8px', fontWeight: 700 }}>
                           {totalItemsSum} Items
                         </Tag>
                       </Table.Summary.Cell>
                       <Table.Summary.Cell index={2} colSpan={2} align="right">
-                        <Text strong style={{ fontSize: '14px', color: '#2e7d32' }}>Sum of Total Revenue:</Text>
+                        <Text strong style={{ fontSize: '13px', color: '#2e7d32' }}>Sum of Total Revenue:</Text>
                       </Table.Summary.Cell>
                       <Table.Summary.Cell index={3} align="right">
-                        <Text strong style={{ fontSize: '18px', color: '#2e7d32' }}>
+                        <Text strong style={{ fontSize: '16px', color: '#2e7d32' }}>
                           ₹{totalRevenueSum.toLocaleString('en-IN')}
                         </Text>
                       </Table.Summary.Cell>
@@ -1021,16 +1028,21 @@ const ReportManagement = () => {
   return (
     <Space direction="vertical" size={20} style={{ width: '100%' }}>
       {/* Top Header Bar */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
         <div>
-          <Title level={3} style={{ margin: 0, fontWeight: 800 }}>{shopSettings?.shopName || 'Store'} Reports & Analytics</Title>
-          <Text type="secondary" style={{ fontSize: '13px' }}>Monitor inventory counts, low stock alerts, order items, customer name/phone filters, and revenue totals.</Text>
+          <Title level={3} style={{ margin: 0, fontWeight: 800, fontSize: isMobile ? '20px' : '24px' }}>
+            {shopSettings?.shopName || 'Store'} Reports & Analytics
+          </Title>
+          <Text type="secondary" style={{ fontSize: '13px' }}>
+            Monitor inventory counts, low stock alerts, order items, customer name/phone filters, and revenue totals.
+          </Text>
         </div>
-        <Space>
+        <Space wrap style={{ width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'flex-start' : 'flex-end' }}>
           <Button
             icon={<DownloadOutlined />}
             onClick={activeTab === 'stock' ? exportStockCSV : exportSalesCSV}
             style={{ borderRadius: '8px' }}
+            block={isMobile}
           >
             Export Excel (CSV)
           </Button>
@@ -1039,6 +1051,7 @@ const ReportManagement = () => {
             icon={<FilePdfOutlined />}
             onClick={() => exportPDF(activeTab)}
             style={{ borderRadius: '8px', background: '#001529', borderColor: '#001529' }}
+            block={isMobile}
           >
             Export PDF
           </Button>
@@ -1046,7 +1059,7 @@ const ReportManagement = () => {
       </div>
 
       {/* Main Full-Width Tabs Container */}
-      <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }}>
+      <Card style={{ borderRadius: '16px', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', padding: isMobile ? '4px' : '16px' }}>
         <Tabs
           activeKey={activeTab}
           onChange={(key) => setActiveTab(key)}
