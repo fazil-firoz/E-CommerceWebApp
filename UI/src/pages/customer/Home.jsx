@@ -88,12 +88,21 @@ const Home = () => {
   const heroTitle = shopSettings?.heroTitle || 'Where Joy & Imagination Come Alive!';
   const heroDescription = shopSettings?.heroDescription || 'Explore our handpicked collection of certified safe STEM toys, educational building blocks, action collectibles, and wooden playsets designed for happy minds.';
   
-  const configuredHeroImages = [
-    shopSettings?.heroImageUrl1,
-    shopSettings?.heroImageUrl2,
-    shopSettings?.heroImageUrl3,
-    shopSettings?.heroImageUrl4
-  ].filter(url => url && url.trim() !== '');
+  const parsedHeroList = shopSettings?.heroImagesList || shopSettings?.heroBannerImages || shopSettings?.heroImages;
+  const configuredHeroImages = Array.isArray(parsedHeroList)
+    ? parsedHeroList
+    : typeof parsedHeroList === 'string'
+      ? parsedHeroList.split(',').map(s => s.trim()).filter(Boolean)
+      : [
+          shopSettings?.heroImageUrl1,
+          shopSettings?.heroImageUrl2,
+          shopSettings?.heroImageUrl3,
+          shopSettings?.heroImageUrl4
+        ].filter(url => url && url.trim() !== '');
+
+  const productImages = products.length > 0
+    ? products.flatMap(p => p.imageUrls && p.imageUrls.length > 0 ? p.imageUrls : (p.imageUrl ? [p.imageUrl] : [])).filter(Boolean)
+    : [];
 
   const defaultHeroImages = [
     'https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=480&auto=format&fit=crop',
@@ -102,7 +111,9 @@ const Home = () => {
     'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?q=80&w=480&auto=format&fit=crop'
   ];
 
-  const heroImagesToDisplay = configuredHeroImages.length > 0 ? configuredHeroImages : defaultHeroImages;
+  const heroImagesToDisplay = configuredHeroImages.length > 0
+    ? configuredHeroImages
+    : (productImages.length > 0 ? productImages : defaultHeroImages);
 
   const promoTitle = shopSettings?.promoTitle || 'Summer Carnival Sale — Enjoy Up to 30% OFF!';
   const promoDescription = shopSettings?.promoDescription || 'Apply coupon codes at checkout to unlock instant extra savings on all wooden playsets and STEM toys.';
