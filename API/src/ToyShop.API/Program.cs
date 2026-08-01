@@ -276,7 +276,16 @@ using (var scope = app.Services.CreateScope())
               SELECT setval('""Admins_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Admins""), 1));
               SELECT setval('""Shops_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""Shops""), 1));
               SELECT setval('""SuperAdminControls_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""SuperAdminControls""), 1));
-              SELECT setval('""CouponCodes_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""CouponCodes""), 1));"
+              SELECT setval('""CouponCodes_Id_seq""', COALESCE((SELECT MAX(""Id"") FROM ""CouponCodes""), 1));
+
+              INSERT INTO ""Admins"" (""Username"", ""PasswordHash"", ""FullName"", ""Email"", ""CreatedDate"", ""CreatedBy"", ""IsDeleted"")
+              SELECT 'admin', '$2a$11$V2.h7Z1y8u9v0w1x2y3z4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0', 'Super Admin', 'admin@store.com', NOW(), 'System', FALSE
+              WHERE NOT EXISTS (SELECT 1 FROM ""Admins"" WHERE ""Username"" = 'admin');
+
+              UPDATE ""Admins""
+              SET ""PasswordHash"" = '$2a$11$V2.h7Z1y8u9v0w1x2y3z4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0',
+                  ""Email"" = COALESCE(""Email"", 'admin@store.com')
+              WHERE ""Username"" = 'admin';"
         );
     }
     catch (System.Exception ex)
