@@ -1,6 +1,7 @@
-// Backend API base URL - must match the HTTPS port Visual Studio/dotnet assigns
-// The backend runs on https://localhost:53993
-const API_BASE_URL = 'https://localhost:53993/api';
+// Backend API base URL - environment variable or default fallback
+// const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:53993/api';
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL || 'https://localhost:53993/api';
 
 export const URLS = {
   BASE_URL: API_BASE_URL,
