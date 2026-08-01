@@ -14,7 +14,9 @@ import {
   SendOutlined,
   CheckOutlined,
   HeartOutlined,
-  HeartFilled
+  HeartFilled,
+  PlusOutlined,
+  MinusOutlined
 } from '@ant-design/icons';
 import { productApi } from '../../api/productApi';
 import { shopApi } from '../../api/shopApi';
@@ -52,7 +54,10 @@ const ProductDetails = () => {
         const response = await productApi.getById(id);
         if (response.success && response.data) {
           setProduct(response.data);
-          setSelectedImage(response.data.imageUrls?.[0] || 'https://via.placeholder.com/400?text=Toy');
+          const initialImg = (response.data.imageUrls && response.data.imageUrls.length > 0)
+            ? response.data.imageUrls[0]
+            : (response.data.imageUrl || '');
+          setSelectedImage(initialImg);
           setCurrentSlide(0);
         } else {
           message.error('Toy not found');
@@ -222,147 +227,107 @@ Could you please confirm availability and details? Thank you!`;
                   }}
                 />
               )}
-              <Carousel
-                ref={carouselRef}
-                dots={true}
-                afterChange={(current) => {
-                  setCurrentSlide(current);
-                  if (product.imageUrls?.[current]) {
-                    setSelectedImage(product.imageUrls[current]);
-                  }
-                }}
-                style={{ height: '460px' }}
-              >
-                {(product.imageUrls && product.imageUrls.length > 0) ? (
-                  product.imageUrls.map((url, index) => (
-                    <div key={index} style={{ height: '460px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fff' }}>
-                      <img
-                        src={resolveProductImageUrl(url, 'large')}
-                        alt={`${product.name} - slide ${index}`}
-                        loading="lazy"
-                        style={{
-                          maxWidth: '100%',
-                          maxHeight: '460px',
-                          objectFit: 'contain',
-                          margin: '0 auto',
-                          display: 'block'
-                        }}
-                      />
-                    </div>
-                  ))
-                ) : (
-                  <div style={{ height: '350px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', borderRadius: '16px', color: '#94a3b8' }}>
-                    <ShopOutlined style={{ fontSize: '48px', color: primaryColor, opacity: 0.6, marginBottom: '12px' }} />
-                    <Text style={{ fontSize: '14px', color: '#64748b', fontWeight: 600 }}>No Product Image Available</Text>
-                  </div>
-                )}
-              </Carousel>
-            </div>
+              {(() => {
+                const allImages = (product.imageUrls && product.imageUrls.length > 0)
+                  ? product.imageUrls
+                  : (product.imageUrl ? [product.imageUrl] : []);
 
-            {/* Thumbnails Row */}
-            {product.imageUrls?.length > 1 && (
-              <div style={{ display: 'flex', gap: '12px', flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: '4px', WebkitOverflowScrolling: 'touch' }}>
-                {product.imageUrls.map((url, index) => (
-                  <div
-                    key={index}
-                    onClick={() => {
-                      setSelectedImage(url);
-                      setCurrentSlide(index);
-                      carouselRef.current?.goTo(index);
-                    }}
-                    style={{
-                      width: '70px', height: '70px',
-                      borderRadius: '10px',
-                      overflow: 'hidden',
-                      border: currentSlide === index ? `2px solid ${primaryColor}` : '1px solid #d9d9d9',
-                      cursor: 'pointer',
-                      background: '#fff',
-                      display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      padding: '4px',
-                      flexShrink: 0,
-                      transition: 'border-color 0.2s'
-                    }}
-                  >
-                    <img
-                      src={resolveProductImageUrl(url, 'thumb')}
-                      alt={`preview ${index}`}
-                      loading="lazy"
-                      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-                      style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
+                return (
+                  <>
+                    <Carousel
+                      ref={carouselRef}
+                      dots={allImages.length > 1}
+                      afterChange={(current) => {
+                        setCurrentSlide(current);
+                        if (allImages[current]) {
+                          setSelectedImage(allImages[current]);
+                        }
+                      }}
+                      style={{ height: '380px' }}
+                    >
+                      {allImages.length > 0 ? (
+                        allImages.map((url, index) => (
+                          <div key={index} style={{ height: '380px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fafafa', position: 'relative' }}>
+                            <img
+                              src={resolveProductImageUrl(url, 'large')}
+                              alt={`${product.name} - slide ${index}`}
+                              loading="lazy"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                if (e.currentTarget.nextSibling) e.currentTarget.nextSibling.style.display = 'flex';
+                              }}
+                              style={{
+                                maxWidth: '100%',
+                                maxHeight: '380px',
+                                objectFit: 'contain',
+                                margin: '0 auto',
+                                display: 'block'
+                              }}
+                            />
+                            <div style={{ display: 'none', width: '100%', height: '380px', background: '#f8fafc', alignItems: 'center', justifyContent: 'center', fontSize: '64px' }}>
+                              🧸
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div style={{ height: '380px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', borderRadius: '16px', color: '#94a3b8' }}>
+                          <ShopOutlined style={{ fontSize: '48px', color: primaryColor, opacity: 0.6, marginBottom: '12px' }} />
+                          <Text style={{ fontSize: '14px', color: '#64748b', fontWeight: 600 }}>No Product Image Available</Text>
+                        </div>
+                      )}
+                    </Carousel>
+
+                    {/* Thumbnails Row */}
+                    {allImages.length > 1 && (
+                      <div style={{ display: 'flex', gap: '12px', flexWrap: 'nowrap', overflowX: 'auto', paddingBottom: '4px', marginTop: '12px', WebkitOverflowScrolling: 'touch' }}>
+                        {allImages.map((url, index) => (
+                          <div
+                            key={index}
+                            onClick={() => {
+                              setSelectedImage(url);
+                              setCurrentSlide(index);
+                              carouselRef.current?.goTo(index);
+                            }}
+                            style={{
+                              width: '64px', height: '64px',
+                              borderRadius: '10px',
+                              overflow: 'hidden',
+                              border: currentSlide === index ? `2px solid ${primaryColor}` : '1px solid #d9d9d9',
+                              cursor: 'pointer',
+                              background: '#fff',
+                              display: 'flex', alignItems: 'center', justifyContent: 'center',
+                              padding: '4px',
+                              flexShrink: 0,
+                              transition: 'border-color 0.2s'
+                            }}
+                          >
+                            <img
+                              src={resolveProductImageUrl(url, 'thumb')}
+                              alt={`preview ${index}`}
+                              loading="lazy"
+                              onError={(e) => { e.currentTarget.style.display = 'none'; }}
+                              style={{ maxWidth: '100%', maxHeight: '100%', objectFit: 'contain' }}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                );
+              })()}
+            </div>
           </Space>
         </Col>
 
         {/* Content Column */}
         <Col xs={24} md={14}>
-          <Space direction="vertical" size={20} style={{ width: '100%' }}>
+          <Space direction="vertical" size={18} style={{ width: '100%' }}>
             <div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Tag style={{ borderRadius: '20px', fontSize: '12px', padding: '4px 12px', background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', fontWeight: 600 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '8px' }}>
+                <Tag style={{ borderRadius: '20px', fontSize: '12px', padding: '4px 14px', background: '#f1f5f9', color: '#475569', border: '1px solid #cbd5e1', fontWeight: 700 }}>
                   {product.categoryName}
                 </Tag>
-                <Space size={8}>
-                  <Button
-                    type="text"
-                    icon={<WhatsAppOutlined style={{ fontSize: '16px', color: '#25D366' }} />}
-                    onClick={handleWhatsAppEnquiry}
-                    style={{
-                      borderRadius: '20px',
-                      color: '#15803d',
-                      fontWeight: 700,
-                      background: '#f0fdf4',
-                      border: '1px solid #bbf7d0',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '4px',
-                      fontSize: '13px'
-                    }}
-                  >
-                    Enquire
-                  </Button>
-                  <Button
-                    type="text"
-                    icon={<ShareAltOutlined style={{ fontSize: '16px', color: primaryColor }} />}
-                    onClick={handleShareProduct}
-                    style={{ borderRadius: '20px', color: primaryColor, fontWeight: 600, background: `${primaryColor}10` }}
-                  >
-                    Share
-                  </Button>
-                </Space>
-              </div>
-
-              <Title level={2} style={{ margin: '12px 0 8px', fontWeight: 800, color: textColor }}>
-                {product.name}
-              </Title>
-
-              <Space align="baseline" style={{ display: 'flex', flexWrap: 'wrap' }}>
-                <Text strong style={{ fontSize: '32px', color: primaryColor }}>
-                  ₹{product.price.toLocaleString('en-IN')}
-                </Text>
-                {product.mrp > product.price && (
-                  <>
-                    <Text delete style={{ color: '#94a3b8', fontSize: '18px', marginLeft: '8px' }}>
-                      ₹{product.mrp.toLocaleString('en-IN')}
-                    </Text>
-                    <Text style={{ color: '#16a34a', fontWeight: 700, marginLeft: '8px', fontSize: '15px' }}>
-                      ({Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF)
-                    </Text>
-                  </>
-                )}
-              </Space>
-              <Text type="secondary" style={{ fontSize: '12px', display: 'block', color: '#64748b', marginTop: '2px' }}>
-                Inclusive of all taxes
-              </Text>
-            </div>
-
-            <Card style={{ background: '#f8fafc', borderRadius: '12px', border: '1px solid #e2e8f0' }} styles={{ body: { padding: '14px 16px' } }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Text strong style={{ color: '#475569' }}>Availability Status:</Text>
-                <Tag color={isOutOfStock ? 'red' : product.stockQuantity < 5 ? 'orange' : 'green'} style={{ fontWeight: 'bold', borderRadius: '12px', padding: '2px 10px' }}>
+                <Tag color={isOutOfStock ? 'red' : product.stockQuantity < 5 ? 'orange' : 'green'} style={{ fontWeight: 'bold', borderRadius: '12px', padding: '4px 12px' }}>
                   {isOutOfStock
                     ? 'Out of Stock'
                     : product.stockQuantity < 5
@@ -371,28 +336,106 @@ Could you please confirm availability and details? Thank you!`;
                   }
                 </Tag>
               </div>
-            </Card>
+
+              <Title level={2} style={{ margin: '12px 0 8px', fontWeight: 800, color: textColor, fontSize: '24px', lineHeight: 1.3 }}>
+                {product.name}
+              </Title>
+
+              <Space align="baseline" style={{ display: 'flex', flexWrap: 'wrap' }}>
+                <Text strong style={{ fontSize: '30px', color: primaryColor }}>
+                  ₹{product.price.toLocaleString('en-IN')}
+                </Text>
+                {product.mrp > product.price && (
+                  <>
+                    <Text delete style={{ color: '#94a3b8', fontSize: '18px', marginLeft: '8px' }}>
+                      ₹{product.mrp.toLocaleString('en-IN')}
+                    </Text>
+                    <Text style={{ color: '#16a34a', fontWeight: 700, marginLeft: '8px', fontSize: '14px' }}>
+                      ({Math.round(((product.mrp - product.price) / product.mrp) * 100)}% OFF)
+                    </Text>
+                  </>
+                )}
+              </Space>
+              <Text type="secondary" style={{ fontSize: '12px', display: 'block', color: '#64748b', marginTop: '2px' }}>
+                Inclusive of all taxes
+              </Text>
+
+              {/* Un-congested Share & WhatsApp Inquiry Action Buttons */}
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginTop: '16px' }}>
+                <Button
+                  icon={<WhatsAppOutlined style={{ fontSize: '16px', color: '#25D366' }} />}
+                  onClick={handleWhatsAppEnquiry}
+                  style={{
+                    borderRadius: '10px',
+                    height: '42px',
+                    fontWeight: 700,
+                    color: '#15803d',
+                    background: '#f0fdf4',
+                    border: '1px solid #bbf7d0',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    fontSize: '13px'
+                  }}
+                >
+                  WhatsApp Inquiry
+                </Button>
+                <Button
+                  icon={<ShareAltOutlined style={{ fontSize: '16px', color: primaryColor }} />}
+                  onClick={handleShareProduct}
+                  style={{
+                    borderRadius: '10px',
+                    height: '42px',
+                    fontWeight: 700,
+                    color: primaryColor,
+                    background: `${primaryColor}12`,
+                    border: `1px solid ${primaryColor}30`,
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    gap: '6px',
+                    fontSize: '13px'
+                  }}
+                >
+                  Share Product
+                </Button>
+              </div>
+            </div>
 
             <div>
               <Text strong style={{ color: '#1e293b', fontSize: '15px' }}>Description:</Text>
-              <Paragraph style={{ color: '#475569', marginTop: '6px', fontSize: '15px', lineHeight: '1.6' }}>
+              <Paragraph style={{ color: '#475569', marginTop: '6px', fontSize: '14px', lineHeight: '1.6' }}>
                 {product.description || 'No description provided for this toy. Let your imagination discover its features!'}
               </Paragraph>
             </div>
 
             {!isOutOfStock && (
               <div>
-                <Text strong style={{ color: '#1e293b', fontSize: '15px', display: 'block', marginBottom: '8px' }}>
+                <Text strong style={{ color: '#1e293b', fontSize: '14px', display: 'block', marginBottom: '8px' }}>
                   Select Quantity:
                 </Text>
-                <InputNumber
-                  min={1}
-                  max={product.stockQuantity}
-                  value={quantity}
-                  onChange={(val) => setQuantity(val || 1)}
-                  style={{ width: '120px', borderRadius: '8px' }}
-                  size="large"
-                />
+                <div style={{ display: 'inline-flex', alignItems: 'center', border: '1.5px solid #cbd5e1', borderRadius: '8px', overflow: 'hidden', background: '#ffffff' }}>
+                  <Button
+                    type="text"
+                    size="middle"
+                    icon={<MinusOutlined style={{ fontSize: '12px', color: quantity <= 1 ? '#cbd5e1' : '#334155' }} />}
+                    disabled={quantity <= 1}
+                    onClick={() => setQuantity(prev => Math.max(1, prev - 1))}
+                    style={{ width: '38px', height: '38px', padding: 0 }}
+                  />
+                  <span style={{ padding: '0 14px', fontSize: '15px', fontWeight: 700, color: '#0f172a', minWidth: '28px', textAlign: 'center' }}>
+                    {quantity}
+                  </span>
+                  <Button
+                    type="text"
+                    size="middle"
+                    icon={<PlusOutlined style={{ fontSize: '12px', color: (product.stockQuantity && quantity >= product.stockQuantity) ? '#cbd5e1' : '#334155' }} />}
+                    disabled={product.stockQuantity && quantity >= product.stockQuantity}
+                    onClick={() => setQuantity(prev => (product.stockQuantity ? Math.min(product.stockQuantity, prev + 1) : prev + 1))}
+                    style={{ width: '38px', height: '38px', padding: 0 }}
+                  />
+                </div>
               </div>
             )}
 
