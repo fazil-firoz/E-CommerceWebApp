@@ -12,7 +12,8 @@ using ToyShop.API.Middlewares;
 
 // Enforce UTC for all Npgsql timestamp operations
 // PostgreSQL timestamptz only accepts DateTimeOffset with offset=0 (UTC)
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+// Disable inotify file watcher to prevent Linux container inotify instance limit errors on Render
+Environment.SetEnvironmentVariable("DOTNET_USE_POLLING_FILE_WATCHER", "true");
 
 var builder = WebApplication.CreateBuilder(args);
 

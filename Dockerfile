@@ -20,6 +20,9 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
 WORKDIR /app
 COPY --from=build /app/publish .
 
+# Environment settings for container runtime
+ENV DOTNET_USE_POLLING_FILE_WATCHER=true
+
 # Expose default port
 EXPOSE 8080
 
