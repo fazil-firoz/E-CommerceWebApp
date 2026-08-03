@@ -1,7 +1,7 @@
 // Backend API base URL - environment variable or default fallback
 // const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://localhost:53993/api';
 const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || 'https://localhost:53993/api';
+  import.meta.env.VITE_API_BASE_URL || 'https://e-commercewebapp-97t8.onrender.com/api';
 
 export const URLS = {
   BASE_URL: API_BASE_URL,
