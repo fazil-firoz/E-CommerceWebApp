@@ -1,0 +1,10 @@
+.git
+.github
+.vs
+**/bin
+**/obj
+UI/
+node_modules/
+*.user
+*.userosscache
+*.sln.docstates
