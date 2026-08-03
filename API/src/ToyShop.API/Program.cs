@@ -103,6 +103,10 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = scope.ServiceProvider.GetRequiredService<ToyShop.Infrastructure.Persistence.ApplicationDbContext>();
+        
+        // Ensure all EF Core model tables are created first for fresh database deployments
+        context.Database.EnsureCreated();
+
         Microsoft.EntityFrameworkCore.RelationalDatabaseFacadeExtensions.ExecuteSqlRaw(
             context.Database, 
             @"ALTER TABLE ""ProductImages"" ADD COLUMN IF NOT EXISTS ""IsMain"" BOOLEAN NOT NULL DEFAULT FALSE;
