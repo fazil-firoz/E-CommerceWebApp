@@ -7,17 +7,23 @@ namespace ToyShop.Application.Common.Interfaces
     public interface IImageProcessor
     {
         /// <summary>
-        /// Resizes and converts the input image stream to WebP, saving Thumbnail, Medium, and Large versions.
+        /// Resizes and converts the input image stream to WebP, saving Thumbnail, Medium, and Large versions,
+        /// or uploading to Cloudinary if configured.
         /// </summary>
-        /// <param name="imageStream">Input stream containing the image bytes.</param>
-        /// <param name="targetDirectory">Directory where files should be saved.</param>
-        /// <param name="baseFileName">Base name of the file (without extension or suffix).</param>
-        /// <param name="cancellationToken">Cancellation token.</param>
-        /// <returns>Relative URL/path of the base WebP image.</returns>
         Task<string> ProcessAndSaveImageAsync(
             Stream imageStream, 
             string targetDirectory, 
             string baseFileName, 
+            CancellationToken cancellationToken = default);
+
+        /// <summary>
+        /// Direct upload for single files (e.g., shop logos, favicons). Uploads to Cloudinary if configured, or saves locally.
+        /// </summary>
+        Task<string> UploadDirectAsync(
+            Stream fileStream,
+            string fileName,
+            string folder = "general",
+            string fallbackTargetDirectory = "",
             CancellationToken cancellationToken = default);
     }
 }

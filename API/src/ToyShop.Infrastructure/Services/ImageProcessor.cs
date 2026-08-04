@@ -1,79 +1,171 @@
+using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.Formats.Webp;
 using SixLabors.ImageSharp.Processing;
 using ToyShop.Application.Common.Interfaces;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 
 namespace ToyShop.Infrastructure.Services
 {
     public class ImageProcessor : IImageProcessor
     {
+        private readonly Cloudinary? _cloudinary;
+
+        public ImageProcessor(IConfiguration configuration)
+        {
+            var cloudName = configuration["Cloudinary:CloudName"];
+            var apiKey = configuration["Cloudinary:ApiKey"];
+            var apiSecret = configuration["Cloudinary:ApiSecret"];
+
+            if (!string.IsNullOrWhiteSpace(cloudName) &&
+                !string.IsNullOrWhiteSpace(apiKey) &&
+                !string.IsNullOrWhiteSpace(apiSecret))
+            {
+                var account = new Account(cloudName, apiKey, apiSecret);
+                _cloudinary = new Cloudinary(account);
+            }
+        }
+
         public async Task<string> ProcessAndSaveImageAsync(
             Stream imageStream, 
             string targetDirectory, 
             string baseFileName, 
             CancellationToken cancellationToken = default)
         {
-            // Ensure target directory exists
-            if (!Directory.Exists(targetDirectory))
-            {
-                Directory.CreateDirectory(targetDirectory);
-            }
-
-            // Define output paths
-            var thumbPath = Path.Combine(targetDirectory, $"{baseFileName}_thumb.webp");
-            var mediumPath = Path.Combine(targetDirectory, $"{baseFileName}_medium.webp");
-            var largePath = Path.Combine(targetDirectory, $"{baseFileName}_large.webp");
-            var basePath = Path.Combine(targetDirectory, $"{baseFileName}.webp"); // Standard/Fallback mapping
-
-            // Rewind stream if seekable
             if (imageStream.CanSeek)
             {
                 imageStream.Position = 0;
             }
 
-            // Load original image using ImageSharp
-            using var image = await Image.LoadAsync(imageStream, cancellationToken);
+            // 1. If Cloudinary is configured, upload directly to Cloudinary CDN
+            if (_cloudinary != null)
+            {
+                try
+                {
+                    var uploadParams = new ImageUploadParams
+                    {
+                        File = new FileDescription($"{baseFileName}.webp", imageStream),
+                        Folder = "products",
+                        PublicId = $"{baseFileName}",
+                        Overwrite = true
+                    };
 
-            // Compress and convert to WebP with a balanced quality of 75 (optimal size/quality ratio)
+                    var uploadResult = await _cloudinary.UploadAsync(uploadParams, cancellationToken);
+                    if (uploadResult?.SecureUrl != null)
+                    {
+                        return uploadResult.SecureUrl.ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Console.WriteLine($"Cloudinary upload warning: {ex.Message}. Falling back to local storage.");
+                }
+            }
+
+            // 2. Fallback: Save locally on disk
+            if (!Directory.Exists(targetDirectory))
+            {
+                Directory.CreateDirectory(targetDirectory);
+            }
+
+            var thumbPath = Path.Combine(targetDirectory, $"{baseFileName}_thumb.webp");
+            var mediumPath = Path.Combine(targetDirectory, $"{baseFileName}_medium.webp");
+            var largePath = Path.Combine(targetDirectory, $"{baseFileName}_large.webp");
+            var basePath = Path.Combine(targetDirectory, $"{baseFileName}.webp");
+
+            if (imageStream.CanSeek)
+            {
+                imageStream.Position = 0;
+            }
+
+            using var image = await Image.LoadAsync(imageStream, cancellationToken);
             var webpEncoder = new WebpEncoder { Quality = 75 };
 
-            // 1. Generate Large Image (Max width/height 1200px)
-            using (var largeImg = image.Clone(x => x.Resize(new ResizeOptions
-            {
-                Size = new Size(1200, 1200),
-                Mode = ResizeMode.Max
-            })))
+            using (var largeImg = image.Clone(x => x.Resize(new ResizeOptions { Size = new Size(1200, 1200), Mode = ResizeMode.Max })))
             {
                 await largeImg.SaveAsWebpAsync(largePath, webpEncoder, cancellationToken);
-                // Also save to base path as a fallback
                 await largeImg.SaveAsWebpAsync(basePath, webpEncoder, cancellationToken);
             }
 
-            // 2. Generate Medium Image (Max width/height 600px)
-            using (var mediumImg = image.Clone(x => x.Resize(new ResizeOptions
-            {
-                Size = new Size(600, 600),
-                Mode = ResizeMode.Max
-            })))
+            using (var mediumImg = image.Clone(x => x.Resize(new ResizeOptions { Size = new Size(600, 600), Mode = ResizeMode.Max })))
             {
                 await mediumImg.SaveAsWebpAsync(mediumPath, webpEncoder, cancellationToken);
             }
 
-            // 3. Generate Thumbnail Image (Max width/height 200px)
-            using (var thumbImg = image.Clone(x => x.Resize(new ResizeOptions
-            {
-                Size = new Size(200, 200),
-                Mode = ResizeMode.Max
-            })))
+            using (var thumbImg = image.Clone(x => x.Resize(new ResizeOptions { Size = new Size(200, 200), Mode = ResizeMode.Max })))
             {
                 await thumbImg.SaveAsWebpAsync(thumbPath, webpEncoder, cancellationToken);
             }
 
-            // Return the relative base url path (database stores this)
             return $"/uploads/products/{baseFileName}.webp";
+        }
+
+        public async Task<string> UploadDirectAsync(
+            Stream fileStream,
+            string fileName,
+            string folder = "general",
+            string fallbackTargetDirectory = "",
+            CancellationToken cancellationToken = default)
+        {
+            if (fileStream.CanSeek)
+            {
+                fileStream.Position = 0;
+            }
+
+            // 1. Upload to Cloudinary if configured
+            if (_cloudinary != null)
+            {
+                try
+                {
+                    var uploadParams = new RawUploadParams
+                    {
+                        File = new FileDescription(fileName, fileStream),
+                        Folder = folder,
+                        PublicId = $"{Path.GetFileNameWithoutExtension(fileName)}_{Guid.NewGuid():N}"
+                    };
+
+                    var uploadResult = await _cloudinary.UploadAsync(uploadParams, cancellationToken);
+                    if (uploadResult?.SecureUrl != null)
+                    {
+                        return uploadResult.SecureUrl.ToString();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Console.WriteLine($"Cloudinary direct upload warning: {ex.Message}. Falling back to local storage.");
+                }
+            }
+
+            // 2. Fallback: Save to local directory
+            if (fileStream.CanSeek)
+            {
+                fileStream.Position = 0;
+            }
+
+            if (!string.IsNullOrEmpty(fallbackTargetDirectory))
+            {
+                if (!Directory.Exists(fallbackTargetDirectory))
+                {
+                    Directory.CreateDirectory(fallbackTargetDirectory);
+                }
+
+                var uniqueFileName = $"{Guid.NewGuid():N}{Path.GetExtension(fileName)}";
+                var filePath = Path.Combine(fallbackTargetDirectory, uniqueFileName);
+
+                using (var outputStream = new FileStream(filePath, FileMode.Create))
+                {
+                    await fileStream.CopyToAsync(outputStream, cancellationToken);
+                }
+
+                return $"/uploads/{folder}/{uniqueFileName}";
+            }
+
+            return string.Empty;
         }
     }
 }

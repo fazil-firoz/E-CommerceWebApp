@@ -16,11 +16,16 @@ namespace ToyShop.API.Controllers
     {
         private readonly IWebHostEnvironment _environment;
         private readonly Microsoft.Extensions.Configuration.IConfiguration _configuration;
+        private readonly IImageProcessor _imageProcessor;
 
-        public ShopController(IWebHostEnvironment environment, Microsoft.Extensions.Configuration.IConfiguration configuration)
+        public ShopController(
+            IWebHostEnvironment environment, 
+            Microsoft.Extensions.Configuration.IConfiguration configuration,
+            IImageProcessor imageProcessor)
         {
             _environment = environment;
             _configuration = configuration;
+            _imageProcessor = imageProcessor;
         }
 
         /// <summary>
@@ -117,22 +122,16 @@ namespace ToyShop.API.Controllers
             if (Array.IndexOf(allowedExtensions, extension) < 0)
                 return BadRequest(BaseResponse<string>.Fail("Invalid image format. Allowed: JPG, PNG, WebP, SVG, ICO"));
 
-            // Create target folder wwwroot/uploads/shopdata
+            // Create target folder wwwroot/uploads/shopdata for local fallback
             var uploadsFolder = Path.Combine(_environment.WebRootPath ?? Path.Combine(Directory.GetCurrentDirectory(), "wwwroot"), "uploads", "shopdata");
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(uploadsFolder);
-            }
+            
+            using var stream = file.OpenReadStream();
+            var relativePath = await _imageProcessor.UploadDirectAsync(
+                stream, 
+                file.FileName, 
+                "shopdata", 
+                uploadsFolder);
 
-            var uniqueFileName = $"{Guid.NewGuid():N}{extension}";
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
-
-            using (var stream = new FileStream(filePath, FileMode.Create))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            var relativePath = $"/uploads/shopdata/{uniqueFileName}";
             return Ok(BaseResponse<string>.Ok(relativePath, "Logo uploaded successfully"));
         }
     }
