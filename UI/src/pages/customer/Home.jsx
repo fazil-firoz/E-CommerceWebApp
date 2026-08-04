@@ -210,7 +210,7 @@ const Home = () => {
               {mainImageUrl ? (
                 <img
                   alt={prod.name}
-                  src={resolveProductImageUrl(mainImageUrl, 'thumb')}
+                  src={resolveProductImageUrl(mainImageUrl, 'large')}
                   loading="lazy"
                   onError={(e) => {
                     e.currentTarget.style.display = 'none';
@@ -221,7 +221,9 @@ const Home = () => {
                   style={{
                     height: '100%',
                     width: '100%',
-                    objectFit: 'cover',
+                    objectFit: 'contain',
+                    padding: '8px',
+                    background: '#ffffff',
                     display: 'block',
                     transform: `scale(${zoom})`,
                     transition: 'transform 0.3s ease'

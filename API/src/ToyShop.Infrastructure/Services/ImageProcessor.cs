@@ -9,6 +9,7 @@ using SixLabors.ImageSharp.Processing;
 using ToyShop.Application.Common.Interfaces;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
+using Size = SixLabors.ImageSharp.Size;
 
 namespace ToyShop.Infrastructure.Services
 {
@@ -18,9 +19,25 @@ namespace ToyShop.Infrastructure.Services
 
         public ImageProcessor(IConfiguration configuration)
         {
-            var cloudName = configuration["Cloudinary:CloudName"];
-            var apiKey = configuration["Cloudinary:ApiKey"];
-            var apiSecret = configuration["Cloudinary:ApiSecret"];
+            var cloudName = configuration["Cloudinary:CloudName"] 
+                ?? configuration["CLOUDINARY_CLOUD_NAME"] 
+                ?? configuration["Cloudinary__CloudName"];
+            var apiKey = configuration["Cloudinary:ApiKey"] 
+                ?? configuration["CLOUDINARY_API_KEY"] 
+                ?? configuration["Cloudinary__ApiKey"];
+            var apiSecret = configuration["Cloudinary:ApiSecret"] 
+                ?? configuration["CLOUDINARY_API_SECRET"] 
+                ?? configuration["Cloudinary__ApiSecret"];
+
+            if (string.IsNullOrWhiteSpace(cloudName) || string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(apiSecret))
+            {
+                var cloudinaryUrl = configuration["CLOUDINARY_URL"];
+                if (!string.IsNullOrWhiteSpace(cloudinaryUrl))
+                {
+                    _cloudinary = new Cloudinary(cloudinaryUrl);
+                    return;
+                }
+            }
 
             if (!string.IsNullOrWhiteSpace(cloudName) &&
                 !string.IsNullOrWhiteSpace(apiKey) &&
@@ -49,9 +66,9 @@ namespace ToyShop.Infrastructure.Services
                 {
                     var uploadParams = new ImageUploadParams
                     {
-                        File = new FileDescription($"{baseFileName}.webp", imageStream),
+                        File = new FileDescription(baseFileName, imageStream),
                         Folder = "products",
-                        PublicId = $"{baseFileName}",
+                        PublicId = baseFileName,
                         Overwrite = true
                     };
 
@@ -59,6 +76,11 @@ namespace ToyShop.Infrastructure.Services
                     if (uploadResult?.SecureUrl != null)
                     {
                         return uploadResult.SecureUrl.ToString();
+                    }
+
+                    if (uploadResult?.Error != null)
+                    {
+                        System.Console.WriteLine($"Cloudinary upload error: {uploadResult.Error.Message}. Falling back to local storage.");
                     }
                 }
                 catch (Exception ex)
@@ -84,7 +106,7 @@ namespace ToyShop.Infrastructure.Services
             }
 
             using var image = await Image.LoadAsync(imageStream, cancellationToken);
-            var webpEncoder = new WebpEncoder { Quality = 75 };
+            var webpEncoder = new WebpEncoder { Quality = 95 };
 
             using (var largeImg = image.Clone(x => x.Resize(new ResizeOptions { Size = new Size(1200, 1200), Mode = ResizeMode.Max })))
             {
@@ -92,12 +114,12 @@ namespace ToyShop.Infrastructure.Services
                 await largeImg.SaveAsWebpAsync(basePath, webpEncoder, cancellationToken);
             }
 
-            using (var mediumImg = image.Clone(x => x.Resize(new ResizeOptions { Size = new Size(600, 600), Mode = ResizeMode.Max })))
+            using (var mediumImg = image.Clone(x => x.Resize(new ResizeOptions { Size = new Size(800, 800), Mode = ResizeMode.Max })))
             {
                 await mediumImg.SaveAsWebpAsync(mediumPath, webpEncoder, cancellationToken);
             }
 
-            using (var thumbImg = image.Clone(x => x.Resize(new ResizeOptions { Size = new Size(200, 200), Mode = ResizeMode.Max })))
+            using (var thumbImg = image.Clone(x => x.Resize(new ResizeOptions { Size = new Size(400, 400), Mode = ResizeMode.Max })))
             {
                 await thumbImg.SaveAsWebpAsync(thumbPath, webpEncoder, cancellationToken);
             }
@@ -122,7 +144,7 @@ namespace ToyShop.Infrastructure.Services
             {
                 try
                 {
-                    var uploadParams = new RawUploadParams
+                    var uploadParams = new ImageUploadParams
                     {
                         File = new FileDescription(fileName, fileStream),
                         Folder = folder,
@@ -133,6 +155,11 @@ namespace ToyShop.Infrastructure.Services
                     if (uploadResult?.SecureUrl != null)
                     {
                         return uploadResult.SecureUrl.ToString();
+                    }
+
+                    if (uploadResult?.Error != null)
+                    {
+                        System.Console.WriteLine($"Cloudinary direct upload error: {uploadResult.Error.Message}. Falling back to local storage.");
                     }
                 }
                 catch (Exception ex)

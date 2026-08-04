@@ -1,18 +1,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-# Copy project files and restore dependencies
-COPY ["API/src/ToyShop.API/ToyShop.API.csproj", "API/src/ToyShop.API/"]
-COPY ["API/src/ToyShop.Application/ToyShop.Application.csproj", "API/src/ToyShop.Application/"]
-COPY ["API/src/ToyShop.Domain/ToyShop.Domain.csproj", "API/src/ToyShop.Domain/"]
-COPY ["API/src/ToyShop.Infrastructure/ToyShop.Infrastructure.csproj", "API/src/ToyShop.Infrastructure/"]
-COPY ["API/src/ToyShop.Shared/ToyShop.Shared.csproj", "API/src/ToyShop.Shared/"]
-
-RUN dotnet restore "API/src/ToyShop.API/ToyShop.API.csproj"
-
-# Copy full source code and publish release build
+# Copy source files
 COPY API/ API/
+
+# Restore dependencies and publish release build
 WORKDIR "/src/API/src/ToyShop.API"
+RUN dotnet restore "ToyShop.API.csproj"
 RUN dotnet publish "ToyShop.API.csproj" -c Release -o /app/publish /p:UseAppHost=false
 
 # Runtime stage

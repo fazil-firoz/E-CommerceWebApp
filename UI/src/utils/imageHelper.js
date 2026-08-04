@@ -25,14 +25,18 @@ export const resolveProductImageUrl = (path, size = 'large') => {
     cleanPath = '/' + cleanPath;
   }
 
-  // Append size suffix if WebP
+  // Remove any existing size suffix to prevent invalid URLs like xyz_thumb_large.webp
+  cleanPath = cleanPath
+    .replace('_thumb.webp', '.webp')
+    .replace('_medium.webp', '.webp')
+    .replace('_large.webp', '.webp');
+
+  // Append size suffix if WebP (thumb & medium use resized variants; large/default uses original base image)
   if (cleanPath.endsWith('.webp')) {
     if (size === 'thumb') {
       cleanPath = cleanPath.replace('.webp', '_thumb.webp');
     } else if (size === 'medium') {
       cleanPath = cleanPath.replace('.webp', '_medium.webp');
-    } else if (size === 'large') {
-      cleanPath = cleanPath.replace('.webp', '_large.webp');
     }
   }
 

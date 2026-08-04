@@ -70,8 +70,8 @@ const Wishlist = () => {
                       <ProductBadge label={prod.badgeLabel} />
                       <img
                         alt={prod.name}
-                        src={resolveProductImageUrl(mainImageUrl, 'thumb')}
-                        style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                        src={resolveProductImageUrl(mainImageUrl, 'large')}
+                        style={{ width: '100%', height: '100%', objectFit: 'contain', padding: '8px', background: '#ffffff' }}
                       />
                       <Button
                         type="primary"
